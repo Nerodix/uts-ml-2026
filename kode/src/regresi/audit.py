@@ -3,6 +3,7 @@
 Dibangun bertahap dari nol dengan prinsip satu fungsi untuk satu pertanyaan audit:
 - Langkah 1a.1: Cek skema kolom, duplikat/irisan ID, keacakan ID, dan rentang waktu.
 - Langkah 1a.2: Cek tipe data, lokasi nilai kosong (missing), dan pola missingness.
+- Langkah 1a.3: Screening leakage & pergeseran distribusi di seluruh kolom numerik.
 """
 
 from __future__ import annotations
@@ -12,15 +13,24 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 # Pastikan direktori kode/ terbaca saat script dijalankan langsung
 KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
-from src.config import REGRESI_TEST_PATH, REGRESI_TRAIN_PATH  # noqa: E402
+from src.config import (  # noqa: E402
+    FIGURES_DIR,
+    REGRESI_TEST_PATH,
+    REGRESI_TRAIN_PATH,
+    SEED,
+    ensure_dirs,
+)
+from src.utils import configure_plotting  # noqa: E402
 
 
 def cek_skema_kolom(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
@@ -303,7 +313,176 @@ def audit_tipe_dan_missing(train: pd.DataFrame, test: pd.DataFrame) -> dict[str,
     }
 
 
-DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing")
+def screening_kolom_numerik(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:
+    """Pindai seluruh kolom numerik dengan dua sinyal: KS (train vs test) dan Spearman ke target.
+
+    Alat detektif objektif untuk menemukan fitur bocor (leakage), fitur yang
+    bergeser seiring waktu (drift), dan fitur noise tanpa menebak-nebak.
+    Korelasi menggunakan Spearman agar tahan terhadap outlier target yang belum
+    dibersihkan pada tahap ini.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi yang memuat kolom target ``durasi_jam``.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    pd.DataFrame
+        Tabel satu baris per kolom numerik berisi ``ks_train_vs_test``,
+        ``spearman_target``, serta ``min``/``median``/``max`` train dan test.
+    """
+    num_cols = [
+        c for c in test.columns
+        if c in train.columns and pd.api.types.is_numeric_dtype(train[c])
+    ]
+    # Sampling deterministik agar uji KS cepat sekaligus stabil di semua kolom
+    tr_samp = train.sample(min(40_000, len(train)), random_state=SEED)
+    te_samp = test.sample(min(40_000, len(test)), random_state=SEED)
+
+    rows: list[dict[str, Any]] = []
+    for col in num_cols:
+        tr_vals = train[col].dropna()
+        te_vals = test[col].dropna()
+        ks_stat = float(
+            stats.ks_2samp(tr_samp[col].dropna(), te_samp[col].dropna()).statistic
+        )
+        rho = float(train[col].corr(train["durasi_jam"], method="spearman"))
+        rows.append(
+            {
+                "kolom": col,
+                "ks_train_vs_test": round(ks_stat, 4),
+                "spearman_target": round(rho, 4),
+                "train_min": round(float(tr_vals.min()), 3),
+                "train_median": round(float(tr_vals.median()), 3),
+                "train_max": round(float(tr_vals.max()), 3),
+                "test_min": round(float(te_vals.min()), 3),
+                "test_median": round(float(te_vals.median()), 3),
+                "test_max": round(float(te_vals.max()), 3),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def kelompokkan_kuadran_detektif(tabel_screening: pd.DataFrame) -> dict[str, list[str]]:
+    """Kelompokkan hasil screening ke kategori leakage, drift, sinyal sehat, dan noise.
+
+    Aturan ambang eksplisit:
+    - ``tersangka_leakage``: ``ks >= 0.50`` dan ``|spearman| >= 0.30``
+    - ``drift_bersinyal``  : ``0.05 <= ks < 0.50`` dan ``|spearman| >= 0.02``
+    - ``drift_noise``      : ``ks >= 0.05`` dan ``|spearman| < 0.02``
+    - ``sinyal_stabil``    : ``ks < 0.05`` dan ``|spearman| >= 0.02``
+    - ``noise_stabil``     : ``ks < 0.05`` dan ``|spearman| < 0.02``
+
+    Parameters
+    ----------
+    tabel_screening : pd.DataFrame
+        Tabel keluaran dari :func:`screening_kolom_numerik`.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Daftar nama kolom pada masing-masing kategori (diurutkan dari KS/Spearman terbesar).
+    """
+    df = tabel_screening.copy()
+    df["abs_rho"] = df["spearman_target"].abs()
+
+    leak = df[(df["ks_train_vs_test"] >= 0.50) & (df["abs_rho"] >= 0.30)].sort_values(
+        "ks_train_vs_test", ascending=False
+    )
+    drift_sig = df[
+        (df["ks_train_vs_test"] >= 0.05) & (df["ks_train_vs_test"] < 0.50) & (df["abs_rho"] >= 0.02)
+    ].sort_values("ks_train_vs_test", ascending=False)
+    drift_noise = df[(df["ks_train_vs_test"] >= 0.05) & (df["abs_rho"] < 0.02)].sort_values(
+        "ks_train_vs_test", ascending=False
+    )
+    sig_stabil = df[(df["ks_train_vs_test"] < 0.05) & (df["abs_rho"] >= 0.02)].sort_values(
+        "abs_rho", ascending=False
+    )
+    noise_stabil = df[(df["ks_train_vs_test"] < 0.05) & (df["abs_rho"] < 0.02)].sort_values(
+        "kolom"
+    )
+
+    return {
+        "tersangka_leakage": leak["kolom"].tolist(),
+        "drift_bersinyal": drift_sig["kolom"].tolist(),
+        "drift_noise": drift_noise["kolom"].tolist(),
+        "sinyal_stabil": sig_stabil["kolom"].tolist(),
+        "noise_stabil": noise_stabil["kolom"].tolist(),
+    }
+
+
+def plot_bukti_leakage_scan(train: pd.DataFrame, test: pd.DataFrame) -> Path:
+    """Buat grafik 2-panel bukti leakage ``jumlah_scan`` (distribusi train–test & scatter).
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    Path
+        Path file PNG yang tersimpan di ``kode/figures/task1_1a3_leakage_scan.png``.
+    """
+    ensure_dirs()
+    configure_plotting()
+
+    ks_scan = float(stats.ks_2samp(train["jumlah_scan"], test["jumlah_scan"]).statistic)
+    rho_scan = float(train["jumlah_scan"].corr(train["durasi_jam"], method="spearman"))
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+
+    # Panel (a): Distribusi jumlah_scan train vs test
+    bins = np.arange(0.5, 36.5, 1.0)
+    axes[0].hist(
+        np.clip(train["jumlah_scan"], 1, 35),
+        bins=bins,
+        density=True,
+        alpha=0.65,
+        color="#2563eb",
+        label=f"Train (med={train['jumlah_scan'].median():.0f}, max={train['jumlah_scan'].max()})",
+    )
+    axes[0].hist(
+        np.clip(test["jumlah_scan"], 1, 35),
+        bins=bins,
+        density=True,
+        alpha=0.75,
+        color="#dc2626",
+        label=f"Test (med={test['jumlah_scan'].median():.0f}, max={test['jumlah_scan'].max()})",
+    )
+    axes[0].set_title(f"(a) Sebaran jumlah_scan Train vs Test (KS = {ks_scan:.3f})")
+    axes[0].set_xlabel("jumlah_scan (dipotong tampilan di 35)")
+    axes[0].set_ylabel("Densitas")
+    axes[0].legend(fontsize=8.5)
+
+    # Panel (b): Scatter jumlah_scan vs durasi_jam (sampel 5.000 baris, sumbu-y dibatasi 350 jam)
+    samp = train.sample(5_000, random_state=SEED)
+    axes[1].scatter(
+        samp["jumlah_scan"],
+        samp["durasi_jam"],
+        s=7,
+        alpha=0.22,
+        color="#1d4ed8",
+        edgecolors="none",
+    )
+    axes[1].set_title(f"(b) jumlah_scan vs durasi_jam (Spearman = {rho_scan:.3f})")
+    axes[1].set_xlabel("jumlah_scan pada data latih")
+    axes[1].set_ylabel("durasi_jam (jam, tampilan 0–350)")
+    axes[1].set_ylim(0, 350)
+
+    fig.tight_layout()
+    out_path = FIGURES_DIR / "task1_1a3_leakage_scan.png"
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
+DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing", "leakage")
 
 
 def _tampilkan_skema(train: pd.DataFrame, test: pd.DataFrame) -> None:
@@ -377,13 +556,39 @@ def _tampilkan_missing(train: pd.DataFrame, test: pd.DataFrame) -> None:
         print(f"    Top-3 fitur paling berkorelasi (Spearman): {pola['top3_spearman_correlates']}")
 
 
+def _tampilkan_leakage(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil Langkah 1a.3 (screening KS & Spearman + figur bukti)."""
+    tabel = screening_kolom_numerik(train, test)
+    kuadran = kelompokkan_kuadran_detektif(tabel)
+    fig_path = plot_bukti_leakage_scan(train, test)
+
+    print("=== [leakage] SCREENING 68 KOLOM NUMERIK (KS TRAIN-VS-TEST & SPEARMAN) ===")
+    print("\nTop 10 kolom paling beda antara Train vs Test (KS terbesar):")
+    top_ks = tabel.sort_values("ks_train_vs_test", ascending=False).head(10)
+    print(top_ks.to_string(index=False))
+
+    print("\nTop 10 kolom paling kuat hubungannya dengan durasi_jam (|Spearman| terbesar):")
+    top_rho = tabel.reindex(
+        tabel["spearman_target"].abs().sort_values(ascending=False).index
+    ).head(10)
+    print(top_rho[["kolom", "spearman_target", "ks_train_vs_test", "train_median", "test_median"]].to_string(index=False))
+
+    print("\nPengelompokan otomatis ke kuadran detektif:")
+    print(f"  1. Tersangka LEAKAGE (KS>=0.50 & |rho|>=0.30) : {kuadran['tersangka_leakage']}")
+    print(f"  2. Drift bersinyal   (KS>=0.05 & |rho|>=0.02) : {kuadran['drift_bersinyal']}")
+    print(f"  3. Drift NOISE       (KS>=0.05 & |rho|<0.02)  : {kuadran['drift_noise']}")
+    print(f"  4. Sinyal stabil     (KS<0.05  & |rho|>=0.02) : {len(kuadran['sinyal_stabil'])} kolom -> {kuadran['sinyal_stabil']}")
+    print(f"  5. Noise stabil      (KS<0.05  & |rho|<0.02)  : {len(kuadran['noise_stabil'])} kolom")
+    print(f"\nGrafik bukti tersimpan di: {fig_path.relative_to(KODE_DIR.parent)}")
+
+
 def main() -> None:
     """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
 
     Contoh penggunaan:
         python kode/src/regresi/audit.py                  # Jalankan semua pemeriksaan
         python kode/src/regresi/audit.py --cek missing    # Hanya cek nilai kosong
-        python kode/src/regresi/audit.py --cek skema tipe # Pilih lebih dari satu cek
+        python kode/src/regresi/audit.py --cek leakage    # Hanya screening leakage & drift
     """
     parser = argparse.ArgumentParser(
         description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
@@ -407,6 +612,7 @@ def main() -> None:
         "waktu": _tampilkan_waktu,
         "tipe": _tampilkan_tipe,
         "missing": _tampilkan_missing,
+        "leakage": _tampilkan_leakage,
     }
 
     for i, nama in enumerate(args.cek):
