@@ -9,7 +9,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .config import (
+_KODE_DIR = Path(__file__).resolve().parents[1]
+if str(_KODE_DIR) not in sys.path:
+    sys.path.insert(0, str(_KODE_DIR))
+
+from src.config import (  # noqa: E402
     CLUSTERING_PATH,
     KLASIFIKASI_TEST_PATH,
     PRED_CLUSTER_PATH,
