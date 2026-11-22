@@ -1,0 +1,516 @@
+{
+  "figure": "task1_1c_model_comparison.png",
+  "models": {
+    "baseline": {
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 21.6906,
+          "p90_coverage": 0.844,
+          "pinball_p50": 10.8453,
+          "pinball_p90": 6.6904
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 19.9345,
+          "p90_coverage": 0.9083,
+          "pinball_p50": 9.9672,
+          "pinball_p90": 6.1475
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 20.9736,
+          "p90_coverage": 0.8891,
+          "pinball_p50": 10.4868,
+          "pinball_p90": 6.4582
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 20.9736,
+        "fold3_p90_coverage": 0.8891,
+        "fold3_pinball_p50": 10.4868,
+        "fold3_pinball_p90": 6.4582,
+        "mae_p50_mean": 20.8662,
+        "mae_p50_std": 0.7209,
+        "p90_coverage_mean": 0.8805,
+        "p90_coverage_std": 0.027,
+        "pinball_p50_mean": 10.4331,
+        "pinball_p50_std": 0.3605,
+        "pinball_p90_mean": 6.432,
+        "pinball_p90_std": 0.2224
+      }
+    },
+    "catboost": {
+      "best_config": {
+        "drop_mitra_id": true,
+        "label": "cb_log_d6_l2_5",
+        "params": {
+          "depth": 6,
+          "iterations": 900,
+          "l2_leaf_reg": 5.0,
+          "learning_rate": 0.06
+        },
+        "use_log_target": true
+      },
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 15.474,
+          "p90_coverage": 0.7877,
+          "pinball_p50": 7.737,
+          "pinball_p90": 5.4921
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 13.0919,
+          "p90_coverage": 0.8969,
+          "pinball_p50": 6.5459,
+          "pinball_p90": 4.1006
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 13.3836,
+          "p90_coverage": 0.8775,
+          "pinball_p50": 6.6918,
+          "pinball_p90": 4.2098
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 13.3836,
+        "fold3_p90_coverage": 0.8775,
+        "fold3_pinball_p50": 6.6918,
+        "fold3_pinball_p90": 4.2098,
+        "mae_p50_mean": 13.9832,
+        "mae_p50_std": 1.0609,
+        "p90_coverage_mean": 0.854,
+        "p90_coverage_std": 0.0476,
+        "pinball_p50_mean": 6.9916,
+        "pinball_p50_std": 0.5305,
+        "pinball_p90_mean": 4.6008,
+        "pinball_p90_std": 0.6318
+      }
+    },
+    "ensemble": {
+      "members": [
+        "log_ridge",
+        "lgbm",
+        "catboost",
+        "xgboost"
+      ],
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 15.4034,
+          "p90_coverage": 0.8062,
+          "pinball_p50": 7.7017,
+          "pinball_p90": 5.3261
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 12.9443,
+          "p90_coverage": 0.9006,
+          "pinball_p50": 6.4721,
+          "pinball_p90": 4.1171
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 13.3863,
+          "p90_coverage": 0.8887,
+          "pinball_p50": 6.6932,
+          "pinball_p90": 4.1998
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 13.3863,
+        "fold3_p90_coverage": 0.8887,
+        "fold3_pinball_p50": 6.6932,
+        "fold3_pinball_p90": 4.1998,
+        "mae_p50_mean": 13.9113,
+        "mae_p50_std": 1.0704,
+        "p90_coverage_mean": 0.8652,
+        "p90_coverage_std": 0.042,
+        "pinball_p50_mean": 6.9557,
+        "pinball_p50_std": 0.5352,
+        "pinball_p90_mean": 4.5477,
+        "pinball_p90_std": 0.5515
+      },
+      "weights_p50_final_all3": {
+        "catboost": 0.4974,
+        "lgbm": 0.4232,
+        "log_ridge": 0.0794,
+        "xgboost": 0.0
+      },
+      "weights_p50_fold12_honest": {
+        "catboost": 0.4147,
+        "lgbm": 0.5046,
+        "log_ridge": 0.0807,
+        "xgboost": 0.0
+      },
+      "weights_p90_final_all3": {
+        "catboost": 0.5451,
+        "lgbm": 0.1143,
+        "log_ridge": 0.3407,
+        "xgboost": 0.0
+      },
+      "weights_p90_fold12_honest": {
+        "catboost": 0.5031,
+        "lgbm": 0.051,
+        "log_ridge": 0.3989,
+        "xgboost": 0.0471
+      }
+    },
+    "lgbm": {
+      "best_config": {
+        "drop_mitra_id": true,
+        "label": "log_no_mitra_d31_reg",
+        "params": {
+          "colsample_bytree": 0.75,
+          "learning_rate": 0.03,
+          "min_child_samples": 80,
+          "n_estimators": 800,
+          "num_leaves": 31,
+          "reg_lambda": 10.0,
+          "subsample": 0.8,
+          "subsample_freq": 1
+        },
+        "use_log_target": true
+      },
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 15.486,
+          "p90_coverage": 0.7908,
+          "pinball_p50": 7.743,
+          "pinball_p90": 5.5587
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 13.0163,
+          "p90_coverage": 0.8875,
+          "pinball_p50": 6.5081,
+          "pinball_p90": 4.1654
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 13.5098,
+          "p90_coverage": 0.8756,
+          "pinball_p50": 6.7549,
+          "pinball_p90": 4.2688
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 13.5098,
+        "fold3_p90_coverage": 0.8756,
+        "fold3_pinball_p50": 6.7549,
+        "fold3_pinball_p90": 4.2688,
+        "mae_p50_mean": 14.004,
+        "mae_p50_std": 1.0671,
+        "p90_coverage_mean": 0.8513,
+        "p90_coverage_std": 0.0431,
+        "pinball_p50_mean": 7.002,
+        "pinball_p50_std": 0.5336,
+        "pinball_p90_mean": 4.6643,
+        "pinball_p90_std": 0.6338
+      }
+    },
+    "log_ridge": {
+      "best_config": {
+        "alpha": 500.0
+      },
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 16.1294,
+          "p90_coverage": 0.8231,
+          "pinball_p50": 8.0647,
+          "pinball_p90": 5.3161
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 13.6188,
+          "p90_coverage": 0.8989,
+          "pinball_p50": 6.8094,
+          "pinball_p90": 4.3471
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 14.0004,
+          "p90_coverage": 0.8903,
+          "pinball_p50": 7.0002,
+          "pinball_p90": 4.3816
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 14.0004,
+        "fold3_p90_coverage": 0.8903,
+        "fold3_pinball_p50": 7.0002,
+        "fold3_pinball_p90": 4.3816,
+        "mae_p50_mean": 14.5829,
+        "mae_p50_std": 1.1046,
+        "p90_coverage_mean": 0.8708,
+        "p90_coverage_std": 0.0339,
+        "pinball_p50_mean": 7.2914,
+        "pinball_p50_std": 0.5523,
+        "pinball_p90_mean": 4.6816,
+        "pinball_p90_std": 0.4489
+      }
+    },
+    "xgboost": {
+      "best_config": {
+        "drop_mitra_id": true,
+        "label": "xgb_log_d6_mcw50",
+        "params": {
+          "colsample_bytree": 0.75,
+          "learning_rate": 0.04,
+          "max_depth": 6,
+          "min_child_weight": 50,
+          "n_estimators": 550,
+          "reg_lambda": 5.0,
+          "subsample": 0.8
+        },
+        "use_log_target": true
+      },
+      "per_fold": [
+        {
+          "fold": "Fold 1 (Mar–Apr)",
+          "mae_p50": 15.9475,
+          "p90_coverage": 0.7998,
+          "pinball_p50": 7.9737,
+          "pinball_p90": 5.6306
+        },
+        {
+          "fold": "Fold 2 (Mei–Jun)",
+          "mae_p50": 13.2675,
+          "p90_coverage": 0.8975,
+          "pinball_p50": 6.6337,
+          "pinball_p90": 4.2941
+        },
+        {
+          "fold": "Fold 3 (Jul–Agu)",
+          "mae_p50": 13.8539,
+          "p90_coverage": 0.8807,
+          "pinball_p50": 6.9269,
+          "pinball_p90": 4.4119
+        }
+      ],
+      "ringkasan": {
+        "fold3_mae_p50": 13.8539,
+        "fold3_p90_coverage": 0.8807,
+        "fold3_pinball_p50": 6.9269,
+        "fold3_pinball_p90": 4.4119,
+        "mae_p50_mean": 14.3563,
+        "mae_p50_std": 1.1503,
+        "p90_coverage_mean": 0.8593,
+        "p90_coverage_std": 0.0427,
+        "pinball_p50_mean": 7.1781,
+        "pinball_p50_std": 0.5752,
+        "pinball_p90_mean": 4.7789,
+        "pinball_p90_std": 0.6042
+      }
+    }
+  },
+  "seed": 42,
+  "task": "Tugas 1c — Perbandingan Baseline, 4 Model Lanjutan, Tuning Time-CV, & Ensemble",
+  "tuning_log": {
+    "catboost": [
+      {
+        "combined_pinball": 11.5924,
+        "fold3_mae_p50": 13.3836,
+        "fold3_p90_coverage": 0.8775,
+        "fold3_pinball_p50": 6.6918,
+        "fold3_pinball_p90": 4.2098,
+        "label": "cb_log_d6_l2_5",
+        "mae_p50_mean": 13.9832,
+        "mae_p50_std": 1.0609,
+        "p90_coverage_mean": 0.854,
+        "p90_coverage_std": 0.0476,
+        "pinball_p50_mean": 6.9916,
+        "pinball_p50_std": 0.5305,
+        "pinball_p90_mean": 4.6008,
+        "pinball_p90_std": 0.6318
+      },
+      {
+        "combined_pinball": 11.6783,
+        "fold3_mae_p50": 13.4029,
+        "fold3_p90_coverage": 0.8712,
+        "fold3_pinball_p50": 6.7015,
+        "fold3_pinball_p90": 4.2546,
+        "label": "cb_log_d8_l2_10",
+        "mae_p50_mean": 13.9444,
+        "mae_p50_std": 1.1222,
+        "p90_coverage_mean": 0.8423,
+        "p90_coverage_std": 0.0514,
+        "pinball_p50_mean": 6.9722,
+        "pinball_p50_std": 0.5611,
+        "pinball_p90_mean": 4.7061,
+        "pinball_p90_std": 0.7215
+      }
+    ],
+    "lgbm": [
+      {
+        "combined_pinball": 11.7381,
+        "fold3_mae_p50": 13.6367,
+        "fold3_p90_coverage": 0.8631,
+        "fold3_pinball_p50": 6.8183,
+        "fold3_pinball_p90": 4.3684,
+        "label": "raw_with_mitra_d63",
+        "mae_p50_mean": 14.0269,
+        "mae_p50_std": 0.9861,
+        "p90_coverage_mean": 0.8429,
+        "p90_coverage_std": 0.0429,
+        "pinball_p50_mean": 7.0135,
+        "pinball_p50_std": 0.4931,
+        "pinball_p90_mean": 4.7246,
+        "pinball_p90_std": 0.6558
+      },
+      {
+        "combined_pinball": 11.7274,
+        "fold3_mae_p50": 13.6287,
+        "fold3_p90_coverage": 0.8616,
+        "fold3_pinball_p50": 6.8143,
+        "fold3_pinball_p90": 4.3899,
+        "label": "log_with_mitra_d63",
+        "mae_p50_mean": 13.9665,
+        "mae_p50_std": 1.038,
+        "p90_coverage_mean": 0.8418,
+        "p90_coverage_std": 0.0438,
+        "pinball_p50_mean": 6.9832,
+        "pinball_p50_std": 0.519,
+        "pinball_p90_mean": 4.7442,
+        "pinball_p90_std": 0.6649
+      },
+      {
+        "combined_pinball": 11.7309,
+        "fold3_mae_p50": 13.5021,
+        "fold3_p90_coverage": 0.8697,
+        "fold3_pinball_p50": 6.7511,
+        "fold3_pinball_p90": 4.307,
+        "label": "log_no_mitra_d63",
+        "mae_p50_mean": 14.013,
+        "mae_p50_std": 1.079,
+        "p90_coverage_mean": 0.8454,
+        "p90_coverage_std": 0.0455,
+        "pinball_p50_mean": 7.0065,
+        "pinball_p50_std": 0.5395,
+        "pinball_p90_mean": 4.7244,
+        "pinball_p90_std": 0.6796
+      },
+      {
+        "combined_pinball": 11.6663,
+        "fold3_mae_p50": 13.5098,
+        "fold3_p90_coverage": 0.8756,
+        "fold3_pinball_p50": 6.7549,
+        "fold3_pinball_p90": 4.2688,
+        "label": "log_no_mitra_d31_reg",
+        "mae_p50_mean": 14.004,
+        "mae_p50_std": 1.0671,
+        "p90_coverage_mean": 0.8513,
+        "p90_coverage_std": 0.0431,
+        "pinball_p50_mean": 7.002,
+        "pinball_p50_std": 0.5336,
+        "pinball_p90_mean": 4.6643,
+        "pinball_p90_std": 0.6338
+      }
+    ],
+    "log_ridge": [
+      {
+        "alpha": 1.0,
+        "combined_pinball": 11.9958,
+        "fold3_mae_p50": 14.1116,
+        "fold3_p90_coverage": 0.8864,
+        "fold3_pinball_p50": 7.0558,
+        "fold3_pinball_p90": 4.4213,
+        "mae_p50_mean": 14.6034,
+        "mae_p50_std": 1.0737,
+        "p90_coverage_mean": 0.8692,
+        "p90_coverage_std": 0.0331,
+        "pinball_p50_mean": 7.3017,
+        "pinball_p50_std": 0.5368,
+        "pinball_p90_mean": 4.6941,
+        "pinball_p90_std": 0.4393
+      },
+      {
+        "alpha": 10.0,
+        "combined_pinball": 11.9947,
+        "fold3_mae_p50": 14.1057,
+        "fold3_p90_coverage": 0.8866,
+        "fold3_pinball_p50": 7.0529,
+        "fold3_pinball_p90": 4.4192,
+        "mae_p50_mean": 14.6015,
+        "mae_p50_std": 1.0747,
+        "p90_coverage_mean": 0.8691,
+        "p90_coverage_std": 0.0332,
+        "pinball_p50_mean": 7.3008,
+        "pinball_p50_std": 0.5373,
+        "pinball_p90_mean": 4.6939,
+        "pinball_p90_std": 0.4405
+      },
+      {
+        "alpha": 100.0,
+        "combined_pinball": 11.9844,
+        "fold3_mae_p50": 14.063,
+        "fold3_p90_coverage": 0.888,
+        "fold3_pinball_p50": 7.0315,
+        "fold3_pinball_p90": 4.4042,
+        "mae_p50_mean": 14.5904,
+        "mae_p50_std": 1.0843,
+        "p90_coverage_mean": 0.8697,
+        "p90_coverage_std": 0.0333,
+        "pinball_p50_mean": 7.2952,
+        "pinball_p50_std": 0.5421,
+        "pinball_p90_mean": 4.6892,
+        "pinball_p90_std": 0.4442
+      },
+      {
+        "alpha": 500.0,
+        "combined_pinball": 11.973,
+        "fold3_mae_p50": 14.0004,
+        "fold3_p90_coverage": 0.8903,
+        "fold3_pinball_p50": 7.0002,
+        "fold3_pinball_p90": 4.3816,
+        "mae_p50_mean": 14.5829,
+        "mae_p50_std": 1.1046,
+        "p90_coverage_mean": 0.8708,
+        "p90_coverage_std": 0.0339,
+        "pinball_p50_mean": 7.2914,
+        "pinball_p50_std": 0.5523,
+        "pinball_p90_mean": 4.6816,
+        "pinball_p90_std": 0.4489
+      }
+    ],
+    "xgboost": [
+      {
+        "combined_pinball": 11.957,
+        "fold3_mae_p50": 13.8539,
+        "fold3_p90_coverage": 0.8807,
+        "fold3_pinball_p50": 6.9269,
+        "fold3_pinball_p90": 4.4119,
+        "label": "xgb_log_d6_mcw50",
+        "mae_p50_mean": 14.3563,
+        "mae_p50_std": 1.1503,
+        "p90_coverage_mean": 0.8593,
+        "p90_coverage_std": 0.0427,
+        "pinball_p50_mean": 7.1781,
+        "pinball_p50_std": 0.5752,
+        "pinball_p90_mean": 4.7789,
+        "pinball_p90_std": 0.6042
+      },
+      {
+        "combined_pinball": 12.077,
+        "fold3_mae_p50": 13.8657,
+        "fold3_p90_coverage": 0.8769,
+        "fold3_pinball_p50": 6.9328,
+        "fold3_pinball_p90": 4.487,
+        "label": "xgb_log_d8_mcw80",
+        "mae_p50_mean": 14.3957,
+        "mae_p50_std": 1.1924,
+        "p90_coverage_mean": 0.8543,
+        "p90_coverage_std": 0.0445,
+        "pinball_p50_mean": 7.1978,
+        "pinball_p50_std": 0.5962,
+        "pinball_p90_mean": 4.8792,
+        "pinball_p90_std": 0.6436
+      }
+    ]
+  }
+}

@@ -1,0 +1,341 @@
+{
+  "eval_protocol": {
+    "calibration_period": "2025-07-01..2025-07-31 (n=34,436)",
+    "evaluation_period": "2025-08-01..2025-08-31 (n=34,168)"
+  },
+  "figure": "task1_1e_conformal_calibration.png",
+  "final_calibration_params": {
+    "additive_delta_jul_agu": 1.6431,
+    "group_multiplicative_factors_jul_agu": {
+      "ekspres": 1.0109,
+      "hemat": 1.0236,
+      "kargo": 1.006,
+      "reguler": 1.0201
+    },
+    "multiplicative_factor_jul_agu": 1.0188,
+    "n_calibration_rows": 68604,
+    "selected_method": "group_multiplicative_cqr"
+  },
+  "per_model_aug_eval": {
+    "catboost": {
+      "additive_cqr": {
+        "abs_cov_gap_pct": 0.21,
+        "delta_jul": 2.7515,
+        "median_interval_width": 21.41,
+        "p90_coverage": 0.8979,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.9049,
+            "pinball_p90": 3.3628
+          },
+          "hemat": {
+            "p90_coverage": 0.8935,
+            "pinball_p90": 4.9738
+          },
+          "kargo": {
+            "p90_coverage": 0.901,
+            "pinball_p90": 4.7467
+          },
+          "reguler": {
+            "p90_coverage": 0.8983,
+            "pinball_p90": 3.7227
+          }
+        },
+        "pinball_p90": 4.1872
+      },
+      "group_multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.34,
+        "factors_jul": {
+          "ekspres": 1.0287,
+          "hemat": 1.0293,
+          "kargo": 1.0207,
+          "reguler": 1.0385
+        },
+        "median_interval_width": 21.12,
+        "p90_coverage": 0.8966,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.8943,
+            "pinball_p90": 3.3567
+          },
+          "hemat": {
+            "p90_coverage": 0.8938,
+            "pinball_p90": 4.9623
+          },
+          "kargo": {
+            "p90_coverage": 0.8957,
+            "pinball_p90": 4.7399
+          },
+          "reguler": {
+            "p90_coverage": 0.8998,
+            "pinball_p90": 3.7137
+          }
+        },
+        "pinball_p90": 4.178
+      },
+      "multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.3,
+        "factor_jul": 1.0327,
+        "median_interval_width": 21.23,
+        "p90_coverage": 0.897,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.897,
+            "pinball_p90": 3.3552
+          },
+          "hemat": {
+            "p90_coverage": 0.8959,
+            "pinball_p90": 4.9597
+          },
+          "kargo": {
+            "p90_coverage": 0.9042,
+            "pinball_p90": 4.7366
+          },
+          "reguler": {
+            "p90_coverage": 0.896,
+            "pinball_p90": 3.7154
+          }
+        },
+        "pinball_p90": 4.1773
+      },
+      "uncalibrated": {
+        "abs_cov_gap_pct": 2.32,
+        "median_interval_width": 18.66,
+        "p90_coverage": 0.8768,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.8799,
+            "pinball_p90": 3.3817
+          },
+          "hemat": {
+            "p90_coverage": 0.8756,
+            "pinball_p90": 5.0155
+          },
+          "kargo": {
+            "p90_coverage": 0.8773,
+            "pinball_p90": 4.7742
+          },
+          "reguler": {
+            "p90_coverage": 0.8765,
+            "pinball_p90": 3.756
+          }
+        },
+        "pinball_p90": 4.2205
+      }
+    },
+    "ensemble": {
+      "additive_cqr": {
+        "abs_cov_gap_pct": 0.22,
+        "delta_jul": 1.4743,
+        "median_interval_width": 21.71,
+        "p90_coverage": 0.8978,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.9032,
+            "pinball_p90": 3.3652
+          },
+          "hemat": {
+            "p90_coverage": 0.8921,
+            "pinball_p90": 5.0136
+          },
+          "kargo": {
+            "p90_coverage": 0.9033,
+            "pinball_p90": 4.7842
+          },
+          "reguler": {
+            "p90_coverage": 0.899,
+            "pinball_p90": 3.7091
+          }
+        },
+        "pinball_p90": 4.1988
+      },
+      "group_multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.2,
+        "factors_jul": {
+          "ekspres": 1.002,
+          "hemat": 1.0205,
+          "kargo": 1.0044,
+          "reguler": 1.0228
+        },
+        "median_interval_width": 21.65,
+        "p90_coverage": 0.898,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.8919,
+            "pinball_p90": 3.3675
+          },
+          "hemat": {
+            "p90_coverage": 0.8954,
+            "pinball_p90": 4.9935
+          },
+          "kargo": {
+            "p90_coverage": 0.8972,
+            "pinball_p90": 4.778
+          },
+          "reguler": {
+            "p90_coverage": 0.9024,
+            "pinball_p90": 3.7008
+          }
+        },
+        "pinball_p90": 4.1884
+      },
+      "multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.23,
+        "factor_jul": 1.0167,
+        "median_interval_width": 21.58,
+        "p90_coverage": 0.8977,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.899,
+            "pinball_p90": 3.3614
+          },
+          "hemat": {
+            "p90_coverage": 0.8931,
+            "pinball_p90": 4.9985
+          },
+          "kargo": {
+            "p90_coverage": 0.9057,
+            "pinball_p90": 4.766
+          },
+          "reguler": {
+            "p90_coverage": 0.8989,
+            "pinball_p90": 3.7023
+          }
+        },
+        "pinball_p90": 4.1885
+      },
+      "uncalibrated": {
+        "abs_cov_gap_pct": 1.22,
+        "median_interval_width": 20.24,
+        "p90_coverage": 0.8878,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.8909,
+            "pinball_p90": 3.3689
+          },
+          "hemat": {
+            "p90_coverage": 0.8834,
+            "pinball_p90": 5.0317
+          },
+          "kargo": {
+            "p90_coverage": 0.8931,
+            "pinball_p90": 4.7861
+          },
+          "reguler": {
+            "p90_coverage": 0.8889,
+            "pinball_p90": 3.7174
+          }
+        },
+        "pinball_p90": 4.209
+      }
+    },
+    "lgbm": {
+      "additive_cqr": {
+        "abs_cov_gap_pct": 0.07,
+        "delta_jul": 3.2318,
+        "median_interval_width": 21.99,
+        "p90_coverage": 0.9007,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.9073,
+            "pinball_p90": 3.4041
+          },
+          "hemat": {
+            "p90_coverage": 0.8946,
+            "pinball_p90": 5.0121
+          },
+          "kargo": {
+            "p90_coverage": 0.8946,
+            "pinball_p90": 4.8092
+          },
+          "reguler": {
+            "p90_coverage": 0.9046,
+            "pinball_p90": 3.7555
+          }
+        },
+        "pinball_p90": 4.226
+      },
+      "group_multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.07,
+        "factors_jul": {
+          "ekspres": 1.0369,
+          "hemat": 1.0365,
+          "kargo": 1.0329,
+          "reguler": 1.041
+        },
+        "median_interval_width": 21.74,
+        "p90_coverage": 0.9007,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.9006,
+            "pinball_p90": 3.3892
+          },
+          "hemat": {
+            "p90_coverage": 0.8978,
+            "pinball_p90": 4.9955
+          },
+          "kargo": {
+            "p90_coverage": 0.8975,
+            "pinball_p90": 4.7908
+          },
+          "reguler": {
+            "p90_coverage": 0.9039,
+            "pinball_p90": 3.746
+          }
+        },
+        "pinball_p90": 4.2125
+      },
+      "multiplicative_cqr": {
+        "abs_cov_gap_pct": 0.11,
+        "factor_jul": 1.0377,
+        "median_interval_width": 21.71,
+        "p90_coverage": 0.9011,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.9006,
+            "pinball_p90": 3.389
+          },
+          "hemat": {
+            "p90_coverage": 0.8991,
+            "pinball_p90": 4.995
+          },
+          "kargo": {
+            "p90_coverage": 0.901,
+            "pinball_p90": 4.7895
+          },
+          "reguler": {
+            "p90_coverage": 0.9028,
+            "pinball_p90": 3.7457
+          }
+        },
+        "pinball_p90": 4.2121
+      },
+      "uncalibrated": {
+        "abs_cov_gap_pct": 2.32,
+        "median_interval_width": 18.76,
+        "p90_coverage": 0.8768,
+        "per_layanan": {
+          "ekspres": {
+            "p90_coverage": 0.8836,
+            "pinball_p90": 3.4167
+          },
+          "hemat": {
+            "p90_coverage": 0.8721,
+            "pinball_p90": 5.0654
+          },
+          "kargo": {
+            "p90_coverage": 0.8699,
+            "pinball_p90": 4.8659
+          },
+          "reguler": {
+            "p90_coverage": 0.8797,
+            "pinball_p90": 3.7773
+          }
+        },
+        "pinball_p90": 4.2604
+      }
+    }
+  },
+  "seed": 42,
+  "task": "Tugas 1e — Kalibrasi Ketidakpastian P90 dengan Conformal Prediction (CQR)"
+}

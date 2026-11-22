@@ -10,6 +10,7 @@ Contoh penggunaan:
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 
@@ -68,7 +69,24 @@ def check_environment(save_report: bool = True) -> int:
     return 0
 
 
+def _run_python_script(rel_script: str, extra_args: list[str] | None = None) -> None:
+    """Jalankan sub-script Python secara deterministik menggunakan interpreter aktif."""
+    cmd = [sys.executable, str(KODE_DIR / rel_script)]
+    if extra_args:
+        cmd.extend(extra_args)
+    subprocess.run(cmd, check=True)
+
+
 def run_stage(stage: str) -> int:
+    if stage == "regresi":
+        _run_python_script("src/regresi/audit.py", ["--simpan-json"])
+        _run_python_script("src/regresi/validation.py")
+        _run_python_script("src/regresi/features.py", ["--uji-unseen"])
+        _run_python_script("src/regresi/models.py")
+        _run_python_script("src/regresi/calibration.py")
+        _run_python_script("src/regresi/analysis.py")
+        return 0
+
     if stage == "validate":
         return validate_all()
 

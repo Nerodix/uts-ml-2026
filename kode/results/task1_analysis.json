@@ -1,0 +1,340 @@
+{
+  "error_breakdown": {
+    "by_layanan": [
+      {
+        "bias_median": -1.15,
+        "layanan": "hemat",
+        "mae_p50": 17.16,
+        "median_aktual": 74.5,
+        "median_p50": 71.92,
+        "n": 22760,
+        "p90_coverage": 0.9,
+        "pinball_p50": 8.5781,
+        "pinball_p90": 4.946
+      },
+      {
+        "bias_median": -0.83,
+        "layanan": "kargo",
+        "mae_p50": 15.19,
+        "median_aktual": 79.2,
+        "median_p50": 77.1,
+        "n": 6867,
+        "p90_coverage": 0.9002,
+        "pinball_p50": 7.5974,
+        "pinball_p90": 4.7014
+      },
+      {
+        "bias_median": -0.62,
+        "layanan": "reguler",
+        "mae_p50": 11.65,
+        "median_aktual": 58.6,
+        "median_p50": 56.7,
+        "n": 28871,
+        "p90_coverage": 0.9,
+        "pinball_p50": 5.8265,
+        "pinball_p90": 3.7673
+      },
+      {
+        "bias_median": -0.3,
+        "layanan": "ekspres",
+        "mae_p50": 8.62,
+        "median_aktual": 39.7,
+        "median_p50": 38.5,
+        "n": 10106,
+        "p90_coverage": 0.9001,
+        "pinball_p50": 4.3095,
+        "pinball_p90": 3.2632
+      }
+    ],
+    "by_mitra_kurir": [
+      {
+        "bias_median": -10.94,
+        "mae_p50": 19.82,
+        "median_aktual": 77.9,
+        "median_p50": 64.98,
+        "mitra_kurir": "K07",
+        "n": 5448,
+        "p90_coverage": 0.7829,
+        "pinball_p50": 9.9091,
+        "pinball_p90": 5.4887
+      },
+      {
+        "bias_median": -2.05,
+        "mae_p50": 13.62,
+        "median_aktual": 66.2,
+        "median_p50": 62.94,
+        "mitra_kurir": "K02",
+        "n": 8309,
+        "p90_coverage": 0.8954,
+        "pinball_p50": 6.8118,
+        "pinball_p90": 4.2131
+      },
+      {
+        "bias_median": -1.52,
+        "mae_p50": 13.5,
+        "median_aktual": 64.8,
+        "median_p50": 62.62,
+        "mitra_kurir": "K03",
+        "n": 7621,
+        "p90_coverage": 0.8967,
+        "pinball_p50": 6.7517,
+        "pinball_p90": 4.2056
+      },
+      {
+        "bias_median": -0.72,
+        "mae_p50": 13.36,
+        "median_aktual": 63.0,
+        "median_p50": 61.53,
+        "mitra_kurir": "K10",
+        "n": 4179,
+        "p90_coverage": 0.905,
+        "pinball_p50": 6.6817,
+        "pinball_p90": 4.2626
+      },
+      {
+        "bias_median": -0.55,
+        "mae_p50": 13.17,
+        "median_aktual": 62.5,
+        "median_p50": 61.26,
+        "mitra_kurir": "K12",
+        "n": 2808,
+        "p90_coverage": 0.9024,
+        "pinball_p50": 6.5832,
+        "pinball_p90": 4.0932
+      },
+      {
+        "bias_median": -0.51,
+        "mae_p50": 13.14,
+        "median_aktual": 62.8,
+        "median_p50": 61.24,
+        "mitra_kurir": "K06",
+        "n": 5403,
+        "p90_coverage": 0.9084,
+        "pinball_p50": 6.5693,
+        "pinball_p90": 4.2339
+      },
+      {
+        "bias_median": -1.0,
+        "mae_p50": 12.87,
+        "median_aktual": 62.9,
+        "median_p50": 61.11,
+        "mitra_kurir": "K05",
+        "n": 6197,
+        "p90_coverage": 0.9082,
+        "pinball_p50": 6.4329,
+        "pinball_p90": 3.9879
+      },
+      {
+        "bias_median": 0.35,
+        "mae_p50": 12.6,
+        "median_aktual": 60.8,
+        "median_p50": 60.84,
+        "mitra_kurir": "K11",
+        "n": 3392,
+        "p90_coverage": 0.9124,
+        "pinball_p50": 6.2983,
+        "pinball_p90": 3.9141
+      },
+      {
+        "bias_median": 0.85,
+        "mae_p50": 12.58,
+        "median_aktual": 59.7,
+        "median_p50": 59.89,
+        "mitra_kurir": "K04",
+        "n": 6777,
+        "p90_coverage": 0.9212,
+        "pinball_p50": 6.289,
+        "pinball_p90": 4.0748
+      },
+      {
+        "bias_median": 1.37,
+        "mae_p50": 12.39,
+        "median_aktual": 58.55,
+        "median_p50": 58.69,
+        "mitra_kurir": "K09",
+        "n": 4072,
+        "p90_coverage": 0.9165,
+        "pinball_p50": 6.196,
+        "pinball_p90": 4.1526
+      },
+      {
+        "bias_median": 1.27,
+        "mae_p50": 12.22,
+        "median_aktual": 57.7,
+        "median_p50": 57.98,
+        "mitra_kurir": "K01",
+        "n": 9621,
+        "p90_coverage": 0.918,
+        "pinball_p50": 6.11,
+        "pinball_p90": 3.8786
+      },
+      {
+        "bias_median": 2.46,
+        "mae_p50": 11.46,
+        "median_aktual": 52.3,
+        "median_p50": 54.4,
+        "mitra_kurir": "K08",
+        "n": 4777,
+        "p90_coverage": 0.9326,
+        "pinball_p50": 5.7303,
+        "pinball_p90": 3.6904
+      }
+    ],
+    "by_pulau_tujuan": [
+      {
+        "bias_median": -4.77,
+        "mae_p50": 41.33,
+        "median_aktual": 164.25,
+        "median_p50": 166.19,
+        "n": 1226,
+        "p90_coverage": 0.8768,
+        "pinball_p50": 20.6643,
+        "pinball_p90": 11.3253,
+        "pulau_tujuan": "Papua"
+      },
+      {
+        "bias_median": -0.93,
+        "mae_p50": 27.28,
+        "median_aktual": 116.9,
+        "median_p50": 119.68,
+        "n": 1341,
+        "p90_coverage": 0.8941,
+        "pinball_p50": 13.6411,
+        "pinball_p90": 7.3568,
+        "pulau_tujuan": "Maluku"
+      },
+      {
+        "bias_median": -1.64,
+        "mae_p50": 21.9,
+        "median_aktual": 92.5,
+        "median_p50": 91.83,
+        "n": 3868,
+        "p90_coverage": 0.8785,
+        "pinball_p50": 10.9494,
+        "pinball_p90": 6.1705,
+        "pulau_tujuan": "Kalimantan"
+      },
+      {
+        "bias_median": -1.36,
+        "mae_p50": 20.52,
+        "median_aktual": 89.4,
+        "median_p50": 90.28,
+        "n": 4532,
+        "p90_coverage": 0.8833,
+        "pinball_p50": 10.2595,
+        "pinball_p90": 5.6462,
+        "pulau_tujuan": "Sulawesi"
+      },
+      {
+        "bias_median": -1.22,
+        "mae_p50": 15.53,
+        "median_aktual": 66.5,
+        "median_p50": 64.35,
+        "n": 2659,
+        "p90_coverage": 0.8857,
+        "pinball_p50": 7.7639,
+        "pinball_p90": 4.5013,
+        "pulau_tujuan": "Bali-Nusa Tenggara"
+      },
+      {
+        "bias_median": -0.47,
+        "mae_p50": 14.44,
+        "median_aktual": 64.2,
+        "median_p50": 62.91,
+        "n": 9178,
+        "p90_coverage": 0.8944,
+        "pinball_p50": 7.2225,
+        "pinball_p90": 4.4381,
+        "pulau_tujuan": "Sumatera"
+      },
+      {
+        "bias_median": -0.6,
+        "mae_p50": 10.47,
+        "median_aktual": 56.7,
+        "median_p50": 55.12,
+        "n": 45800,
+        "p90_coverage": 0.9063,
+        "pinball_p50": 5.2352,
+        "pinball_p90": 3.5086,
+        "pulau_tujuan": "Jawa"
+      }
+    ],
+    "figure": "task1_1f_error_breakdown.png",
+    "overall_fold3_calibrated": {
+      "mae_p50": 13.3863,
+      "n": 68604,
+      "p90_coverage": 0.9001,
+      "pinball_p50": 6.6932,
+      "pinball_p90": 4.1776
+    }
+  },
+  "seed": 42,
+  "shap_analysis": {
+    "figure": "task1_1f_shap_summary.png",
+    "n_samples": 3000,
+    "top15_p50_mean_abs_shap": {
+      "antrean_hub_asal": 0.02217,
+      "antrean_x_f17": 0.03974,
+      "cod": 0.03415,
+      "days_since_twin": 0.02376,
+      "f04": 0.01046,
+      "f35": 0.01114,
+      "indeks_kemacetan": 0.01115,
+      "is_lebaran_2025": 0.01217,
+      "jarak_x_f35": 0.01514,
+      "kota_asal": 0.00973,
+      "kota_tujuan": 0.02519,
+      "layanan": 0.17506,
+      "log_jarak_x_f35": 0.04609,
+      "pengalaman_kurir_bulan": 0.0222,
+      "te_rute_log_mean": 0.1785
+    },
+    "top15_p90_mean_abs_shap": {
+      "antrean_hub_asal": 0.01868,
+      "antrean_x_f17": 0.02962,
+      "cod": 0.04201,
+      "days_since_twin": 0.02398,
+      "f04": 0.02149,
+      "indeks_kemacetan": 0.00783,
+      "is_lebaran_2025": 0.01088,
+      "is_twin_window": 0.0089,
+      "jarak_x_alamat_risk": 0.01821,
+      "jarak_x_f35": 0.01176,
+      "kota_tujuan": 0.02825,
+      "layanan": 0.1824,
+      "log_jarak_x_f35": 0.05433,
+      "pengalaman_kurir_bulan": 0.01686,
+      "te_rute_log_mean": 0.1675
+    }
+  },
+  "submission_summary": {
+    "calibration_applied": "group_multiplicative_cqr",
+    "median_interval_width": 22.02,
+    "n_rows": 60000,
+    "output_file": "prediksi_regresi.csv",
+    "p50_quantiles": {
+      "0.05": 32.84,
+      "0.25": 47.73,
+      "0.5": 62.75,
+      "0.75": 84.1,
+      "0.95": 134.91
+    },
+    "p90_quantiles": {
+      "0.05": 44.6,
+      "0.25": 65.01,
+      "0.5": 85.08,
+      "0.75": 114.09,
+      "0.95": 187.12
+    },
+    "sanity_checks_test": {
+      "K07_shift_median_p50": 77.2,
+      "K08_cepat_median_p50": 55.34,
+      "K13_unseen_median_p50": 68.38,
+      "normal_days_median_p50": 61.42,
+      "other_median_p50": 61.82,
+      "twin_99_1010_median_p50": 78.71
+    },
+    "validation_passed": true
+  },
+  "task": "Tugas 1f — Analisis Error, Interpretasi SHAP, & Prediksi Final Regresi"
+}
