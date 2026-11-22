@@ -4,6 +4,7 @@ Dibangun bertahap dari nol dengan prinsip satu fungsi untuk satu pertanyaan audi
 - Langkah 1a.1: Cek skema kolom, duplikat/irisan ID, keacakan ID, dan rentang waktu.
 - Langkah 1a.2: Cek tipe data, lokasi nilai kosong (missing), dan pola missingness.
 - Langkah 1a.3: Screening leakage & pergeseran distribusi di seluruh kolom numerik.
+- Langkah 1a.4: Audit anomali target durasi_jam & nilai tidak wajar/sentinel numerik.
 """
 
 from __future__ import annotations
@@ -482,7 +483,258 @@ def plot_bukti_leakage_scan(train: pd.DataFrame, test: pd.DataFrame) -> Path:
     return out_path
 
 
-DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing", "leakage")
+def cek_anomali_target(train: pd.DataFrame, ambang_menit: float = 1000.0) -> dict[str, Any]:
+    """Audit sebaran target ``durasi_jam`` dan uji hipotesis error satuan menit (``* 60``).
+
+    Memeriksa kuantil target, celah nilai antara ``<= ambang_menit`` dan
+    ``> ambang_menit``, persentase kelipatan eksak 6 (``0,1 jam * 60``), serta
+    kesesuaian median dan rasio ``durasi_jam / jumlah_scan`` setelah dibagi 60.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi yang memuat ``durasi_jam`` dan ``jumlah_scan``.
+    ambang_menit : float, default=1000.0
+        Ambang batas (jam) pemisah antara durasi sah dan kandidat satuan menit.
+
+    Returns
+    -------
+    dict[str, Any]
+        Ringkasan kuantil, celah distribusi, dan bukti kuantitatif error satuan menit.
+    """
+    y = train["durasi_jam"]
+    corrupt_mask = y > ambang_menit
+    clean = y.loc[~corrupt_mask]
+    corrupt = y.loc[corrupt_mask]
+    corrupt_div60 = corrupt / 60.0
+
+    # Cek apakah ada nilai <= 1000 yang mencurigakan (>300 jam tapi jumlah_scan < 15)
+    susp_low_scan = int(((y > 300) & (y <= ambang_menit) & (train["jumlah_scan"] < 15)).sum())
+
+    kuantil = {
+        str(q): round(float(val), 2)
+        for q, val in y.quantile([0.0, 0.01, 0.5, 0.9, 0.99, 0.999, 1.0]).items()
+    }
+    return {
+        "n_le_zero": int((y <= 0).sum()),
+        "kuantil_mentah": kuantil,
+        "n_gt_ambang": int(corrupt_mask.sum()),
+        "pct_gt_ambang": round(float(corrupt_mask.mean() * 100.0), 4),
+        "maks_sah_le_ambang": round(float(clean.max()), 2),
+        "min_ekstrem_gt_ambang": round(float(corrupt.min()), 2),
+        "pct_kelipatan_6": round(float(np.isclose(corrupt % 6.0, 0.0).mean() * 100.0), 2),
+        "suspicious_le_ambang_low_scan": susp_low_scan,
+        "mean_mentah": round(float(y.mean()), 2),
+        "mean_setelah_koreksi": round(float(np.where(corrupt_mask, y / 60.0, y).mean()), 2),
+        "median_bersih": round(float(clean.median()), 2),
+        "median_ekstrem_dibagi_60": round(float(corrupt_div60.median()), 2),
+        "median_jam_per_scan_bersih": round(
+            float((clean / train.loc[~corrupt_mask, "jumlah_scan"]).median()), 3
+        ),
+        "median_jam_per_scan_koreksi": round(
+            float((corrupt_div60 / train.loc[corrupt_mask, "jumlah_scan"]).median()), 3
+        ),
+    }
+
+
+def plot_bukti_target_menit(train: pd.DataFrame, ambang_menit: float = 1000.0) -> Path:
+    """Buat grafik 2-panel bukti error satuan menit pada target ``durasi_jam``.
+
+    Panel (a) menampilkan histogram ``log10(durasi_jam)`` yang memperlihatkan
+    celah kosong bersih di sekitar 1.000 jam. Panel (b) membandingkan sebaran
+    baris ``> 1000`` setelah dibagi 60 terhadap data bersih.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    ambang_menit : float, default=1000.0
+        Ambang batas pemisah jam vs menit.
+
+    Returns
+    -------
+    Path
+        Path file PNG yang tersimpan di ``kode/figures/task1_1a4_target_unit_error.png``.
+    """
+    ensure_dirs()
+    configure_plotting()
+
+    y = train["durasi_jam"]
+    corrupt_mask = y > ambang_menit
+    clean = y.loc[~corrupt_mask]
+    corrupt_div60 = y.loc[corrupt_mask] / 60.0
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+
+    # Panel (a): Celah bersih pada skala log10
+    axes[0].hist(
+        np.log10(clean),
+        bins=45,
+        color="#2563eb",
+        alpha=0.75,
+        label=f"Sah (<= {clean.max():.1f} jam)",
+    )
+    axes[0].hist(
+        np.log10(y.loc[corrupt_mask]),
+        bins=20,
+        color="#dc2626",
+        alpha=0.85,
+        label=f"Satuan menit (>1000, n={int(corrupt_mask.sum())})",
+    )
+    axes[0].axvline(np.log10(ambang_menit), color="#111827", linestyle="--", linewidth=1.2, label="Ambang 1.000 jam")
+    axes[0].set_yscale("log")
+    axes[0].set_title("(a) Celah Bersih durasi_jam Mentah (Skala log10)")
+    axes[0].set_xlabel("log10(durasi_jam mentah)")
+    axes[0].set_ylabel("Jumlah paket (skala log)")
+    axes[0].legend(fontsize=8)
+
+    # Panel (b): Verifikasi distribusi sesudah dibagi 60
+    axes[1].hist(
+        clean,
+        bins=60,
+        range=(0, 260),
+        density=True,
+        alpha=0.55,
+        color="#2563eb",
+        label=f"Data bersih (med={clean.median():.1f} jam)",
+    )
+    axes[1].hist(
+        corrupt_div60,
+        bins=30,
+        range=(0, 260),
+        density=True,
+        alpha=0.65,
+        color="#16a34a",
+        label=f"Baris >1000 dibagi 60 (med={corrupt_div60.median():.1f} jam)",
+    )
+    axes[1].set_title("(b) Verifikasi Sebaran Setelah Koreksi / 60")
+    axes[1].set_xlabel("durasi_jam terkoreksi (jam)")
+    axes[1].set_ylabel("Densitas")
+    axes[1].legend(fontsize=8)
+
+    fig.tight_layout()
+    out_path = FIGURES_DIR / "task1_1a4_target_unit_error.png"
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
+def cek_batas_fisik_numerik(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:
+    """Periksa rentang min/median/max dan pelanggaran batas fisik fitur numerik bernama.
+
+    Memeriksa seluruh fitur numerik bernama (bukan kolom anonim ``f01–f50`` dan
+    bukan ``jumlah_scan`` yang sudah teridentifikasi bocor) terhadap aturan fisik
+    seperti nilai negatif, skor di luar ``[0, 1]``, rating di luar ``[1, 5]``,
+    jam di luar ``[0, 23]``, dan sentinel jarak ``0`` atau ``9999``.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    pd.DataFrame
+        Tabel ringkasan batas nilai dan catatan anomali per fitur numerik bernama.
+    """
+    named_nums = [
+        c for c in test.columns
+        if pd.api.types.is_numeric_dtype(test[c])
+        and not (c.startswith("f") and c[1:].isdigit())
+        and c != "jumlah_scan"
+    ]
+
+    aturan: dict[str, tuple[str, Any]] = {
+        "jam_pickup": ("di luar [0,23]", lambda s: (s < 0) | (s > 23)),
+        "jarak_km": ("==0 atau >=9999", lambda s: (s <= 0) | (s >= 9999)),
+        "berat_kg": ("<=0", lambda s: s <= 0),
+        "volume_liter": ("<=0", lambda s: s <= 0),
+        "jumlah_item": ("<1", lambda s: s < 1),
+        "nilai_barang": ("<=0", lambda s: s <= 0),
+        "asuransi": ("bukan {0,1}", lambda s: ~s.isin([0, 1])),
+        "cod": ("bukan {0,1}", lambda s: ~s.isin([0, 1])),
+        "alamat_skor": ("di luar [0,1]", lambda s: (s < 0) | (s > 1)),
+        "indeks_kemacetan": ("di luar [0,1]", lambda s: (s < 0) | (s > 1)),
+        "rating_penjual": ("di luar [1,5]", lambda s: (s < 1) | (s > 5)),
+    }
+
+    rows: list[dict[str, Any]] = []
+    for col in named_nums:
+        tr_v = train[col].dropna()
+        te_v = test[col].dropna()
+        label_aturan, fn = aturan.get(col, ("<0", lambda s: s < 0))
+        n_bad_tr = int(fn(tr_v).sum())
+        n_bad_te = int(fn(te_v).sum())
+        rows.append(
+            {
+                "kolom": col,
+                "train_min": round(float(tr_v.min()), 3),
+                "train_med": round(float(tr_v.median()), 3),
+                "train_max": round(float(tr_v.max()), 3),
+                "test_min": round(float(te_v.min()), 3),
+                "test_max": round(float(te_v.max()), 3),
+                "cek_fisik": label_aturan,
+                "melanggar_tr": n_bad_tr,
+                "melanggar_te": n_bad_te,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def cek_pemulihan_rute_jarak(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
+    """Audit sentinel ``jarak_km`` (0 & 9999) dan uji pemulihan eksak via rute train.
+
+    Memeriksa seberapa konsisten ``jarak_km`` pada tiap pasangan
+    ``(kota_asal, kota_tujuan)`` yang valid di data latih, serta berapa banyak
+    baris sentinel pada data uji yang dapat dipulihkan persis tanpa mengintip test.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    dict[str, Any]
+        Jumlah sentinel train/test, bukti determinisme rute (``max_std``), dan
+        persentase cakupan pemulihan rute pada data uji.
+    """
+    bad_tr = (train["jarak_km"] <= 0) | (train["jarak_km"] >= 9999)
+    bad_te = (test["jarak_km"] <= 0) | (test["jarak_km"] >= 9999)
+
+    valid_tr = train.loc[~bad_tr]
+    route_stats = valid_tr.groupby(["kota_asal", "kota_tujuan"])["jarak_km"].agg(["nunique", "std"])
+    valid_routes = set(zip(valid_tr["kota_asal"], valid_tr["kota_tujuan"]))
+
+    test_bad_df = test.loc[bad_te]
+    recoverable = sum(
+        (a, b) in valid_routes
+        for a, b in zip(test_bad_df["kota_asal"], test_bad_df["kota_tujuan"])
+    )
+    total_bad_te = int(bad_te.sum())
+
+    return {
+        "train_nol": int((train["jarak_km"] == 0).sum()),
+        "train_9999": int((train["jarak_km"] == 9999).sum()),
+        "train_total_rusak": int(bad_tr.sum()),
+        "train_pct_rusak": round(float(bad_tr.mean() * 100.0), 3),
+        "test_nol": int((test["jarak_km"] == 0).sum()),
+        "test_9999": int((test["jarak_km"] == 9999).sum()),
+        "test_total_rusak": total_bad_te,
+        "test_pct_rusak": round(float(bad_te.mean() * 100.0), 3),
+        "jumlah_rute_valid_train": int(len(route_stats)),
+        "max_nunique_per_rute": int(route_stats["nunique"].max()),
+        "max_std_per_rute": round(float(route_stats["std"].fillna(0.0).max()), 6),
+        "test_rusak_terpulihkan_eksak": int(recoverable),
+        "test_rusak_terpulihkan_pct": round(recoverable / max(1, total_bad_te) * 100.0, 2),
+    }
+
+
+DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing", "leakage", "target", "sentinel")
 
 
 def _tampilkan_skema(train: pd.DataFrame, test: pd.DataFrame) -> None:
@@ -582,13 +834,55 @@ def _tampilkan_leakage(train: pd.DataFrame, test: pd.DataFrame) -> None:
     print(f"\nGrafik bukti tersimpan di: {fig_path.relative_to(KODE_DIR.parent)}")
 
 
+def _tampilkan_target(train: pd.DataFrame, _test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil audit anomali target ``durasi_jam`` + grafik bukti."""
+    info = cek_anomali_target(train)
+    fig_path = plot_bukti_target_menit(train)
+    print("=== [target] AUDIT TARGET durasi_jam & ERROR SATUAN MENIT ===")
+    print(f"Baris <= 0 jam                : {info['n_le_zero']}")
+    print(f"Kuantil mentah                : {info['kuantil_mentah']}")
+    print(f"Baris > 1.000 jam             : {info['n_gt_ambang']} ({info['pct_gt_ambang']}%)")
+    print(f"Celah bersih (<=1000 vs >1000): maks sah = {info['maks_sah_le_ambang']} jam | min ekstrem = {info['min_ekstrem_gt_ambang']}")
+    print(f"Persentase kelipatan 6 (>1000): {info['pct_kelipatan_6']}% (0,1 jam x 60 = 6)")
+    print(f"Baris mencurigakan <= 1000    : {info['suspicious_le_ambang_low_scan']}")
+    print(f"Mean target (mentah -> /60)   : {info['mean_mentah']} jam -> {info['mean_setelah_koreksi']} jam")
+    print(f"Median bersih vs ekstrem / 60 : {info['median_bersih']} jam vs {info['median_ekstrem_dibagi_60']} jam")
+    print(f"Median jam/scan (bersih vs/60): {info['median_jam_per_scan_bersih']} vs {info['median_jam_per_scan_koreksi']}")
+    print(f"Grafik bukti tersimpan di     : {fig_path.relative_to(KODE_DIR.parent)}")
+
+
+def _tampilkan_sentinel(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak pemeriksaan batas fisik numerik & pemulihan sentinel ``jarak_km``."""
+    tabel = cek_batas_fisik_numerik(train, test)
+    rute = cek_pemulihan_rute_jarak(train, test)
+    print("=== [sentinel] CEK BATAS FISIK FITUR NUMERIK BERNAMA ===")
+    print(tabel.to_string(index=False))
+    print("\n=== [sentinel] DETAIL SENTINEL jarak_km & PEMULIHAN RUTE ===")
+    print(
+        f"Train rusak (0 / 9999 / total): {rute['train_nol']} / {rute['train_9999']} / "
+        f"{rute['train_total_rusak']} ({rute['train_pct_rusak']}%)"
+    )
+    print(
+        f"Test rusak  (0 / 9999 / total): {rute['test_nol']} / {rute['test_9999']} / "
+        f"{rute['test_total_rusak']} ({rute['test_pct_rusak']}%)"
+    )
+    print(
+        f"Konsistensi rute valid train  : {rute['jumlah_rute_valid_train']:,} rute | "
+        f"max_nunique={rute['max_nunique_per_rute']} | max_std={rute['max_std_per_rute']}"
+    )
+    print(
+        f"Test rusak pulih eksak (train): {rute['test_rusak_terpulihkan_eksak']}/{rute['test_total_rusak']} "
+        f"({rute['test_rusak_terpulihkan_pct']}%)"
+    )
+
+
 def main() -> None:
     """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
 
     Contoh penggunaan:
-        python kode/src/regresi/audit.py                  # Jalankan semua pemeriksaan
-        python kode/src/regresi/audit.py --cek missing    # Hanya cek nilai kosong
-        python kode/src/regresi/audit.py --cek leakage    # Hanya screening leakage & drift
+        python kode/src/regresi/audit.py                    # Jalankan semua pemeriksaan
+        python kode/src/regresi/audit.py --cek target       # Hanya cek target durasi_jam
+        python kode/src/regresi/audit.py --cek sentinel     # Hanya cek batas fisik & jarak_km
     """
     parser = argparse.ArgumentParser(
         description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
@@ -613,6 +907,8 @@ def main() -> None:
         "tipe": _tampilkan_tipe,
         "missing": _tampilkan_missing,
         "leakage": _tampilkan_leakage,
+        "target": _tampilkan_target,
+        "sentinel": _tampilkan_sentinel,
     }
 
     for i, nama in enumerate(args.cek):
