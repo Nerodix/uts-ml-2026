@@ -1,12 +1,31 @@
 # Panduan Reproduksi Kode — UTS Machine Learning 2026
 
-Dokumen ini menjelaskan cara mereproduksi seluruh hasil audit data, validasi, pelatihan model, gambar/tabel laporan, dan ketiga file prediksi (`prediksi_regresi.csv`, `prediksi_klasifikasi.csv`, `cluster.csv`) dalam satu perintah.
+Seluruh eksperimen, audit data, pelatihan model, figur/tabel laporan, dan ketiga file prediksi (`prediksi_regresi.csv`, `prediksi_klasifikasi.csv`, `cluster.csv`) dirancang agar dapat direproduksi secara deterministik dari satu perintah.
 
-> *Status: Inisialisasi repositori. Perintah tunggal, daftar pustaka beserta versinya, dan random seed akan diperbarui seiring integrasi pipeline Tugas 1–3.*
+## Struktur Direktori `kode/`
+
+```text
+kode/
+├── README.md                  # Panduan reproduksi ini
+├── pyproject.toml             # Spesifikasi dependensi Python (PEP 621 / uv)
+├── uv.lock                    # Lockfile dependensi persis
+├── requirements.txt           # Versi paket terkunci untuk pip
+├── run_all.py                 # Entrypoint perintah tunggal seluruh pipeline
+├── src/
+│   ├── config.py              # Path, konstanta domain, dan SEED global (= 42)
+│   ├── utils.py               # Seeding, metrik UTS (pinball, coverage, cost), tema plot
+│   ├── validate_outputs.py    # Validator kontrak kolom/baris/range file prediksi
+│   ├── audit/                 # Audit data Tugas 1–3
+│   ├── regresi/               # Pipeline Tugas 1 (estimasi durasi pengiriman)
+│   ├── klasifikasi/           # Pipeline Tugas 2 (deteksi transaksi fraud)
+│   └── clustering/            # Pipeline Tugas 3 (segmentasi pelanggan)
+└── tests/
+    └── test_core.py           # Verifikasi unit metrik evaluasi dan validator output
+```
 
 ## Prasyarat Data
 
-Ekstrak dataset resmi UTS (`data_uts_ml.zip`) ke folder `data/` di root repositori (tidak ikut di-commit ke Git) sehingga struktur berikut tersedia:
+Ekstrak `data_uts_ml.zip` ke direktori `data/` di root repositori (tidak ikut di-commit ke Git) atau set variabel lingkungan `UTS_ML_DATA_DIR=/path/ke/data`:
 
 ```text
 data/
@@ -17,3 +36,61 @@ data/
 ├── klasifikasi_test.csv.gz
 └── clustering.csv.gz
 ```
+
+## Instalasi Environment
+
+### Opsi 1 — Menggunakan `uv` (direkomendasikan)
+
+```bash
+cd kode
+uv sync --python 3.12
+```
+
+### Opsi 2 — Menggunakan `pip` + `venv`
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r kode/requirements.txt
+```
+
+## Menjalankan Pipeline
+
+### Verifikasi environment & ketersediaan dataset
+
+```bash
+python kode/run_all.py --check-env
+python kode/tests/test_core.py
+```
+
+### Menjalankan seluruh pipeline (satu perintah)
+
+```bash
+python kode/run_all.py
+```
+
+*(Tahap `audit`, `regresi`, `klasifikasi`, dan `clustering` akan diintegrasikan bertahap ke `run_all.py` melalui masing-masing PR.)*
+
+## Versi Pustaka & Random Seed
+
+- **Python:** `3.12.13`
+- **Global Seed:** `SEED = 42` (`PYTHONHASHSEED`, `random`, `numpy`, serta parameter `random_state`/`seed` pada seluruh model)
+- **Pustaka utama (terkunci di `uv.lock` & `requirements.txt`):**
+
+| Pustaka | Versi |
+| --- | --- |
+| `numpy` | `2.2.6` |
+| `pandas` | `3.1.1` |
+| `scipy` | `1.18.1` |
+| `pyarrow` | `26.0.1` |
+| `scikit-learn` | `1.9.1` |
+| `lightgbm` | `4.7.0` |
+| `xgboost` | `3.4.1` |
+| `catboost` | `1.2.10` |
+| `statsmodels` | `0.15.0` |
+| `imbalanced-learn` | `0.14.2` |
+| `shap` | `0.54.1` |
+| `optuna` | `5.1.0` |
+| `matplotlib` | `3.11.2` |
+| `seaborn` | `0.13.2` |
+| `joblib` | `1.6.0` |

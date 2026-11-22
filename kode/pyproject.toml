@@ -1,0 +1,27 @@
+[project]
+name = "uts-ml-2026"
+version = "0.1.0"
+description = "Pipeline reproduksibel UTS Machine Learning 2026 (Regresi, Klasifikasi Fraud, Clustering)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "catboost>=1.2.8",
+    "imbalanced-learn>=0.13.0",
+    "joblib>=1.4.2",
+    "lightgbm>=4.6.0",
+    "matplotlib>=3.10.0",
+    "numpy>=2.1.0,<2.3.0",
+    "optuna>=4.2.0",
+    "pandas>=2.2.3",
+    "pyarrow>=19.0.0",
+    "scikit-learn>=1.6.1",
+    "scipy>=1.15.0",
+    "seaborn>=0.13.2",
+    "shap>=0.47.0",
+    "statsmodels>=0.14.4",
+    "tqdm>=4.67.1",
+    "xgboost>=2.1.4",
+]
+
+[tool.uv]
+package = false

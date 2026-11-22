@@ -1,10 +1,12 @@
-# Dataset mentah (tidak disimpan di git; taruh/symlink ke ./data/)
-data/
+# Dataset mentah (directory maupun symlink; tidak disimpan di git)
+/data
+/data/
 *.csv.gz
 *.zip
 
 # Python environment & caches
 .venv/
+kode/.venv/
 venv/
 __pycache__/
 *.py[cod]
