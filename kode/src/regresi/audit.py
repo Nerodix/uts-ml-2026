@@ -5,6 +5,7 @@ Dibangun bertahap dari nol dengan prinsip satu fungsi untuk satu pertanyaan audi
 - Langkah 1a.2: Cek tipe data, lokasi nilai kosong (missing), dan pola missingness.
 - Langkah 1a.3: Screening leakage & pergeseran distribusi di seluruh kolom numerik.
 - Langkah 1a.4: Audit anomali target durasi_jam & nilai tidak wajar/sentinel numerik.
+- Langkah 1a.5: Audit kolom kategorikal (unseen/high-cardinality) & pergeseran waktu.
 """
 
 from __future__ import annotations
@@ -734,7 +735,253 @@ def cek_pemulihan_rute_jarak(train: pd.DataFrame, test: pd.DataFrame) -> dict[st
     }
 
 
-DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing", "leakage", "target", "sentinel")
+KOLOM_KATEGORIKAL = (
+    "layanan",
+    "mitra_kurir",
+    "hub_asal",
+    "kota_asal",
+    "pulau_tujuan",
+    "kota_tujuan",
+)
+
+
+def cek_kolom_kategorikal(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
+    """Audit 6 kolom kategorikal: kardinalitas, typo/spasi, kategori unseen di test, dan hierarki.
+
+    Memeriksa apakah ada inkonsistensi kapitalisasi/spasi (membandingkan jumlah
+    unik mentah vs sesudah ``strip().lower()``), mendata kategori yang hanya muncul
+    pada data uji beserta porsi barisnya, serta memverifikasi hubungan 1-ke-1
+    ``kota_asal -> hub_asal`` dan ``kota_tujuan -> pulau_tujuan``.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    dict[str, Any]
+        Tabel ringkasan per kolom kategorikal dan cek konsistensi hierarki kota.
+    """
+    rows: list[dict[str, Any]] = []
+    for col in KOLOM_KATEGORIKAL:
+        tr_s = train[col].dropna().astype(str)
+        te_s = test[col].dropna().astype(str)
+        tr_u = set(tr_s.unique())
+        te_u = set(te_s.unique())
+        unseen = sorted(te_u - tr_u)
+        unseen_rows = int(test[col].astype(str).isin(unseen).sum())
+        norm_tr = int(tr_s.str.strip().str.lower().nunique())
+        norm_te = int(te_s.str.strip().str.lower().nunique())
+        rows.append(
+            {
+                "kolom": col,
+                "unik_train": len(tr_u),
+                "unik_train_norm": norm_tr,
+                "unik_test": len(te_u),
+                "unik_test_norm": norm_te,
+                "unseen_di_test": unseen,
+                "baris_unseen": unseen_rows,
+                "pct_unseen_test": round(unseen_rows / len(test) * 100.0, 2),
+            }
+        )
+
+    kt_counts = train["kota_tujuan"].value_counts()
+    return {
+        "ringkasan_kategori": pd.DataFrame(rows),
+        "max_hub_per_kota_asal": int(train.groupby("kota_asal")["hub_asal"].nunique().max()),
+        "max_pulau_per_kota_tujuan": int(train.groupby("kota_tujuan")["pulau_tujuan"].nunique().max()),
+        "min_baris_kota_tujuan_train": int(kt_counts.min()),
+        "kota_tujuan_kurang_50_baris": int((kt_counts < 50).sum()),
+    }
+
+
+def cek_pergeseran_bulanan(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
+    """Lacak pergeseran bulanan (Jan–Okt 2025) pada kurir, antrean hub, dan fitur drift.
+
+    Menghubungkan temuan fitur drift dari Langkah 1a.3 (``f35``, ``antrean_hub_asal``,
+    ``f17``, ``f30``) dengan dimensi waktu bulan-ke-bulan serta membandingkan
+    perubahan ``f35`` kurir ``K07`` terhadap median ``durasi_jam`` terkoreksi.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi (Jan–Agu 2025).
+    test : pd.DataFrame
+        Data uji regresi (Sep–Okt 2025).
+
+    Returns
+    -------
+    dict[str, Any]
+        Pivot bulanan ``f35`` per kurir, ``durasi_jam`` bersih per kurir,
+        ``antrean_hub_asal`` per hub, dan median bulanan ``f30`` vs ``f17``.
+    """
+    tr = train.copy()
+    te = test.copy()
+    tr["_y"] = np.where(tr["durasi_jam"] > 1000.0, tr["durasi_jam"] / 60.0, tr["durasi_jam"])
+    tr["_ym"] = pd.to_datetime(tr["tgl_pickup"]).dt.to_period("M").astype(str)
+    te["_ym"] = pd.to_datetime(te["tgl_pickup"]).dt.to_period("M").astype(str)
+
+    both = pd.concat(
+        [
+            tr[["_ym", "mitra_kurir", "hub_asal", "antrean_hub_asal", "f35", "f30", "f17"]],
+            te[["_ym", "mitra_kurir", "hub_asal", "antrean_hub_asal", "f35", "f30", "f17"]],
+        ],
+        ignore_index=True,
+    )
+
+    f35_kurir = both.pivot_table(index="mitra_kurir", columns="_ym", values="f35", aggfunc="median").round(3)
+    y_kurir = tr.pivot_table(index="mitra_kurir", columns="_ym", values="_y", aggfunc="median").round(1)
+    antrean_hub = both.pivot_table(index="hub_asal", columns="_ym", values="antrean_hub_asal", aggfunc="median").round(0)
+    drift_f = both.groupby("_ym")[["antrean_hub_asal", "f17", "f30"]].median().round(3)
+
+    return {
+        "f35_per_kurir_bulan": f35_kurir,
+        "durasi_per_kurir_bulan": y_kurir,
+        "antrean_per_hub_bulan": antrean_hub,
+        "ringkasan_drift_bulanan": drift_f,
+    }
+
+
+def cek_efek_kalender(train: pd.DataFrame) -> dict[str, Any]:
+    """Ukur efek hari dalam seminggu, tanggal kembar, dan musim libur Lebaran 2025.
+
+    Menggunakan ``durasi_jam`` yang telah dikoreksi satuan menit (``/ 60`` untuk
+    ``> 1000``) agar median dan P90 tidak terdistorsi.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi (Jan–Agu 2025).
+
+    Returns
+    -------
+    dict[str, Any]
+        Tabel median & P90 menurut hari dalam seminggu, tanggal kembar (1.1–8.8),
+        serta jendela libur Lebaran (26 Mar–6 Apr 2025).
+    """
+    tr = train.copy()
+    tr["_y"] = np.where(tr["durasi_jam"] > 1000.0, tr["durasi_jam"] / 60.0, tr["durasi_jam"])
+    dt = pd.to_datetime(tr["tgl_pickup"])
+    nama_hari = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"]
+    tr["_hari"] = dt.dt.day_of_week.map(lambda d: f"{d}-{nama_hari[d]}")
+
+    by_hari = (
+        tr.groupby("_hari")["_y"]
+        .agg(jumlah="size", median="median", p90=lambda s: s.quantile(0.9))
+        .round(2)
+    )
+
+    is_kembar = dt.dt.month == dt.dt.day
+    is_lebaran = (dt >= "2025-03-26") & (dt <= "2025-04-06")
+
+    return {
+        "per_hari": by_hari,
+        "tanggal_kembar": {
+            "n_kembar": int(is_kembar.sum()),
+            "median_kembar": round(float(tr.loc[is_kembar, "_y"].median()), 2),
+            "p90_kembar": round(float(tr.loc[is_kembar, "_y"].quantile(0.9)), 2),
+            "median_biasa": round(float(tr.loc[~is_kembar, "_y"].median()), 2),
+            "p90_biasa": round(float(tr.loc[~is_kembar, "_y"].quantile(0.9)), 2),
+        },
+        "lebaran_2025": {
+            "n_lebaran": int(is_lebaran.sum()),
+            "median_lebaran": round(float(tr.loc[is_lebaran, "_y"].median()), 2),
+            "p90_lebaran": round(float(tr.loc[is_lebaran, "_y"].quantile(0.9)), 2),
+            "median_non_lebaran": round(float(tr.loc[~is_lebaran, "_y"].median()), 2),
+            "p90_non_lebaran": round(float(tr.loc[~is_lebaran, "_y"].quantile(0.9)), 2),
+        },
+    }
+
+
+def plot_pergeseran_temporal(train: pd.DataFrame, test: pd.DataFrame) -> Path:
+    """Buat grafik 3-panel pergeseran temporal (Jan–Okt 2025) untuk laporan Tugas 1a.
+
+    Panel (a): Pergeseran ``f35`` pada kurir ``K07`` mulai Juli 2025 dan kurir
+    baru ``K13`` pada test dibandingkan kurir stabil (``K02``, ``K08``).
+    Panel (b): Pertumbuhan ``antrean_hub_asal`` per hub beserta lonjakan Maret
+    (Ramadan) dan Sep–Okt.
+    Panel (c): Perbandingan ``f30`` (drift noise naik linear) vs ``f17`` (sinyal antrean).
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+
+    Returns
+    -------
+    Path
+        Path file PNG yang tersimpan di ``kode/figures/task1_1a5_temporal_shifts.png``.
+    """
+    ensure_dirs()
+    configure_plotting()
+
+    pergeseran = cek_pergeseran_bulanan(train, test)
+    piv_f35 = pergeseran["f35_per_kurir_bulan"].T
+    piv_ant = pergeseran["antrean_per_hub_bulan"].T
+    drift_f = pergeseran["ringkasan_drift_bulanan"]
+    months = list(drift_f.index)
+
+    fig, axes = plt.subplots(1, 3, figsize=(14.0, 4.1))
+
+    # Panel (a): Shift K07 & unseen K13 pada f35
+    for k, col, style in [
+        ("K07", "#dc2626", "-o"),
+        ("K13", "#9333ea", "-s"),
+        ("K02", "#f59e0b", "--^"),
+        ("K08", "#16a34a", "--v"),
+    ]:
+        if k in piv_f35.columns:
+            axes[0].plot(months, piv_f35[k], style, color=col, linewidth=2, markersize=5, label=k)
+    axes[0].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
+    axes[0].text(7.65, 0.92, "Test\n(Sep–Okt)", fontsize=8, color="#4b5563")
+    axes[0].set_title("(a) Shift Kurir K07 & Unseen K13 pada f35")
+    axes[0].set_ylabel("Median f35")
+    axes[0].tick_params(axis="x", rotation=45, labelsize=8)
+    axes[0].legend(fontsize=8, loc="upper left")
+
+    # Panel (b): Antrean hub per bulan
+    for hub, col in [("JKT", "#dc2626"), ("MKS", "#2563eb"), ("SBY", "#f97316"), ("BDG", "#16a34a")]:
+        axes[1].plot(months, piv_ant[hub], "-o", color=col, linewidth=1.8, markersize=4, label=hub)
+    axes[1].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
+    axes[1].set_title("(b) Drift antrean_hub_asal per Hub")
+    axes[1].set_ylabel("Median antrean_hub_asal")
+    axes[1].tick_params(axis="x", rotation=45, labelsize=8)
+    axes[1].legend(fontsize=8)
+
+    # Panel (c): Drift noise f30 vs sinyal f17
+    axes[2].plot(months, drift_f["f30"], "-o", color="#dc2626", linewidth=2, markersize=4, label="f30 (drift noise, rho=-0,004)")
+    axes[2].plot(months, drift_f["f17"], "-s", color="#2563eb", linewidth=2, markersize=4, label="f17 (sinyal antrean, rho=+0,215)")
+    axes[2].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
+    axes[2].set_title("(c) Drift Noise (f30) vs Sinyal (f17)")
+    axes[2].set_ylabel("Median nilai fitur")
+    axes[2].tick_params(axis="x", rotation=45, labelsize=8)
+    axes[2].legend(fontsize=8)
+
+    fig.tight_layout()
+    out_path = FIGURES_DIR / "task1_1a5_temporal_shifts.png"
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
+DAFTAR_CEK = (
+    "skema",
+    "duplikat",
+    "id",
+    "waktu",
+    "tipe",
+    "missing",
+    "leakage",
+    "target",
+    "sentinel",
+    "kategori",
+    "temporal",
+)
 
 
 def _tampilkan_skema(train: pd.DataFrame, test: pd.DataFrame) -> None:
@@ -876,13 +1123,59 @@ def _tampilkan_sentinel(train: pd.DataFrame, test: pd.DataFrame) -> None:
     )
 
 
+def _tampilkan_kategori(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak audit 6 kolom kategorikal beserta cek hierarki."""
+    info = cek_kolom_kategorikal(train, test)
+    print("=== [kategori] AUDIT 6 KOLOM KATEGORIKAL & UNSEEN TEST ===")
+    print(info["ringkasan_kategori"].to_string(index=False))
+    print(
+        f"\nHierarki 1-ke-1: max hub per kota_asal = {info['max_hub_per_kota_asal']} | "
+        f"max pulau per kota_tujuan = {info['max_pulau_per_kota_tujuan']}"
+    )
+    print(
+        f"Sebaran kota_tujuan (train): min baris per kota = {info['min_baris_kota_tujuan_train']} | "
+        f"kota dengan <50 baris = {info['kota_tujuan_kurang_50_baris']}"
+    )
+
+
+def _tampilkan_temporal(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak audit pergeseran bulanan, efek kalender, dan grafik 3-panel."""
+    geser = cek_pergeseran_bulanan(train, test)
+    kal = cek_efek_kalender(train)
+    fig_path = plot_pergeseran_temporal(train, test)
+
+    print("=== [temporal] PERGESERAN BULANAN (JAN–OKT 2025) ===")
+    print("\n1. Median f35 untuk kurir kunci (K07 bergeser di Juli; K13 baru muncul di Sep–Okt):")
+    print(geser["f35_per_kurir_bulan"].loc[["K01", "K02", "K07", "K08", "K13"]].to_string())
+
+    print("\n2. Median durasi_jam terkoreksi untuk kurir kunci pada train (Jan–Agu):")
+    print(geser["durasi_per_kurir_bulan"].loc[["K01", "K02", "K07", "K08"]].to_string())
+
+    print("\n3. Median antrean_hub_asal per hub x bulan (Jan–Okt):")
+    print(geser["antrean_per_hub_bulan"].to_string())
+
+    print("\n4. Efek kalender pada durasi_jam terkoreksi (train):")
+    print(kal["per_hari"].to_string())
+    tk = kal["tanggal_kembar"]
+    lb = kal["lebaran_2025"]
+    print(
+        f"   Tanggal kembar (n={tk['n_kembar']:,}): median={tk['median_kembar']} jam (P90={tk['p90_kembar']}) "
+        f"vs hari biasa: median={tk['median_biasa']} jam (P90={tk['p90_biasa']})"
+    )
+    print(
+        f"   Lebaran 26 Mar–6 Apr (n={lb['n_lebaran']:,}): median={lb['median_lebaran']} jam (P90={lb['p90_lebaran']}) "
+        f"vs non-Lebaran: median={lb['median_non_lebaran']} jam (P90={lb['p90_non_lebaran']})"
+    )
+    print(f"\nGrafik bukti tersimpan di: {fig_path.relative_to(KODE_DIR.parent)}")
+
+
 def main() -> None:
     """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
 
     Contoh penggunaan:
         python kode/src/regresi/audit.py                    # Jalankan semua pemeriksaan
-        python kode/src/regresi/audit.py --cek target       # Hanya cek target durasi_jam
-        python kode/src/regresi/audit.py --cek sentinel     # Hanya cek batas fisik & jarak_km
+        python kode/src/regresi/audit.py --cek kategori     # Hanya audit kolom kategorikal
+        python kode/src/regresi/audit.py --cek temporal     # Hanya pergeseran waktu & kalender
     """
     parser = argparse.ArgumentParser(
         description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
@@ -909,6 +1202,8 @@ def main() -> None:
         "leakage": _tampilkan_leakage,
         "target": _tampilkan_target,
         "sentinel": _tampilkan_sentinel,
+        "kategori": _tampilkan_kategori,
+        "temporal": _tampilkan_temporal,
     }
 
     for i, nama in enumerate(args.cek):
