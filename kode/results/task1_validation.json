@@ -1,0 +1,113 @@
+{
+  "figure": "task1_1b_validation_comparison.png",
+  "random_kfold_cv": {
+    "per_fold": [
+      {
+        "fold": "Random Fold 1",
+        "mae_p50": 13.2015,
+        "n_train": 200000,
+        "n_val": 50000,
+        "p90_coverage": 0.8874,
+        "pinball_p50": 6.6007,
+        "pinball_p90": 4.2648
+      },
+      {
+        "fold": "Random Fold 2",
+        "mae_p50": 13.4209,
+        "n_train": 200000,
+        "n_val": 50000,
+        "p90_coverage": 0.8835,
+        "pinball_p50": 6.7105,
+        "pinball_p90": 4.3979
+      },
+      {
+        "fold": "Random Fold 3",
+        "mae_p50": 13.2907,
+        "n_train": 200000,
+        "n_val": 50000,
+        "p90_coverage": 0.8864,
+        "pinball_p50": 6.6454,
+        "pinball_p90": 4.3123
+      },
+      {
+        "fold": "Random Fold 4",
+        "mae_p50": 13.3123,
+        "n_train": 200000,
+        "n_val": 50000,
+        "p90_coverage": 0.8845,
+        "pinball_p50": 6.6562,
+        "pinball_p90": 4.2845
+      },
+      {
+        "fold": "Random Fold 5",
+        "mae_p50": 13.1989,
+        "n_train": 200000,
+        "n_val": 50000,
+        "p90_coverage": 0.8856,
+        "pinball_p50": 6.5994,
+        "pinball_p90": 4.2425
+      }
+    ],
+    "ringkasan": {
+      "mae_p50_mean": 13.2849,
+      "mae_p50_std": 0.082,
+      "p90_coverage_mean": 0.8855,
+      "p90_coverage_std": 0.0014,
+      "pinball_p50_mean": 6.6424,
+      "pinball_p50_std": 0.041,
+      "pinball_p90_mean": 4.3004,
+      "pinball_p90_std": 0.0539
+    },
+    "skema": "Random 5-Fold CV (shuffle=True)"
+  },
+  "seed": 42,
+  "task": "Tugas 1b — Desain Validasi Berbasis Waktu vs Random K-Fold",
+  "time_based_cv": {
+    "per_fold": [
+      {
+        "fold": "Fold 1 (Mar–Apr)",
+        "mae_p50": 15.4517,
+        "n_train": 57541,
+        "n_val": 59073,
+        "p90_coverage": 0.7972,
+        "periode_train": "2025-01-01..2025-02-28",
+        "periode_val": "2025-03-01..2025-04-30",
+        "pinball_p50": 7.7259,
+        "pinball_p90": 5.5699
+      },
+      {
+        "fold": "Fold 2 (Mei–Jun)",
+        "mae_p50": 12.9038,
+        "n_train": 116614,
+        "n_val": 64782,
+        "p90_coverage": 0.9064,
+        "periode_train": "2025-01-01..2025-04-30",
+        "periode_val": "2025-05-01..2025-06-30",
+        "pinball_p50": 6.4519,
+        "pinball_p90": 4.215
+      },
+      {
+        "fold": "Fold 3 (Jul–Agu)",
+        "mae_p50": 13.7625,
+        "n_train": 181396,
+        "n_val": 68604,
+        "p90_coverage": 0.8757,
+        "periode_train": "2025-01-01..2025-06-30",
+        "periode_val": "2025-07-01..2025-08-31",
+        "pinball_p50": 6.8813,
+        "pinball_p90": 4.4086
+      }
+    ],
+    "ringkasan": {
+      "mae_p50_mean": 14.0393,
+      "mae_p50_std": 1.0584,
+      "p90_coverage_mean": 0.8598,
+      "p90_coverage_std": 0.046,
+      "pinball_p50_mean": 7.0197,
+      "pinball_p50_std": 0.5292,
+      "pinball_p90_mean": 4.7312,
+      "pinball_p90_std": 0.5983
+    },
+    "skema": "Expanding-Window Forward CV (3 fold x 2 bulan)"
+  }
+}
