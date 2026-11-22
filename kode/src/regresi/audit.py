@@ -6,6 +6,7 @@ Dibangun bertahap dari nol dengan prinsip satu fungsi untuk satu pertanyaan audi
 - Langkah 1a.3: Screening leakage & pergeseran distribusi di seluruh kolom numerik.
 - Langkah 1a.4: Audit anomali target durasi_jam & nilai tidak wajar/sentinel numerik.
 - Langkah 1a.5: Audit kolom kategorikal (unseen/high-cardinality) & pergeseran waktu.
+- Langkah 1a.6: Pengukuran dampak kuantitatif tiap temuan & ekspor JSON laporan.
 """
 
 from __future__ import annotations
@@ -29,10 +30,12 @@ from src.config import (  # noqa: E402
     FIGURES_DIR,
     REGRESI_TEST_PATH,
     REGRESI_TRAIN_PATH,
+    RESULTS_DIR,
     SEED,
     ensure_dirs,
 )
-from src.utils import configure_plotting  # noqa: E402
+from src.regresi.audit_dampak import jalankan_semua_dampak  # noqa: E402
+from src.utils import configure_plotting, save_json, set_global_seed  # noqa: E402
 
 
 def cek_skema_kolom(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
@@ -981,6 +984,7 @@ DAFTAR_CEK = (
     "sentinel",
     "kategori",
     "temporal",
+    "dampak",
 )
 
 
@@ -1169,14 +1173,113 @@ def _tampilkan_temporal(train: pd.DataFrame, test: pd.DataFrame) -> None:
     print(f"\nGrafik bukti tersimpan di: {fig_path.relative_to(KODE_DIR.parent)}")
 
 
+def _tampilkan_dampak(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
+    """Jalankan dan cetak hasil pengukuran dampak kuantitatif Langkah 1a.6b."""
+    hasil = jalankan_semua_dampak(train, test)
+    e1 = hasil["exp1_leakage_jumlah_scan"]
+    e2 = hasil["exp2_satuan_target"]
+    e3 = hasil["exp3_pemulihan_jarak_km"]
+    e4 = hasil["exp4_imputasi_berat_kg"]
+    e5 = hasil["exp5_seleksi_fitur_f"]
+
+    print("=== [dampak] PENGUKURAN DAMPAK KUANTITATIF (TRAIN JAN–JUN -> VAL JUL–AGU) ===")
+    print("\n1. Dampak Leakage jumlah_scan (LightGBM Quantile):")
+    for nama, m in e1.items():
+        print(f"   {nama:28s} -> P50={m['pinball_p50']:.4f} | P90={m['pinball_p90']:.4f} | cov90={m['p90_coverage']:.4f}")
+
+    print("\n2. Dampak Error Satuan Target durasi_jam > 1000 (370 baris x60):")
+    r_raw = e2["ridge_target_mentah"]
+    r_cln = e2["ridge_target_koreksi_60"]
+    l_raw = e2["lgbm_target_mentah"]
+    l_cln = e2["lgbm_target_koreksi_60"]
+    print(f"   Ridge (target mentah) -> RMSE={r_raw['rmse']:.2f} | MAE={r_raw['mae']:.2f} | bias={r_raw['mean_bias']:+.2f} jam")
+    print(f"   Ridge (target / 60)   -> RMSE={r_cln['rmse']:.2f} | MAE={r_cln['mae']:.2f} | bias={r_cln['mean_bias']:+.2f} jam")
+    print(f"   LGBM  (target mentah) -> P50={l_raw['pinball_p50']:.4f} | P90={l_raw['pinball_p90']:.4f} | cov90={l_raw['p90_coverage']:.4f}")
+    print(f"   LGBM  (target / 60)   -> P50={l_cln['pinball_p50']:.4f} | P90={l_cln['pinball_p90']:.4f} | cov90={l_cln['p90_coverage']:.4f}")
+
+    print(f"\n3. Dampak Pemulihan Sentinel jarak_km (subset sentinel val n={e3['n_sentinel_validasi']}):")
+    s_raw = e3["subset_sentinel_mentah"]
+    s_rec = e3["subset_sentinel_dipulihkan"]
+    print(f"   Sentinel mentah     -> P50={s_raw['pinball_p50']:.4f} | P90={s_raw['pinball_p90']:.4f} | MAE={s_raw['mae_p50']:.2f} jam")
+    print(f"   Sentinel dipulihkan -> P50={s_rec['pinball_p50']:.4f} | P90={s_rec['pinball_p90']:.4f} | MAE={s_rec['mae_p50']:.2f} jam")
+
+    print("\n4. Dampak Imputasi berat_kg (MAE kg pada validasi):")
+    print(f"   Global (median vs volume*densitas): {e4['global_mae_median_kg']:.3f} kg -> {e4['global_mae_densitas_kg']:.3f} kg")
+    print(f"   Kargo  (median vs volume*densitas): {e4['kargo_mae_median_kg']:.3f} kg -> {e4['kargo_mae_densitas_kg']:.3f} kg")
+
+    print("\n5. Dampak Memangkas 40 Fitur Noise f (termasuk f30 drift):")
+    f50 = e5["semua_50_fitur_f"]
+    f10 = e5["hanya_10_fitur_sinyal_f"]
+    print(f"   Semua 50 fitur f -> P50={f50['pinball_p50']:.4f} | P90={f50['pinball_p90']:.4f} | cov90={f50['p90_coverage']:.4f}")
+    print(f"   10 fitur sinyal  -> P50={f10['pinball_p50']:.4f} | P90={f10['pinball_p90']:.4f} | cov90={f10['p90_coverage']:.4f}")
+    print(f"\nGrafik dampak tersimpan di: kode/figures/{hasil['grafik_dampak']}")
+    return hasil
+
+
+def simpan_ringkasan_audit_1a(
+    train: pd.DataFrame,
+    test: pd.DataFrame,
+    hasil_dampak: dict[str, Any] | None = None,
+) -> Path:
+    """Rangkum dan simpan seluruh temuan Tugas 1a ke ``kode/results/task1_audit.json``.
+
+    Parameters
+    ----------
+    train : pd.DataFrame
+        Data latih regresi.
+    test : pd.DataFrame
+        Data uji regresi.
+    hasil_dampak : dict[str, Any] or None, default=None
+        Jika sudah dihitung, gunakan hasil dampak tersebut agar tidak dihitung ulang.
+
+    Returns
+    -------
+    Path
+        Path file JSON yang tersimpan.
+    """
+    ensure_dirs()
+    tabel_scr = screening_kolom_numerik(train, test)
+    kat = cek_kolom_kategorikal(train, test)
+    kal = cek_efek_kalender(train)
+    dampak = hasil_dampak if hasil_dampak is not None else jalankan_semua_dampak(train, test)
+
+    ringkasan = {
+        "task": "Tugas 1a — Audit Data & Pengukuran Dampak (Regresi)",
+        "seed": SEED,
+        "langkah_1a1_skema_waktu": audit_skema_dan_waktu(train, test),
+        "langkah_1a2_tipe_missing": audit_tipe_dan_missing(train, test),
+        "langkah_1a3_kuadran_leakage_drift": kelompokkan_kuadran_detektif(tabel_scr),
+        "langkah_1a4_target_dan_jarak": {
+            "target": cek_anomali_target(train),
+            "pemulihan_jarak": cek_pemulihan_rute_jarak(train, test),
+        },
+        "langkah_1a5_kategori_dan_kalender": {
+            "kategori": kat["ringkasan_kategori"].to_dict(orient="records"),
+            "hierarki": {
+                "max_hub_per_kota_asal": kat["max_hub_per_kota_asal"],
+                "max_pulau_per_kota_tujuan": kat["max_pulau_per_kota_tujuan"],
+                "min_baris_kota_tujuan_train": kat["min_baris_kota_tujuan_train"],
+                "kota_tujuan_kurang_50_baris": kat["kota_tujuan_kurang_50_baris"],
+            },
+            "tanggal_kembar": kal["tanggal_kembar"],
+            "lebaran_2025": kal["lebaran_2025"],
+        },
+        "langkah_1a6_pengukuran_dampak": dampak,
+    }
+    out_path = RESULTS_DIR / "task1_audit.json"
+    save_json(ringkasan, out_path)
+    return out_path
+
+
 def main() -> None:
     """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
 
     Contoh penggunaan:
-        python kode/src/regresi/audit.py                    # Jalankan semua pemeriksaan
-        python kode/src/regresi/audit.py --cek kategori     # Hanya audit kolom kategorikal
-        python kode/src/regresi/audit.py --cek temporal     # Hanya pergeseran waktu & kalender
+        python kode/src/regresi/audit.py                 # Jalankan semua + ekspor JSON
+        python kode/src/regresi/audit.py --cek dampak    # Hanya 5 eksperimen ukur dampak
+        python kode/src/regresi/audit.py --cek target    # Hanya cek anomali target
     """
+    set_global_seed(SEED)
     parser = argparse.ArgumentParser(
         description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
     )
@@ -1186,6 +1289,11 @@ def main() -> None:
         choices=DAFTAR_CEK,
         default=list(DAFTAR_CEK),
         help=f"Pilih satu atau lebih pemeriksaan (default: semua -> {', '.join(DAFTAR_CEK)}).",
+    )
+    parser.add_argument(
+        "--simpan-json",
+        action="store_true",
+        help="Simpan ringkasan lengkap Tugas 1a ke kode/results/task1_audit.json.",
     )
     args = parser.parse_args()
 
@@ -1204,12 +1312,21 @@ def main() -> None:
         "sentinel": _tampilkan_sentinel,
         "kategori": _tampilkan_kategori,
         "temporal": _tampilkan_temporal,
+        "dampak": _tampilkan_dampak,
     }
 
+    hasil_dampak: dict[str, Any] | None = None
     for i, nama in enumerate(args.cek):
         if i > 0:
             print()
-        handlers[nama](train, test)
+        ret = handlers[nama](train, test)
+        if nama == "dampak":
+            hasil_dampak = ret
+
+    # Ekspor JSON otomatis saat menjalankan seluruh cek atau bila --simpan-json diaktifkan
+    if args.simpan_json or set(args.cek) == set(DAFTAR_CEK):
+        json_path = simpan_ringkasan_audit_1a(train, test, hasil_dampak=hasil_dampak)
+        print(f"\nRingkasan lengkap Tugas 1a tersimpan di: {json_path.relative_to(KODE_DIR.parent)}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,438 @@
+{
+  "langkah_1a1_skema_waktu": {
+    "duplikat": {
+      "dup_id_test": 0,
+      "dup_id_train": 0,
+      "dup_rows_train": 0,
+      "overlap_id_train_test": 0
+    },
+    "keacakan_id": {
+      "id_corr_row_index": -0.00089,
+      "id_corr_target_spearman": -0.002
+    },
+    "skema": {
+      "test_only_cols": [],
+      "test_shape": [
+        60000,
+        76
+      ],
+      "train_only_cols": [
+        "durasi_jam"
+      ],
+      "train_shape": [
+        250000,
+        77
+      ]
+    },
+    "waktu": {
+      "invalid_date_test": 0,
+      "invalid_date_train": 0,
+      "test_date_range": [
+        "2025-09-01",
+        "2025-10-31"
+      ],
+      "test_monthly_counts": {
+        "2025-09": 29638,
+        "2025-10": 30362
+      },
+      "train_date_range": [
+        "2025-01-01",
+        "2025-08-31"
+      ],
+      "train_monthly_counts": {
+        "2025-01": 29985,
+        "2025-02": 27556,
+        "2025-03": 32829,
+        "2025-04": 26244,
+        "2025-05": 32841,
+        "2025-06": 31941,
+        "2025-07": 34436,
+        "2025-08": 34168
+      }
+    }
+  },
+  "langkah_1a2_tipe_missing": {
+    "missing_values": {
+      "berat_kg": {
+        "test_n": 3265,
+        "test_pct": 5.44,
+        "train_n": 13897,
+        "train_pct": 5.56
+      }
+    },
+    "pola_missing": {
+      "berat_kg": {
+        "median_target_when_missing": 71.4,
+        "median_target_when_present": 61.1,
+        "missing_pct_by_category": {
+          "hub_asal": {
+            "BDG": 5.5,
+            "JKT": 5.43,
+            "MDN": 5.8,
+            "MKS": 5.69,
+            "SBY": 5.63,
+            "SMG": 5.61
+          },
+          "layanan": {
+            "ekspres": 2.55,
+            "hemat": 2.55,
+            "kargo": 32.87,
+            "reguler": 2.5
+          },
+          "mitra_kurir": {
+            "K01": 5.53,
+            "K02": 5.45,
+            "K03": 5.66,
+            "K04": 5.64,
+            "K05": 5.43,
+            "K06": 5.44,
+            "K07": 5.69,
+            "K08": 5.51,
+            "K09": 5.74,
+            "K10": 5.67,
+            "K11": 5.56,
+            "K12": 5.4
+          },
+          "pulau_tujuan": {
+            "Bali-Nusa Tenggara": 5.28,
+            "Jawa": 5.59,
+            "Kalimantan": 5.36,
+            "Maluku": 6.02,
+            "Papua": 5.53,
+            "Sulawesi": 5.57,
+            "Sumatera": 5.5
+          }
+        },
+        "top3_spearman_correlates": {
+          "jumlah_item": 0.1543,
+          "nilai_barang": 0.1001,
+          "volume_liter": 0.9248
+        }
+      }
+    },
+    "tipe_data": {
+      "dtype_mismatches": {},
+      "n_numeric_features": 68,
+      "target_dtype": "float64",
+      "text_columns": [
+        "id_paket",
+        "tgl_pickup",
+        "layanan",
+        "mitra_kurir",
+        "hub_asal",
+        "kota_asal",
+        "pulau_tujuan",
+        "kota_tujuan"
+      ]
+    }
+  },
+  "langkah_1a3_kuadran_leakage_drift": {
+    "drift_bersinyal": [
+      "antrean_hub_asal",
+      "f17",
+      "f35"
+    ],
+    "drift_noise": [
+      "f30"
+    ],
+    "noise_stabil": [
+      "f01",
+      "f02",
+      "f03",
+      "f06",
+      "f07",
+      "f08",
+      "f10",
+      "f11",
+      "f12",
+      "f14",
+      "f15",
+      "f16",
+      "f18",
+      "f19",
+      "f20",
+      "f21",
+      "f24",
+      "f25",
+      "f26",
+      "f27",
+      "f29",
+      "f31",
+      "f32",
+      "f33",
+      "f34",
+      "f36",
+      "f37",
+      "f38",
+      "f39",
+      "f40",
+      "f42",
+      "f43",
+      "f44",
+      "f45",
+      "f46",
+      "f47",
+      "f48",
+      "f49",
+      "f50",
+      "hujan_asal_mm",
+      "indeks_kemacetan",
+      "jam_pickup",
+      "umur_akun_penjual_hari",
+      "volume_penjual_30h"
+    ],
+    "sinyal_stabil": [
+      "jarak_km",
+      "f04",
+      "f05",
+      "f22",
+      "f23",
+      "f09",
+      "alamat_skor",
+      "volume_liter",
+      "f28",
+      "cod",
+      "jumlah_item",
+      "berat_kg",
+      "f41",
+      "pengalaman_kurir_bulan",
+      "nilai_barang",
+      "f13",
+      "rating_penjual",
+      "hujan_tujuan_mm",
+      "asuransi"
+    ],
+    "tersangka_leakage": [
+      "jumlah_scan"
+    ]
+  },
+  "langkah_1a4_target_dan_jarak": {
+    "pemulihan_jarak": {
+      "jumlah_rute_valid_train": 10979,
+      "max_nunique_per_rute": 1,
+      "max_std_per_rute": 0.0,
+      "test_9999": 130,
+      "test_nol": 177,
+      "test_pct_rusak": 0.512,
+      "test_rusak_terpulihkan_eksak": 305,
+      "test_rusak_terpulihkan_pct": 99.35,
+      "test_total_rusak": 307,
+      "train_9999": 456,
+      "train_nol": 703,
+      "train_pct_rusak": 0.464,
+      "train_total_rusak": 1159
+    },
+    "target": {
+      "kuantil_mentah": {
+        "0.0": 11.6,
+        "0.01": 23.5,
+        "0.5": 61.7,
+        "0.9": 117.8,
+        "0.99": 224.7,
+        "0.999": 3054.02,
+        "1.0": 25452.0
+      },
+      "maks_sah_le_ambang": 693.1,
+      "mean_mentah": 77.84,
+      "mean_setelah_koreksi": 71.27,
+      "median_bersih": 61.6,
+      "median_ekstrem_dibagi_60": 64.1,
+      "median_jam_per_scan_bersih": 7.433,
+      "median_jam_per_scan_koreksi": 7.288,
+      "min_ekstrem_gt_ambang": 1272.0,
+      "n_gt_ambang": 370,
+      "n_le_zero": 0,
+      "pct_gt_ambang": 0.148,
+      "pct_kelipatan_6": 100.0,
+      "suspicious_le_ambang_low_scan": 0
+    }
+  },
+  "langkah_1a5_kategori_dan_kalender": {
+    "hierarki": {
+      "kota_tujuan_kurang_50_baris": 16,
+      "max_hub_per_kota_asal": 1,
+      "max_pulau_per_kota_tujuan": 1,
+      "min_baris_kota_tujuan_train": 37
+    },
+    "kategori": [
+      {
+        "baris_unseen": 0,
+        "kolom": "layanan",
+        "pct_unseen_test": 0.0,
+        "unik_test": 4,
+        "unik_test_norm": 4,
+        "unik_train": 4,
+        "unik_train_norm": 4,
+        "unseen_di_test": []
+      },
+      {
+        "baris_unseen": 2342,
+        "kolom": "mitra_kurir",
+        "pct_unseen_test": 3.9,
+        "unik_test": 13,
+        "unik_test_norm": 13,
+        "unik_train": 12,
+        "unik_train_norm": 12,
+        "unseen_di_test": [
+          "K13"
+        ]
+      },
+      {
+        "baris_unseen": 0,
+        "kolom": "hub_asal",
+        "pct_unseen_test": 0.0,
+        "unik_test": 6,
+        "unik_test_norm": 6,
+        "unik_train": 6,
+        "unik_train_norm": 6,
+        "unseen_di_test": []
+      },
+      {
+        "baris_unseen": 0,
+        "kolom": "kota_asal",
+        "pct_unseen_test": 0.0,
+        "unik_test": 30,
+        "unik_test_norm": 30,
+        "unik_train": 30,
+        "unik_train_norm": 30,
+        "unseen_di_test": []
+      },
+      {
+        "baris_unseen": 0,
+        "kolom": "pulau_tujuan",
+        "pct_unseen_test": 0.0,
+        "unik_test": 7,
+        "unik_test_norm": 7,
+        "unik_train": 7,
+        "unik_train_norm": 7,
+        "unseen_di_test": []
+      },
+      {
+        "baris_unseen": 0,
+        "kolom": "kota_tujuan",
+        "pct_unseen_test": 0.0,
+        "unik_test": 405,
+        "unik_test_norm": 405,
+        "unik_train": 405,
+        "unik_train_norm": 405,
+        "unseen_di_test": []
+      }
+    ],
+    "lebaran_2025": {
+      "median_lebaran": 92.2,
+      "median_non_lebaran": 61.0,
+      "n_lebaran": 6060,
+      "p90_lebaran": 151.31,
+      "p90_non_lebaran": 115.9
+    },
+    "tanggal_kembar": {
+      "median_biasa": 60.7,
+      "median_kembar": 74.0,
+      "n_kembar": 17604,
+      "p90_biasa": 115.7,
+      "p90_kembar": 133.9
+    }
+  },
+  "langkah_1a6_pengukuran_dampak": {
+    "exp1_leakage_jumlah_scan": {
+      "dengan_scan_cv_naif": {
+        "mae_p50": 10.8458,
+        "p90_coverage": 0.8746,
+        "pinball_p50": 5.4229,
+        "pinball_p90": 2.9634
+      },
+      "dengan_scan_simulasi_test": {
+        "mae_p50": 21.0044,
+        "p90_coverage": 0.4291,
+        "pinball_p50": 10.5022,
+        "pinball_p90": 13.4648
+      },
+      "tanpa_scan_jujur": {
+        "mae_p50": 13.7825,
+        "p90_coverage": 0.8742,
+        "pinball_p50": 6.8913,
+        "pinball_p90": 4.4414
+      }
+    },
+    "exp2_satuan_target": {
+      "lgbm_target_koreksi_60": {
+        "mae_p50": 13.7825,
+        "p90_coverage": 0.8742,
+        "pinball_p50": 6.8913,
+        "pinball_p90": 4.4414
+      },
+      "lgbm_target_mentah": {
+        "mae_p50": 13.7662,
+        "p90_coverage": 0.8761,
+        "pinball_p50": 6.8831,
+        "pinball_p90": 4.4457
+      },
+      "ridge_target_koreksi_60": {
+        "mae": 16.8146,
+        "mean_bias": -0.9788,
+        "pinball_p50": 8.4073,
+        "rmse": 26.5609
+      },
+      "ridge_target_mentah": {
+        "mae": 18.3826,
+        "mean_bias": 5.0917,
+        "pinball_p50": 9.1913,
+        "rmse": 27.1426
+      }
+    },
+    "exp3_pemulihan_jarak_km": {
+      "global_dipulihkan": {
+        "mae_p50": 13.7825,
+        "p90_coverage": 0.8742,
+        "pinball_p50": 6.8913,
+        "pinball_p90": 4.4414
+      },
+      "global_mentah": {
+        "mae_p50": 13.7934,
+        "p90_coverage": 0.8755,
+        "pinball_p50": 6.8967,
+        "pinball_p90": 4.4367
+      },
+      "n_sentinel_validasi": 314,
+      "subset_sentinel_dipulihkan": {
+        "mae_p50": 16.0078,
+        "p90_coverage": 0.879,
+        "pinball_p50": 8.0039,
+        "pinball_p90": 6.6483
+      },
+      "subset_sentinel_mentah": {
+        "mae_p50": 20.2621,
+        "p90_coverage": 0.8917,
+        "pinball_p50": 10.131,
+        "pinball_p90": 7.6887
+      }
+    },
+    "exp4_imputasi_berat_kg": {
+      "global_mae_densitas_kg": 1.582,
+      "global_mae_median_kg": 3.996,
+      "kargo_mae_densitas_kg": 14.418,
+      "kargo_mae_median_kg": 41.298
+    },
+    "exp5_seleksi_fitur_f": {
+      "hanya_10_fitur_sinyal_f": {
+        "mae_p50": 13.7368,
+        "p90_coverage": 0.875,
+        "pinball_p50": 6.8684,
+        "pinball_p90": 4.4139
+      },
+      "semua_50_fitur_f": {
+        "mae_p50": 13.7825,
+        "p90_coverage": 0.8742,
+        "pinball_p50": 6.8913,
+        "pinball_p90": 4.4414
+      }
+    },
+    "grafik_dampak": "task1_1a6_dampak_audit.png",
+    "protokol_split": {
+      "train": "2025-01-01..2025-06-30 (n=181,396)",
+      "validasi": "2025-07-01..2025-08-31 (n=68,604)"
+    }
+  },
+  "seed": 42,
+  "task": "Tugas 1a — Audit Data & Pengukuran Dampak (Regresi)"
+}
