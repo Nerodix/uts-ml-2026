@@ -7,6 +7,7 @@ Dibangun bertahap dari nol dengan prinsip satu fungsi untuk satu pertanyaan audi
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any
@@ -302,45 +303,67 @@ def audit_tipe_dan_missing(train: pd.DataFrame, test: pd.DataFrame) -> dict[str,
     }
 
 
-def main() -> None:
-    """Jalankan audit Tugas 1a hingga tahap saat ini dan cetak hasilnya ke terminal."""
-    train = pd.read_csv(REGRESI_TRAIN_PATH)
-    test = pd.read_csv(REGRESI_TEST_PATH)
+DAFTAR_CEK = ("skema", "duplikat", "id", "waktu", "tipe", "missing")
 
-    # --- Langkah 1a.1 ---
-    hasil_1 = audit_skema_dan_waktu(train, test)
-    skema = hasil_1["skema"]
-    dup = hasil_1["duplikat"]
-    acak = hasil_1["keacakan_id"]
-    waktu = hasil_1["waktu"]
 
-    print("=== LANGKAH 1a.1: SKEMA, DUPLIKAT, ID, DAN WAKTU ===")
-    print(f"Ukuran train               : {skema['train_shape'][0]:,} baris x {skema['train_shape'][1]} kolom")
-    print(f"Ukuran test                : {skema['test_shape'][0]:,} baris x {skema['test_shape'][1]} kolom")
-    print(f"Kolom hanya di train       : {skema['train_only_cols']}")
-    print(f"Kolom hanya di test        : {skema['test_only_cols']}")
+def _tampilkan_skema(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_skema_kolom``."""
+    skema = cek_skema_kolom(train, test)
+    print("=== [skema] UKURAN & DAFTAR KOLOM ===")
+    print(f"Ukuran train         : {skema['train_shape'][0]:,} baris x {skema['train_shape'][1]} kolom")
+    print(f"Ukuran test          : {skema['test_shape'][0]:,} baris x {skema['test_shape'][1]} kolom")
+    print(f"Kolom hanya di train : {skema['train_only_cols']}")
+    print(f"Kolom hanya di test  : {skema['test_only_cols']}")
+
+
+def _tampilkan_duplikat(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_duplikat_dan_irisan_id``."""
+    dup = cek_duplikat_dan_irisan_id(train, test)
+    print("=== [duplikat] DUPLIKAT & IRISAN ID ===")
     print(f"Duplikat ID (train / test) : {dup['dup_id_train']} / {dup['dup_id_test']}")
     print(f"Irisan ID train & test     : {dup['overlap_id_train_test']}")
     print(f"Duplikat baris penuh train : {dup['dup_rows_train']}")
+
+
+def _tampilkan_keacakan_id(train: pd.DataFrame, _test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_keacakan_id``."""
+    acak = cek_keacakan_id(train)
+    print("=== [id] KEACAKAN NOMOR ID ===")
     print(f"Korelasi ID vs urutan baris: {acak['id_corr_row_index']:+.5f}")
     print(f"Korelasi ID vs target      : {acak['id_corr_target_spearman']:+.5f} (Spearman)")
-    print(f"Tanggal train              : {waktu['train_date_range'][0]} s.d. {waktu['train_date_range'][1]} (rusak={waktu['invalid_date_train']})")
-    print(f"Tanggal test               : {waktu['test_date_range'][0]} s.d. {waktu['test_date_range'][1]} (rusak={waktu['invalid_date_test']})")
 
-    # --- Langkah 1a.2 ---
-    hasil_2 = audit_tipe_dan_missing(train, test)
-    tipe = hasil_2["tipe_data"]
-    missing = hasil_2["missing_values"]
 
-    print("\n=== LANGKAH 1a.2: TIPE DATA & POLA NILAI KOSONG (MISSING) ===")
-    print(f"Jumlah fitur numerik       : {tipe['n_numeric_features']}")
-    print(f"Kolom teks / kategorikal   : {tipe['text_columns']}")
-    print(f"Tipe target durasi_jam     : {tipe['target_dtype']}")
-    print(f"Beda tipe train vs test    : {tipe['dtype_mismatches']}")
-    print(f"Kolom dengan nilai kosong  : {list(missing.keys())}")
+def _tampilkan_waktu(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_rentang_waktu``."""
+    waktu = cek_rentang_waktu(train, test)
+    print("=== [waktu] RENTANG TANGGAL & VOLUME BULANAN ===")
+    print(f"Tanggal train : {waktu['train_date_range'][0]} s.d. {waktu['train_date_range'][1]} (rusak={waktu['invalid_date_train']})")
+    print(f"Tanggal test  : {waktu['test_date_range'][0]} s.d. {waktu['test_date_range'][1]} (rusak={waktu['invalid_date_test']})")
+    print("Volume paket per bulan (train):")
+    for bulan, jumlah in waktu["train_monthly_counts"].items():
+        print(f"  {bulan} : {jumlah:>6,}")
+    print("Volume paket per bulan (test):")
+    for bulan, jumlah in waktu["test_monthly_counts"].items():
+        print(f"  {bulan} : {jumlah:>6,}")
 
+
+def _tampilkan_tipe(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_tipe_data``."""
+    tipe = cek_tipe_data(train, test)
+    print("=== [tipe] TIPE DATA KOLOM ===")
+    print(f"Jumlah fitur numerik     : {tipe['n_numeric_features']}")
+    print(f"Kolom teks / kategorikal : {tipe['text_columns']}")
+    print(f"Tipe target durasi_jam   : {tipe['target_dtype']}")
+    print(f"Beda tipe train vs test  : {tipe['dtype_mismatches']}")
+
+
+def _tampilkan_missing(train: pd.DataFrame, test: pd.DataFrame) -> None:
+    """Jalankan dan cetak hasil ``cek_missing_values`` beserta ``cek_pola_missing``."""
+    missing = cek_missing_values(train, test)
+    print("=== [missing] NILAI KOSONG & POLA MISSINGNESS ===")
+    print(f"Kolom dengan nilai kosong: {list(missing.keys())}")
     for col, stat in missing.items():
-        pola = hasil_2["pola_missing"][col]
+        pola = cek_pola_missing(train, col)
         print(f"\n  [Detail missing: {col}]")
         print(f"    Train kosong : {stat['train_n']:,} baris ({stat['train_pct']}%)")
         print(f"    Test kosong  : {stat['test_n']:,} baris ({stat['test_pct']}%)")
@@ -352,6 +375,44 @@ def main() -> None:
             f"{pola['median_target_when_missing']} jam vs {pola['median_target_when_present']} jam"
         )
         print(f"    Top-3 fitur paling berkorelasi (Spearman): {pola['top3_spearman_correlates']}")
+
+
+def main() -> None:
+    """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
+
+    Contoh penggunaan:
+        python kode/src/regresi/audit.py                  # Jalankan semua pemeriksaan
+        python kode/src/regresi/audit.py --cek missing    # Hanya cek nilai kosong
+        python kode/src/regresi/audit.py --cek skema tipe # Pilih lebih dari satu cek
+    """
+    parser = argparse.ArgumentParser(
+        description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
+    )
+    parser.add_argument(
+        "--cek",
+        nargs="+",
+        choices=DAFTAR_CEK,
+        default=list(DAFTAR_CEK),
+        help=f"Pilih satu atau lebih pemeriksaan (default: semua -> {', '.join(DAFTAR_CEK)}).",
+    )
+    args = parser.parse_args()
+
+    train = pd.read_csv(REGRESI_TRAIN_PATH)
+    test = pd.read_csv(REGRESI_TEST_PATH)
+
+    handlers = {
+        "skema": _tampilkan_skema,
+        "duplikat": _tampilkan_duplikat,
+        "id": _tampilkan_keacakan_id,
+        "waktu": _tampilkan_waktu,
+        "tipe": _tampilkan_tipe,
+        "missing": _tampilkan_missing,
+    }
+
+    for i, nama in enumerate(args.cek):
+        if i > 0:
+            print()
+        handlers[nama](train, test)
 
 
 if __name__ == "__main__":
