@@ -1,0 +1,28 @@
+# Dataset mentah (tidak disimpan di git; taruh/symlink ke ./data/)
+data/
+*.csv.gz
+*.zip
+
+# Python environment & caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Intermediate artifacts & trained model binaries (direproduksi lewat kode)
+kode/cache/
+kode/models/
+*.pkl
+*.joblib
+*.parquet
+*.feather
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
