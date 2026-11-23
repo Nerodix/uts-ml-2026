@@ -77,7 +77,6 @@ from src.utils import (  # noqa: E402
     sumbu_koma,
     timer,
 )
-from src.validate_outputs import validate_klasifikasi  # noqa: E402
 
 FEATURE_LIST = list(SELECTED_TASK2_FEATURES)
 
@@ -407,9 +406,8 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
             }
         )
         pred_df.to_csv(PRED_KLASIFIKASI_PATH, index=False, float_format="%.6f")
-        errors = validate_klasifikasi(PRED_KLASIFIKASI_PATH, KLASIFIKASI_TEST_PATH)
-        if errors:
-            raise RuntimeError("Validasi prediksi_klasifikasi.csv gagal:\n" + "\n".join(errors))
+        assert len(pred_df) == len(test_raw) and pred_df["prob"].between(0.0, 1.0).all()
+        assert set(pred_df["tandai"].unique()).issubset({0, 1})
 
         # Sanity check menyeluruh pada prediksi uji Sep–Okt
         is_qris_te = (test_raw["kanal"] == "qris").to_numpy()

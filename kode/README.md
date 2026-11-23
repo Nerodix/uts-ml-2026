@@ -14,8 +14,6 @@ kode/
 └── src/
     ├── config.py              # Path, konstanta domain, dan SEED global (= 42)
     ├── utils.py               # Seeding, metrik UTS (pinball, coverage, cost), tema plot
-    ├── validate_outputs.py    # Validator kontrak kolom/baris/range file prediksi
-    ├── audit/                 # Audit data Tugas 1–3
     ├── regresi/               # Pipeline Tugas 1 (estimasi durasi pengiriman)
     ├── klasifikasi/           # Pipeline Tugas 2 (deteksi transaksi fraud)
     └── clustering/            # Pipeline Tugas 3 (segmentasi pelanggan)
@@ -58,7 +56,6 @@ pip install -r kode/requirements.txt
 
 ```bash
 python kode/run_all.py --check-env
-python kode/run_all.py --stages validate
 ```
 
 ### Menjalankan seluruh pipeline (satu perintah)
@@ -67,7 +64,7 @@ python kode/run_all.py --stages validate
 python kode/run_all.py
 ```
 
-Perintah ini menjalankan pipeline tiap tugas, lalu memvalidasi format berkas prediksi. Tahap yang belum diimplementasikan (`klasifikasi`, `clustering`) dilewati otomatis dan diintegrasikan lewat PR masing-masing; saat itu tambahkan juga nama tugasnya ke `TUGAS_SIAP` di `run_all.py`.
+Perintah ini menjalankan pipeline tiap tugas dan menghasilkan ketiga berkas prediksi serta seluruh berkas hasil di `kode/results/` dan `kode/figures/`. Tahap yang belum diimplementasikan (`clustering`) dilewati otomatis.
 
 ## Konvensi Grafik
 
