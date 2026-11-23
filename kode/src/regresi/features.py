@@ -11,7 +11,7 @@ dan menangani dua tantangan kategori utama Tugas 1d:
    kurir real-time), dibuktikan lewat simulasi *Leave-One-Courier-Out*.
 
 Jalankan simulasi unseen courier:
-    python kode/src/regresi/features.py --uji-unseen
+    python kode/src/regresi/features.py --test-unseen
 """
 
 from __future__ import annotations
@@ -597,11 +597,11 @@ def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
 def main() -> None:
     """Jalankan uji simulasi kategori unseen kurir dari CLI."""
     set_global_seed(SEED)
-    parser = argparse.ArgumentParser(description="Feature engineering & uji unseen courier Tugas 1d.")
-    parser.add_argument("--uji-unseen", action="store_true", help="Jalankan simulasi Leave-One-Courier-Out.")
+    parser = argparse.ArgumentParser(description="Task 1d feature engineering and unseen courier test.")
+    parser.add_argument("--test-unseen", action="store_true", help="Run Leave-One-Courier-Out simulation.")
     args = parser.parse_args()
 
-    if args.uji_unseen:
+    if args.test_unseen:
         train = pd.read_csv(REGRESI_TRAIN_PATH)
         with timer("Simulasi Leave-One-Courier-Out (K08, K02, K07)"):
             res = uji_kategori_unseen_kurir(train)

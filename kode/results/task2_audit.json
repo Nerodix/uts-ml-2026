@@ -1,0 +1,1866 @@
+{
+  "dampak": {
+    "indikator_kualitas": {
+      "delta_pr_auc_matang": -0.0011134504533680811,
+      "delta_pr_auc_qris_shift": 0.05057466932404775,
+      "matang_jun_jul_dasar": {
+        "brier": 0.002263303403229161,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.45047162896019,
+        "flag_rate_pct": 1.0953275759670527,
+        "mean_prob": 0.005898683617748218,
+        "n_flagged": 1125,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7656410558850615,
+        "ratio_pred_to_obs": 0.9466373370239088,
+        "recall_at_bayes": 0.68125,
+        "roc_auc": 0.9872640382976222,
+        "total_cost_idr": 74257400.0
+      },
+      "matang_jun_jul_dengan_flag": {
+        "brier": 0.0022560262447336938,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.40530718253586,
+        "flag_rate_pct": 1.1323253074219397,
+        "mean_prob": 0.00589212961075615,
+        "n_flagged": 1163,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7645276054316934,
+        "ratio_pred_to_obs": 0.9455855315486771,
+        "recall_at_bayes": 0.68125,
+        "roc_auc": 0.9876598795912568,
+        "total_cost_idr": 74608600.0
+      },
+      "qris_shift_agt11_21_dasar": {
+        "brier": 0.006441614429524236,
+        "cost_flag_all_idr": 102600000.0,
+        "cost_flag_none_idr": 50858100.0,
+        "cost_reduction_vs_none_pct": 82.88414234900635,
+        "flag_rate_pct": 1.7300194931773878,
+        "mean_prob": 0.0073447316192141255,
+        "n_flagged": 71,
+        "obs_rate": 0.009746588693957114,
+        "pr_auc": 0.5227361104165856,
+        "ratio_pred_to_obs": 0.7535694641313693,
+        "recall_at_bayes": 0.775,
+        "roc_auc": 0.9865465059055117,
+        "total_cost_idr": 8704800.0
+      },
+      "qris_shift_agt11_21_dengan_flag": {
+        "brier": 0.006326321376796303,
+        "cost_flag_all_idr": 102600000.0,
+        "cost_flag_none_idr": 50858100.0,
+        "cost_reduction_vs_none_pct": 92.1243617044286,
+        "flag_rate_pct": 1.827485380116959,
+        "mean_prob": 0.009198392534072218,
+        "n_flagged": 75,
+        "obs_rate": 0.009746588693957114,
+        "pr_auc": 0.5733107797406334,
+        "ratio_pred_to_obs": 0.9437550739958097,
+        "recall_at_bayes": 0.875,
+        "roc_auc": 0.9907480314960629,
+        "total_cost_idr": 4005400.0
+      }
+    },
+    "label_delay_censoring": {
+      "latihan_matang_vs_ekor_tersensor_pada_agt_awal_non_qris": {
+        "depresi_mean_prob_pct": -6.020502917595849,
+        "latih_campur_ekor_tersensor_15_31": {
+          "brier": 0.0034538464117154274,
+          "cost_flag_all_idr": 229925000.0,
+          "cost_flag_none_idr": 53995100.0,
+          "cost_reduction_vs_none_pct": 86.28616300367996,
+          "flag_rate_pct": 1.4243775144068718,
+          "mean_prob": 0.008777404044567168,
+          "n_flagged": 131,
+          "obs_rate": 0.008263564205719257,
+          "pr_auc": 0.6903018323148405,
+          "ratio_pred_to_obs": 1.0621813815511085,
+          "recall_at_bayes": 0.7763157894736842,
+          "roc_auc": 0.9901499720136873,
+          "total_cost_idr": 7404800.0
+        },
+        "latih_matang_jan_jul": {
+          "brier": 0.0034804660681285213,
+          "cost_flag_all_idr": 229925000.0,
+          "cost_flag_none_idr": 53995100.0,
+          "cost_reduction_vs_none_pct": 86.14800231872893,
+          "flag_rate_pct": 1.533108622376862,
+          "mean_prob": 0.009339701016776954,
+          "n_flagged": 141,
+          "obs_rate": 0.008263564205719257,
+          "pr_auc": 0.66938347021963,
+          "ratio_pred_to_obs": 1.1302267138328637,
+          "recall_at_bayes": 0.8026315789473685,
+          "roc_auc": 0.9884664654729687,
+          "total_cost_idr": 7479400.0
+        }
+      },
+      "val_agt_akhir_15_31": {
+        "brier": 0.003973377269581418,
+        "cost_flag_all_idr": 710375000.0,
+        "cost_flag_none_idr": 68197200.0,
+        "cost_reduction_vs_none_pct": 44.032599578868336,
+        "flag_rate_pct": 1.0909730775998594,
+        "mean_prob": 0.005552868115556273,
+        "n_flagged": 310,
+        "n_fraud": 70,
+        "n_rows": 28415,
+        "obs_rate": 0.002463487594580327,
+        "pr_auc": 0.12472320325307445,
+        "ratio_pred_to_obs": 2.2540678214790213,
+        "recall_at_bayes": 0.5142857142857142,
+        "roc_auc": 0.9253856815260944,
+        "total_cost_idr": 38168200.0
+      },
+      "val_agt_akhir_non_qris": {
+        "brier": 0.003788924768724589,
+        "cost_flag_all_idr": 552975000.0,
+        "cost_flag_none_idr": 31207600.0,
+        "cost_reduction_vs_none_pct": 73.1520527051103,
+        "flag_rate_pct": 1.2206700122067002,
+        "mean_prob": 0.0067688093170691615,
+        "n_flagged": 270,
+        "n_fraud": 40,
+        "n_rows": 22119,
+        "obs_rate": 0.0018084000180840002,
+        "pr_auc": 0.1786368870077145,
+        "ratio_pred_to_obs": 3.74298233210632,
+        "recall_at_bayes": 0.725,
+        "roc_auc": 0.9851918112233343,
+        "total_cost_idr": 8378600.0
+      },
+      "val_agt_penuh_tersensor": {
+        "brier": 0.004621675015916457,
+        "cost_flag_all_idr": 1322600000.0,
+        "cost_flag_none_idr": 250001200.0,
+        "cost_reduction_vs_none_pct": 52.53854781497049,
+        "flag_rate_pct": 1.204067745350068,
+        "mean_prob": 0.006229946662451669,
+        "n_flagged": 637,
+        "n_fraud": 245,
+        "n_rows": 52904,
+        "obs_rate": 0.004631029789807954,
+        "pr_auc": 0.27468032878799226,
+        "ratio_pred_to_obs": 1.3452616254299719,
+        "recall_at_bayes": 0.5428571428571428,
+        "roc_auc": 0.9251450320913416,
+        "total_cost_idr": 118654200.0
+      },
+      "val_jul_matang": {
+        "brier": 0.002252769296656321,
+        "cost_flag_all_idr": 1308350000.0,
+        "cost_flag_none_idr": 347603000.0,
+        "cost_reduction_vs_none_pct": 89.38426883542432,
+        "flag_rate_pct": 1.249665609355295,
+        "mean_prob": 0.006500953413643638,
+        "n_flagged": 654,
+        "n_fraud": 341,
+        "n_rows": 52334,
+        "obs_rate": 0.0065158405625406045,
+        "pr_auc": 0.7829951190603441,
+        "ratio_pred_to_obs": 0.997715237388933,
+        "recall_at_bayes": 0.7038123167155426,
+        "roc_auc": 0.9870272972117329,
+        "total_cost_idr": 36900600.0
+      }
+    },
+    "leakage_review_manual": {
+      "dengan_review_cv_naif": {
+        "brier": 0.0014529267663422702,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 95.27067032166036,
+        "flag_rate_pct": 0.8022665978638679,
+        "mean_prob": 0.005991202569789491,
+        "n_flagged": 824,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.9016786537072503,
+        "ratio_pred_to_obs": 0.9614850386570449,
+        "recall_at_bayes": 0.7890625,
+        "roc_auc": 0.9956331317540096,
+        "total_cost_idr": 36775400.0
+      },
+      "dengan_review_simulasi_uji": {
+        "brier": 0.0030591039377437647,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 87.48434290617266,
+        "flag_rate_pct": 0.6805635338675287,
+        "mean_prob": 0.00426840397871599,
+        "n_flagged": 699,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.6888687692824115,
+        "ratio_pred_to_obs": 0.6850054753905321,
+        "recall_at_bayes": 0.58125,
+        "roc_auc": 0.9825116771497712,
+        "total_cost_idr": 97322100.0
+      },
+      "jujur_tanpa_review": {
+        "brier": 0.002263303403229161,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.45047162896019,
+        "flag_rate_pct": 1.0953275759670527,
+        "mean_prob": 0.005898683617748218,
+        "n_flagged": 1125,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7656410558850615,
+        "ratio_pred_to_obs": 0.9466373370239088,
+        "recall_at_bayes": 0.68125,
+        "roc_auc": 0.9872640382976222,
+        "total_cost_idr": 74257400.0
+      },
+      "keunggulan_pr_auc_jujur_vs_bocor_uji": 0.07677228660265001,
+      "laju_review_acak_non_fraud_train": 0.011903453832912135,
+      "penghematan_biaya_jujur_vs_bocor_uji_idr": 23064700.0,
+      "penurunan_pr_auc_bocor_saat_uji": -0.21280988442483884
+    },
+    "seleksi_fitur_v": {
+      "bernama_plus_8_v_sinyal": {
+        "brier": 0.002263303403229161,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.45047162896019,
+        "flag_rate_pct": 1.0953275759670527,
+        "mean_prob": 0.005898683617748218,
+        "n_flagged": 1125,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7656410558850615,
+        "ratio_pred_to_obs": 0.9466373370239088,
+        "recall_at_bayes": 0.68125,
+        "roc_auc": 0.9872640382976222,
+        "total_cost_idr": 74257400.0
+      },
+      "delta_biaya_8v_vs_50v_idr": -2218900.0,
+      "delta_pr_auc_8v_vs_50v": 0.009051202217362886,
+      "hanya_bernama_tanpa_v": {
+        "brier": 0.002226155506384756,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.02243819080898,
+        "flag_rate_pct": 1.2413712527626595,
+        "mean_prob": 0.006052563678863563,
+        "n_flagged": 1275,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7607402368185376,
+        "ratio_pred_to_obs": 0.9713324420193713,
+        "recall_at_bayes": 0.684375,
+        "roc_auc": 0.9861552295505982,
+        "total_cost_idr": 77585800.0
+      },
+      "semua_50_v": {
+        "brier": 0.002341321477944244,
+        "cost_flag_all_idr": 2567725000.0,
+        "cost_flag_none_idr": 777602800.0,
+        "cost_reduction_vs_none_pct": 90.16512029020471,
+        "flag_rate_pct": 1.0670924651199019,
+        "mean_prob": 0.00572320540615998,
+        "n_flagged": 1096,
+        "obs_rate": 0.006231196876612566,
+        "pr_auc": 0.7565898536676986,
+        "ratio_pred_to_obs": 0.9184761000957584,
+        "recall_at_bayes": 0.6703125,
+        "roc_auc": 0.9855766687240984,
+        "total_cost_idr": 76476300.0
+      },
+      "signal_v_cols": [
+        "v03",
+        "v11",
+        "v19",
+        "v26",
+        "v29",
+        "v38",
+        "v42",
+        "v47"
+      ]
+    },
+    "split_info": {
+      "n_train": 247464,
+      "n_train_fraud": 1737,
+      "n_val": 102709,
+      "n_val_fraud": 640,
+      "train_period": "2025-01-01 s.d. 2025-05-31",
+      "val_period": "2025-06-01 s.d. 2025-07-31"
+    }
+  },
+  "id": {
+    "catatan": "Nomor id_transaksi acak (tidak berkorelasi dengan waktu/label); seluruh ID entitas hanya digunakan untuk agregasi riwayat kausal, bukan sebagai angka mentah.",
+    "spearman_id_merchant_fraud": -0.002543251775179861,
+    "spearman_id_pengguna_fraud": 0.03629220977906282,
+    "spearman_id_transaksi_fraud": 0.0011913442062205458,
+    "spearman_id_transaksi_waktu": 0.0003362981076288049
+  },
+  "kualitas": {
+    "kardinalitas_dan_unseen": {
+      "email_domain": {
+        "test_unik": 5,
+        "train_unik": 5,
+        "unseen_baris_test_pct": 0.0,
+        "unseen_unik": 0
+      },
+      "id_merchant": {
+        "test_unik": 7850,
+        "train_unik": 7914,
+        "unseen_baris_test_pct": 0.7227628100568085,
+        "unseen_unik": 152
+      },
+      "id_pengguna": {
+        "test_unik": 59778,
+        "train_unik": 102621,
+        "unseen_baris_test_pct": 14.520876689727583,
+        "unseen_unik": 11458
+      },
+      "kanal": {
+        "test_unik": 5,
+        "train_unik": 5,
+        "unseen_baris_test_pct": 0.0,
+        "unseen_unik": 0
+      },
+      "kategori_merchant": {
+        "test_unik": 24,
+        "train_unik": 24,
+        "unseen_baris_test_pct": 0.0,
+        "unseen_unik": 0
+      },
+      "tipe_perangkat": {
+        "test_unik": 3,
+        "train_unik": 3,
+        "unseen_baris_test_pct": 0.0,
+        "unseen_unik": 0
+      }
+    },
+    "kecocokan_missing_dengan_trx_pertama": 1.0,
+    "laju_fraud_trx_berulang_matang_pct": 0.5809213609707492,
+    "laju_fraud_trx_pertama_matang_pct": 0.9369870982486029,
+    "missing": {
+      "menit_sejak_trx_terakhir": {
+        "test_na_pct": 10.741136546862403,
+        "train_na_pct": 25.459403538281766
+      },
+      "rasio_nominal_rata2": {
+        "test_na_pct": 10.741136546862403,
+        "train_na_pct": 25.459403538281766
+      }
+    },
+    "pengulangan_fraud_matang": {
+      "maks_fraud_per_merchant": 20,
+      "maks_fraud_per_pengguna": 11,
+      "merchant_ge1_fraud": 1631,
+      "merchant_ge2_fraud": 362,
+      "pengguna_ge1_fraud": 1431,
+      "pengguna_ge2_fraud": 425
+    },
+    "persen_saldo_capped_50": {
+      "matang_fraud_rate_pct": 49.473684210526315,
+      "test_count": 74,
+      "train_count": 215,
+      "train_fraud_rate_pct": 45.11627906976744
+    },
+    "statistik_kolom_kunci": [
+      {
+        "kolom": "flag_review_manual",
+        "ks_train_vs_test": 0.004814201079585856,
+        "roc_auc_matang": 0.8941280619711343,
+        "test_median": 0.0,
+        "train_max": 1.0,
+        "train_median": 0.0,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "nominal",
+        "ks_train_vs_test": 0.0044759937094637214,
+        "roc_auc_matang": 0.6391764464193254,
+        "test_median": 126900.0,
+        "train_max": 25460700.0,
+        "train_median": 128200.0,
+        "train_min": 1000.0
+      },
+      {
+        "kolom": "menit_sejak_trx_terakhir",
+        "ks_train_vs_test": 0.12207636517066955,
+        "roc_auc_matang": 0.24403352391327002,
+        "test_median": 38276.45,
+        "train_max": 347252.1,
+        "train_median": 25757.4,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "trx_1j",
+        "ks_train_vs_test": 0.0016636647288409412,
+        "roc_auc_matang": 0.6878511011921926,
+        "test_median": 0.0,
+        "train_max": 10.0,
+        "train_median": 0.0,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "jarak_lokasi_km",
+        "ks_train_vs_test": 0.0024186883787988833,
+        "roc_auc_matang": 0.6792209490519331,
+        "test_median": 5.2,
+        "train_max": 1997.0,
+        "train_median": 5.2,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "umur_perangkat_hari",
+        "ks_train_vs_test": 0.04970531865998895,
+        "roc_auc_matang": 0.32623771485577213,
+        "test_median": 648.8,
+        "train_max": 2026.3,
+        "train_median": 699.6,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "umur_akun_hari",
+        "ks_train_vs_test": 0.05926826059444862,
+        "roc_auc_matang": 0.39111322459430603,
+        "test_median": 820.0,
+        "train_max": 2039.0,
+        "train_median": 864.0,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "persen_saldo",
+        "ks_train_vs_test": 0.005086150115061416,
+        "roc_auc_matang": 0.603249755961905,
+        "test_median": 0.353,
+        "train_max": 50.0,
+        "train_median": 0.359,
+        "train_min": 0.0
+      },
+      {
+        "kolom": "umur_merchant_hari",
+        "ks_train_vs_test": 0.08041263956172318,
+        "roc_auc_matang": 0.4055729592170514,
+        "test_median": 1031.0,
+        "train_max": 2239.0,
+        "train_median": 953.0,
+        "train_min": -274.0
+      },
+      {
+        "kolom": "refund_merchant_30h",
+        "ks_train_vs_test": 0.006409952088142656,
+        "roc_auc_matang": 0.599002116086281,
+        "test_median": 1.17,
+        "train_max": 13.46,
+        "train_median": 1.17,
+        "train_min": 0.03
+      },
+      {
+        "kolom": "v03",
+        "ks_train_vs_test": 0.002775921939028425,
+        "roc_auc_matang": 0.6370243505817145,
+        "test_median": 0.731,
+        "train_max": 9.544,
+        "train_median": 0.724,
+        "train_min": -6.978
+      },
+      {
+        "kolom": "v15",
+        "ks_train_vs_test": 0.5018644064364115,
+        "roc_auc_matang": 0.5032570350465311,
+        "test_median": 2.729,
+        "train_max": 6.991,
+        "train_median": 1.222,
+        "train_min": -3.832
+      },
+      {
+        "kolom": "v26",
+        "ks_train_vs_test": 0.02168813721723556,
+        "roc_auc_matang": 0.5353377573891316,
+        "test_median": -0.199,
+        "train_max": 6.369,
+        "train_median": -0.132,
+        "train_min": -6.059
+      },
+      {
+        "kolom": "v29",
+        "ks_train_vs_test": 0.001844445106217174,
+        "roc_auc_matang": 0.5407936373738651,
+        "test_median": 0.002,
+        "train_max": 4.795,
+        "train_median": 0.0,
+        "train_min": -4.643
+      },
+      {
+        "kolom": "v38",
+        "ks_train_vs_test": 0.01432670280107412,
+        "roc_auc_matang": 0.411946081037945,
+        "test_median": 1.959,
+        "train_max": 5.53,
+        "train_median": 1.98,
+        "train_min": -2.216
+      }
+    ],
+    "umur_merchant_negatif": {
+      "matang_fraud_rate_pct": 20.17259978425027,
+      "test_count": 20,
+      "test_pct": 0.018748711026116954,
+      "train_count": 955,
+      "train_fraud_rate_pct": 20.31413612565445,
+      "train_min_hari": -274.0,
+      "train_pct": 0.23692743570087105
+    }
+  },
+  "label_delay": {
+    "bulanan": [
+      {
+        "bulan": "2025-01",
+        "fraud": 327,
+        "fraud_qris": 13,
+        "laju_non_qris_pct": 0.7973185719364176,
+        "laju_pct": 0.6483978426395939,
+        "laju_qris_pct": 0.1176470588235294,
+        "n": 50432
+      },
+      {
+        "bulan": "2025-02",
+        "fraud": 301,
+        "fraud_qris": 15,
+        "laju_non_qris_pct": 0.7939151676660005,
+        "laju_pct": 0.6509515570934256,
+        "laju_qris_pct": 0.14682850430696948,
+        "n": 46240
+      },
+      {
+        "bulan": "2025-03",
+        "fraud": 387,
+        "fraud_qris": 16,
+        "laju_non_qris_pct": 0.9351448088120384,
+        "laju_pct": 0.7581100141043724,
+        "laju_qris_pct": 0.14065934065934066,
+        "n": 51048
+      },
+      {
+        "bulan": "2025-04",
+        "fraud": 355,
+        "fraud_qris": 12,
+        "laju_non_qris_pct": 0.9265512304492287,
+        "laju_pct": 0.7487397971020606,
+        "laju_qris_pct": 0.11545122185876468,
+        "n": 47413
+      },
+      {
+        "bulan": "2025-05",
+        "fraud": 367,
+        "fraud_qris": 13,
+        "laju_non_qris_pct": 0.864975809998534,
+        "laju_pct": 0.701305153732969,
+        "laju_qris_pct": 0.11398509425690487,
+        "n": 52331
+      },
+      {
+        "bulan": "2025-06",
+        "fraud": 299,
+        "fraud_qris": 13,
+        "laju_non_qris_pct": 0.7301692665117823,
+        "laju_pct": 0.5935483870967742,
+        "laju_qris_pct": 0.11600928074245939,
+        "n": 50375
+      },
+      {
+        "bulan": "2025-07",
+        "fraud": 341,
+        "fraud_qris": 10,
+        "laju_non_qris_pct": 0.8107578503894578,
+        "laju_pct": 0.6515840562540605,
+        "laju_qris_pct": 0.08689607229753216,
+        "n": 52334
+      },
+      {
+        "bulan": "2025-08",
+        "fraud": 245,
+        "fraud_qris": 92,
+        "laju_non_qris_pct": 0.37099903006789525,
+        "laju_pct": 0.46310297898079544,
+        "laju_qris_pct": 0.7887517146776405,
+        "n": 52904
+      }
+    ],
+    "harian_agustus": [
+      {
+        "fraud": 10,
+        "hari_agt": 1,
+        "laju_non_qris_pct": 0.6666666666666667,
+        "laju_pct": 0.5817335660267597,
+        "laju_qris_pct": 0.27100271002710025,
+        "n": 1719,
+        "tanggal": "2025-08-01"
+      },
+      {
+        "fraud": 18,
+        "hari_agt": 2,
+        "laju_non_qris_pct": 1.0061919504643964,
+        "laju_pct": 1.0935601458080195,
+        "laju_qris_pct": 1.4124293785310735,
+        "n": 1646,
+        "tanggal": "2025-08-02"
+      },
+      {
+        "fraud": 18,
+        "hari_agt": 3,
+        "laju_non_qris_pct": 1.06951871657754,
+        "laju_pct": 1.2465373961218837,
+        "laju_qris_pct": 1.8633540372670807,
+        "n": 1444,
+        "tanggal": "2025-08-03"
+      },
+      {
+        "fraud": 15,
+        "hari_agt": 4,
+        "laju_non_qris_pct": 0.42583392476933996,
+        "laju_pct": 0.8310249307479225,
+        "laju_qris_pct": 2.272727272727273,
+        "n": 1805,
+        "tanggal": "2025-08-04"
+      },
+      {
+        "fraud": 14,
+        "hari_agt": 5,
+        "laju_non_qris_pct": 0.8233532934131738,
+        "laju_pct": 0.8092485549132947,
+        "laju_qris_pct": 0.7614213197969544,
+        "n": 1730,
+        "tanggal": "2025-08-05"
+      },
+      {
+        "fraud": 18,
+        "hari_agt": 6,
+        "laju_non_qris_pct": 1.0844306738962044,
+        "laju_pct": 1.0863005431502715,
+        "laju_qris_pct": 1.092896174863388,
+        "n": 1657,
+        "tanggal": "2025-08-06"
+      },
+      {
+        "fraud": 17,
+        "hari_agt": 7,
+        "laju_non_qris_pct": 0.7874015748031495,
+        "laju_pct": 0.952914798206278,
+        "laju_qris_pct": 1.550387596899225,
+        "n": 1784,
+        "tanggal": "2025-08-07"
+      },
+      {
+        "fraud": 12,
+        "hari_agt": 8,
+        "laju_non_qris_pct": 0.29550827423167847,
+        "laju_pct": 0.5517241379310345,
+        "laju_qris_pct": 1.4492753623188406,
+        "n": 2175,
+        "tanggal": "2025-08-08"
+      },
+      {
+        "fraud": 9,
+        "hari_agt": 9,
+        "laju_non_qris_pct": 0.6085192697768762,
+        "laju_pct": 0.47948854555141185,
+        "laju_qris_pct": 0.0,
+        "n": 1877,
+        "tanggal": "2025-08-09"
+      },
+      {
+        "fraud": 6,
+        "hari_agt": 10,
+        "laju_non_qris_pct": 0.07930214115781126,
+        "laju_pct": 0.375,
+        "laju_qris_pct": 1.4749262536873156,
+        "n": 1600,
+        "tanggal": "2025-08-10"
+      },
+      {
+        "fraud": 11,
+        "hari_agt": 11,
+        "laju_non_qris_pct": 0.20876826722338201,
+        "laju_pct": 0.5984766050054406,
+        "laju_qris_pct": 1.99501246882793,
+        "n": 1838,
+        "tanggal": "2025-08-11"
+      },
+      {
+        "fraud": 7,
+        "hari_agt": 12,
+        "laju_non_qris_pct": 0.42253521126760557,
+        "laju_pct": 0.3835616438356164,
+        "laju_qris_pct": 0.24691358024691357,
+        "n": 1825,
+        "tanggal": "2025-08-12"
+      },
+      {
+        "fraud": 9,
+        "hari_agt": 13,
+        "laju_non_qris_pct": 0.6139677666922486,
+        "laju_pct": 0.5415162454873645,
+        "laju_qris_pct": 0.2785515320334262,
+        "n": 1662,
+        "tanggal": "2025-08-13"
+      },
+      {
+        "fraud": 11,
+        "hari_agt": 14,
+        "laju_non_qris_pct": 0.37537537537537535,
+        "laju_pct": 0.6369426751592357,
+        "laju_qris_pct": 1.5189873417721518,
+        "n": 1727,
+        "tanggal": "2025-08-14"
+      },
+      {
+        "fraud": 7,
+        "hari_agt": 15,
+        "laju_non_qris_pct": 0.37678975131876413,
+        "laju_pct": 0.4156769596199525,
+        "laju_qris_pct": 0.5602240896358543,
+        "n": 1684,
+        "tanggal": "2025-08-15"
+      },
+      {
+        "fraud": 4,
+        "hari_agt": 16,
+        "laju_non_qris_pct": 0.1597444089456869,
+        "laju_pct": 0.25412960609911056,
+        "laju_qris_pct": 0.6211180124223602,
+        "n": 1574,
+        "tanggal": "2025-08-16"
+      },
+      {
+        "fraud": 6,
+        "hari_agt": 17,
+        "laju_non_qris_pct": 0.3412969283276451,
+        "laju_pct": 0.4029550033579583,
+        "laju_qris_pct": 0.6309148264984227,
+        "n": 1489,
+        "tanggal": "2025-08-17"
+      },
+      {
+        "fraud": 8,
+        "hari_agt": 18,
+        "laju_non_qris_pct": 0.363901018922853,
+        "laju_pct": 0.45045045045045046,
+        "laju_qris_pct": 0.7462686567164178,
+        "n": 1776,
+        "tanggal": "2025-08-18"
+      },
+      {
+        "fraud": 10,
+        "hari_agt": 19,
+        "laju_non_qris_pct": 0.07304601899196494,
+        "laju_pct": 0.5656108597285068,
+        "laju_qris_pct": 2.2556390977443606,
+        "n": 1768,
+        "tanggal": "2025-08-19"
+      },
+      {
+        "fraud": 6,
+        "hari_agt": 20,
+        "laju_non_qris_pct": 0.23166023166023164,
+        "laju_pct": 0.3612281757977122,
+        "laju_qris_pct": 0.819672131147541,
+        "n": 1661,
+        "tanggal": "2025-08-20"
+      },
+      {
+        "fraud": 5,
+        "hari_agt": 21,
+        "laju_non_qris_pct": 0.1460920379839299,
+        "laju_pct": 0.2857142857142857,
+        "laju_qris_pct": 0.7874015748031495,
+        "n": 1750,
+        "tanggal": "2025-08-21"
+      },
+      {
+        "fraud": 4,
+        "hari_agt": 22,
+        "laju_non_qris_pct": 0.23364485981308408,
+        "laju_pct": 0.24330900243309003,
+        "laju_qris_pct": 0.2777777777777778,
+        "n": 1644,
+        "tanggal": "2025-08-22"
+      },
+      {
+        "fraud": 4,
+        "hari_agt": 23,
+        "laju_non_qris_pct": 0.31496062992125984,
+        "laju_pct": 0.245398773006135,
+        "laju_qris_pct": 0.0,
+        "n": 1630,
+        "tanggal": "2025-08-23"
+      },
+      {
+        "fraud": 5,
+        "hari_agt": 24,
+        "laju_non_qris_pct": 0.3469210754553339,
+        "laju_pct": 0.33377837116154874,
+        "laju_qris_pct": 0.2898550724637681,
+        "n": 1498,
+        "tanggal": "2025-08-24"
+      },
+      {
+        "fraud": 1,
+        "hari_agt": 25,
+        "laju_non_qris_pct": 0.0,
+        "laju_pct": 0.05339028296849973,
+        "laju_qris_pct": 0.24271844660194172,
+        "n": 1873,
+        "tanggal": "2025-08-25"
+      },
+      {
+        "fraud": 2,
+        "hari_agt": 26,
+        "laju_non_qris_pct": 0.0,
+        "laju_pct": 0.11242270938729623,
+        "laju_qris_pct": 0.49261083743842365,
+        "n": 1779,
+        "tanggal": "2025-08-26"
+      },
+      {
+        "fraud": 5,
+        "hari_agt": 27,
+        "laju_non_qris_pct": 0.2911208151382824,
+        "laju_pct": 0.27901785714285715,
+        "laju_qris_pct": 0.23923444976076555,
+        "n": 1792,
+        "tanggal": "2025-08-27"
+      },
+      {
+        "fraud": 3,
+        "hari_agt": 28,
+        "laju_non_qris_pct": 0.2255639097744361,
+        "laju_pct": 0.17472335468841002,
+        "laju_qris_pct": 0.0,
+        "n": 1717,
+        "tanggal": "2025-08-28"
+      },
+      {
+        "fraud": 0,
+        "hari_agt": 29,
+        "laju_non_qris_pct": 0.0,
+        "laju_pct": 0.0,
+        "laju_qris_pct": 0.0,
+        "n": 1719,
+        "tanggal": "2025-08-29"
+      },
+      {
+        "fraud": 0,
+        "hari_agt": 30,
+        "laju_non_qris_pct": 0.0,
+        "laju_pct": 0.0,
+        "laju_qris_pct": 0.0,
+        "n": 1633,
+        "tanggal": "2025-08-30"
+      },
+      {
+        "fraud": 0,
+        "hari_agt": 31,
+        "laju_non_qris_pct": 0.0,
+        "laju_pct": 0.0,
+        "laju_qris_pct": 0.0,
+        "n": 1428,
+        "tanggal": "2025-08-31"
+      }
+    ],
+    "kurva_maturitas": [
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 0,
+        "fraud_qris": 0,
+        "hari_max": 3.0,
+        "hari_min": -0.001,
+        "laju_non_qris": 0.0,
+        "laju_qris": 0.0,
+        "n_non_qris": 3717,
+        "n_qris": 1064,
+        "rasio_maturitas": 0.0,
+        "rentang_hari": "0–3h",
+        "tengah_hari": 1.4995
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 7,
+        "fraud_qris": 4,
+        "hari_max": 7.0,
+        "hari_min": 3.0,
+        "laju_non_qris": 0.0012642225031605564,
+        "laju_qris": 0.0024645717806531116,
+        "n_non_qris": 5537,
+        "n_qris": 1623,
+        "rasio_maturitas": 0.15105328822336628,
+        "rentang_hari": "3–7h",
+        "tengah_hari": 5.0
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 11,
+        "fraud_qris": 2,
+        "hari_max": 10.0,
+        "hari_min": 7.0,
+        "laju_non_qris": 0.002967359050445104,
+        "laju_qris": 0.0018779342723004694,
+        "n_non_qris": 3707,
+        "n_qris": 1065,
+        "rasio_maturitas": 0.3545494094500971,
+        "rentang_hari": "7–10h",
+        "tengah_hari": 8.5
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 11,
+        "fraud_qris": 18,
+        "hari_max": 14.0,
+        "hari_min": 10.0,
+        "laju_non_qris": 0.002034399852043647,
+        "laju_qris": 0.011627906976744186,
+        "n_non_qris": 5407,
+        "n_qris": 1548,
+        "rasio_maturitas": 0.24307650468494726,
+        "rentang_hari": "10–14h",
+        "tengah_hari": 12.0
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 16,
+        "fraud_qris": 12,
+        "hari_max": 18.0,
+        "hari_min": 14.0,
+        "laju_non_qris": 0.0031477473932716897,
+        "laju_qris": 0.008626887131560028,
+        "n_non_qris": 5083,
+        "n_qris": 1391,
+        "rasio_maturitas": 0.37610277705192274,
+        "rentang_hari": "14–18h",
+        "tengah_hari": 16.0
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 17,
+        "fraud_qris": 10,
+        "hari_max": 21.0,
+        "hari_min": 18.0,
+        "laju_non_qris": 0.004086538461538462,
+        "laju_qris": 0.008583690987124463,
+        "n_non_qris": 4160,
+        "n_qris": 1165,
+        "rasio_maturitas": 0.488272492004713,
+        "rentang_hari": "18–21h",
+        "tengah_hari": 19.5
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 26,
+        "fraud_qris": 18,
+        "hari_max": 25.0,
+        "hari_min": 21.0,
+        "laju_non_qris": 0.004460456338994682,
+        "laju_qris": 0.01120099564405725,
+        "n_non_qris": 5829,
+        "n_qris": 1607,
+        "rasio_maturitas": 0.5329493782126867,
+        "rentang_hari": "21–25h",
+        "tengah_hari": 23.0
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 65,
+        "fraud_qris": 28,
+        "hari_max": 31.0,
+        "hari_min": 25.0,
+        "laju_non_qris": 0.008333333333333333,
+        "laju_qris": 0.012721490231712857,
+        "n_non_qris": 7800,
+        "n_qris": 2201,
+        "rasio_maturitas": 0.9956929248723559,
+        "rentang_hari": "25–31h",
+        "tengah_hari": 28.0
+      },
+      {
+        "baseline_non_qris": 0.008369380885579392,
+        "fraud_non_qris": 116,
+        "fraud_qris": 4,
+        "hari_max": 45.0,
+        "hari_min": 31.0,
+        "laju_non_qris": 0.006433007985803017,
+        "laju_qris": 0.0007920792079207921,
+        "n_non_qris": 18032,
+        "n_qris": 5050,
+        "rasio_maturitas": 0.7686360644533714,
+        "rentang_hari": "31–45h",
+        "tengah_hari": 38.0
+      }
+    ],
+    "laju_fraud_agustus_pct": 0.46310297898079544,
+    "laju_fraud_matang_non_qris_pct": 0.8369380885579392,
+    "laju_fraud_matang_pct": 0.6788073323757114,
+    "laju_fraud_total_pct": 0.6504960590656376,
+    "n_fraud_matang_jan_jul": 2377,
+    "n_fraud_total": 2622,
+    "n_matang_jan_jul": 350173,
+    "n_total": 403077,
+    "nominal_fraud_matang": {
+      "mean_idr": 1228940.8918805216,
+      "median_idr": 344800.0,
+      "persen_le_25k": 12.915439629785444,
+      "q10_idr": 19000.0,
+      "q90_idr": 4611920.000000001,
+      "total_kerugian_idr": 2921192500.0
+    },
+    "tiga_hari_terakhir_fraud": 0,
+    "tiga_hari_terakhir_n": 4780
+  },
+  "leakage_review": {
+    "kontingensi_train": {
+      "rev0_fraud": 527,
+      "rev0_nonfraud": 395652,
+      "rev1_fraud": 2095,
+      "rev1_nonfraud": 4803
+    },
+    "laju_review_bulanan_pct": {
+      "2025-01": 1.681472081218274,
+      "2025-02": 1.7560553633217992,
+      "2025-03": 1.7806770098730607,
+      "2025-04": 1.8876679391728008,
+      "2025-05": 1.6414744606447422,
+      "2025-06": 1.6853598014888338,
+      "2025-07": 1.6681316161577557,
+      "2025-08": 1.6123544533494631,
+      "2025-09": 1.2809254734270006,
+      "2025-10": 1.1806962608215141
+    },
+    "laju_review_test_total_pct": 1.2299154433132722,
+    "laju_review_train_nonfraud_pct": 1.1993856987676517,
+    "laju_review_train_total_pct": 1.7113355512718413,
+    "pr_auc_univariat_matang": 0.2531215786272709,
+    "precision_review_di_train_pct": 30.371122064366485,
+    "proporsi_fraud_yang_direview_pct": 79.90083905415713,
+    "rasio_fitur_risiko_rev1_vs_rev0": [
+      {
+        "kolom": "trx_1j",
+        "label": "Trx 1 jam",
+        "rasio_latih_non_fraud": 1.0839808552076673,
+        "rasio_latih_semua": 9.009842972481763,
+        "rasio_uji": 1.2655736774058286
+      },
+      {
+        "kolom": "ganti_password_7h",
+        "label": "Ganti sandi",
+        "rasio_latih_non_fraud": 0.9912877856874953,
+        "rasio_latih_semua": 3.949914635027016,
+        "rasio_uji": 0.8851899840186399
+      },
+      {
+        "kolom": "gagal_login_24j",
+        "label": "Gagal masuk",
+        "rasio_latih_non_fraud": 0.8790555816556131,
+        "rasio_latih_semua": 3.5317232630748574,
+        "rasio_uji": 0.9499032323985142
+      },
+      {
+        "kolom": "perangkat_baru",
+        "label": "Perangkat baru",
+        "rasio_latih_non_fraud": 1.0444882221609295,
+        "rasio_latih_semua": 3.5790754966868787,
+        "rasio_uji": 0.8043734695732702
+      },
+      {
+        "kolom": "jarak_lokasi_km",
+        "label": "Jarak lokasi",
+        "rasio_latih_non_fraud": 1.1125673607107882,
+        "rasio_latih_semua": 2.2738653825439323,
+        "rasio_uji": 1.1057565575707569
+      },
+      {
+        "kolom": "persen_saldo",
+        "label": "Persen saldo",
+        "rasio_latih_non_fraud": 1.066064875353626,
+        "rasio_latih_semua": 2.1404265621221352,
+        "rasio_uji": 0.9658086941091183
+      },
+      {
+        "kolom": "nominal",
+        "label": "Nominal",
+        "rasio_latih_non_fraud": 1.0483766316700647,
+        "rasio_latih_semua": 1.9518334147827316,
+        "rasio_uji": 0.9561329917729129
+      }
+    ],
+    "roc_auc_univariat_matang": 0.8941280619711343
+  },
+  "pattern_shift": {
+    "arketipe_fraud": [
+      {
+        "arketipe": "Merchant Kolusif (Nominal Besar)",
+        "median_nominal_idr": 4778400.0,
+        "n_agustus": 13,
+        "n_fraud": 399,
+        "n_jan_jul": 386,
+        "pangsa_jumlah_pct": 15.217391304347828,
+        "pangsa_kerugian_pct": 67.0499156201023,
+        "total_nominal_idr": 2126282700.0
+      },
+      {
+        "arketipe": "Pengambilalihan Akun (ATO)",
+        "median_nominal_idr": 414350.0,
+        "n_agustus": 87,
+        "n_fraud": 966,
+        "n_jan_jul": 879,
+        "pangsa_jumlah_pct": 36.84210526315789,
+        "pangsa_kerugian_pct": 17.66830893994271,
+        "total_nominal_idr": 560296300.0
+      },
+      {
+        "arketipe": "Anomali Merchant & Lainnya",
+        "median_nominal_idr": 419500.0,
+        "n_agustus": 26,
+        "n_fraud": 432,
+        "n_jan_jul": 406,
+        "pangsa_jumlah_pct": 16.475972540045767,
+        "pangsa_kerugian_pct": 8.616266486654537,
+        "total_nominal_idr": 273238500.0
+      },
+      {
+        "arketipe": "Gelombang QRIS",
+        "median_nominal_idr": 800000.0,
+        "n_agustus": 92,
+        "n_fraud": 184,
+        "n_jan_jul": 92,
+        "pangsa_jumlah_pct": 7.017543859649122,
+        "pangsa_kerugian_pct": 5.987127181792775,
+        "total_nominal_idr": 189863400.0
+      },
+      {
+        "arketipe": "Card Testing & Velocity",
+        "median_nominal_idr": 27000.0,
+        "n_agustus": 27,
+        "n_fraud": 641,
+        "n_jan_jul": 614,
+        "pangsa_jumlah_pct": 24.446987032799388,
+        "pangsa_kerugian_pct": 0.6783817715076819,
+        "total_nominal_idr": 21512800.0
+      }
+    ],
+    "laju_fraud_qris_bulat100k_agt_awal_1_10_pct": 86.36363636363636,
+    "laju_jasa_lainnya_agustus_pct": 3.1201248049921997,
+    "laju_jasa_lainnya_jan_jul_pct": 0.1008500216107189,
+    "laju_kanal_bulanan_pct": {
+      "aplikasi": {
+        "2025-01": 0.40812705172566766,
+        "2025-02": 0.339459774016779,
+        "2025-03": 0.4405674508767292,
+        "2025-04": 0.5082352941176471,
+        "2025-05": 0.3936165661233047,
+        "2025-06": 0.30668029690208454,
+        "2025-07": 0.3395512765408751,
+        "2025-08": 0.134850400337126
+      },
+      "kartu": {
+        "2025-01": 1.8461538461538463,
+        "2025-02": 1.700375872561303,
+        "2025-03": 2.0372433550851508,
+        "2025-04": 1.7823479005998284,
+        "2025-05": 2.0788420080073915,
+        "2025-06": 1.466992665036675,
+        "2025-07": 1.7734291392753403,
+        "2025-08": 0.8968609865470852
+      },
+      "qris": {
+        "2025-01": 0.1176470588235294,
+        "2025-02": 0.14682850430696948,
+        "2025-03": 0.14065934065934066,
+        "2025-04": 0.11545122185876468,
+        "2025-05": 0.11398509425690487,
+        "2025-06": 0.11600928074245939,
+        "2025-07": 0.08689607229753216,
+        "2025-08": 0.7887517146776405
+      },
+      "va": {
+        "2025-01": 0.7684154742978272,
+        "2025-02": 1.0008703220191473,
+        "2025-03": 1.1087645195353748,
+        "2025-04": 1.098282174035483,
+        "2025-05": 0.8360128617363344,
+        "2025-06": 0.9624508607835163,
+        "2025-07": 0.9466547268773187,
+        "2025-08": 0.4851889683350358
+      },
+      "web": {
+        "2025-01": 1.6041065126724416,
+        "2025-02": 1.7796030116358659,
+        "2025-03": 1.8934531450577663,
+        "2025-04": 1.8714689265536724,
+        "2025-05": 1.8879415347137638,
+        "2025-06": 1.773274224192527,
+        "2025-07": 1.9362898188632107,
+        "2025-08": 0.7785736530675802
+      }
+    },
+    "laju_qris_agustus_pct": 0.7887517146776405,
+    "laju_qris_jan_jul_pct": 0.11924203540970009,
+    "n_qris_bulat100k_test_sep_okt": 461,
+    "persen_bulat100k_pada_fraud_qris_agt": 79.34782608695652,
+    "persen_bulat100k_pada_normal_jan_jul": 0.07360636695074124,
+    "qris_bulat100k_bulanan": [
+      {
+        "bulan": "2025-01",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 12,
+        "n_qris": 11050,
+        "persen_bulat100k": 0.1085972850678733,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-02",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 11,
+        "n_qris": 10216,
+        "persen_bulat100k": 0.1076742364917776,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-03",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 6,
+        "n_qris": 11375,
+        "persen_bulat100k": 0.05274725274725274,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-04",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 7,
+        "n_qris": 10394,
+        "persen_bulat100k": 0.06734654608427938,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-05",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 2,
+        "n_qris": 11405,
+        "persen_bulat100k": 0.017536168347216136,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-06",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 7,
+        "n_qris": 11206,
+        "persen_bulat100k": 0.062466535784401214,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-07",
+        "fraud_bulat100k": 0,
+        "laju_fraud_bulat100k_pct": 0.0,
+        "n_bulat100k": 11,
+        "n_qris": 11508,
+        "persen_bulat100k": 0.09558567952728537,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-08",
+        "fraud_bulat100k": 73,
+        "laju_fraud_bulat100k_pct": 52.89855072463768,
+        "n_bulat100k": 138,
+        "n_qris": 11664,
+        "persen_bulat100k": 1.183127572016461,
+        "split": "train"
+      },
+      {
+        "bulan": "2025-09",
+        "fraud_bulat100k": null,
+        "laju_fraud_bulat100k_pct": null,
+        "n_bulat100k": 220,
+        "n_qris": 11529,
+        "persen_bulat100k": 1.9082314164281375,
+        "split": "test"
+      },
+      {
+        "bulan": "2025-10",
+        "fraud_bulat100k": null,
+        "laju_fraud_bulat100k_pct": null,
+        "n_bulat100k": 241,
+        "n_qris": 12001,
+        "persen_bulat100k": 2.0081659861678194,
+        "split": "test"
+      }
+    ]
+  },
+  "skema": {
+    "dup_id_test": 0,
+    "dup_id_train": 0,
+    "dup_rows_test": 0,
+    "dup_rows_train": 0,
+    "overlap_id_train_test": 0,
+    "test_only_cols": [],
+    "test_shape": [
+      106674,
+      84
+    ],
+    "train_only_cols": [
+      "is_fraud"
+    ],
+    "train_shape": [
+      403077,
+      85
+    ]
+  },
+  "v_screening": {
+    "drift_noise_v_cols": [
+      "v15"
+    ],
+    "n_noise": 42,
+    "n_signal": 8,
+    "semua_v": [
+      {
+        "auc_agustus": 0.6258053839663821,
+        "auc_matang": 0.6370243505817145,
+        "kekuatan_sinyal_agustus": 0.12580538396638208,
+        "kekuatan_sinyal_matang": 0.13702435058171447,
+        "kolom": "v03",
+        "ks_train_test": 0.002775921939028425,
+        "spearman_waktu_train": 0.0017372945227122226,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.48916556310896714,
+        "auc_matang": 0.411946081037945,
+        "kekuatan_sinyal_agustus": 0.010834436891032861,
+        "kekuatan_sinyal_matang": 0.088053918962055,
+        "kolom": "v38",
+        "ks_train_test": 0.01432670280107412,
+        "spearman_waktu_train": -0.01670038013677362,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.5796791137123682,
+        "auc_matang": 0.5750944877850992,
+        "kekuatan_sinyal_agustus": 0.07967911371236824,
+        "kekuatan_sinyal_matang": 0.0750944877850992,
+        "kolom": "v11",
+        "ks_train_test": 0.0026296020634205552,
+        "spearman_waktu_train": 0.00013678967724098864,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.5176465367665894,
+        "auc_matang": 0.5735166499979657,
+        "kekuatan_sinyal_agustus": 0.01764653676658945,
+        "kekuatan_sinyal_matang": 0.0735166499979657,
+        "kolom": "v42",
+        "ks_train_test": 0.0015273139363521926,
+        "spearman_waktu_train": -0.0035238775493043584,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.5246695430864193,
+        "auc_matang": 0.566241742768343,
+        "kekuatan_sinyal_agustus": 0.024669543086419332,
+        "kekuatan_sinyal_matang": 0.06624174276834305,
+        "kolom": "v19",
+        "ks_train_test": 0.002833831690717048,
+        "spearman_waktu_train": 0.003883025973167929,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.489561138646765,
+        "auc_matang": 0.5407936373738651,
+        "kekuatan_sinyal_agustus": 0.010438861353235018,
+        "kekuatan_sinyal_matang": 0.0407936373738651,
+        "kolom": "v29",
+        "ks_train_test": 0.001844445106217174,
+        "spearman_waktu_train": -0.0013932503250134926,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.6038717726023926,
+        "auc_matang": 0.5353377573891316,
+        "kekuatan_sinyal_agustus": 0.10387177260239255,
+        "kekuatan_sinyal_matang": 0.035337757389131585,
+        "kolom": "v26",
+        "ks_train_test": 0.02168813721723556,
+        "spearman_waktu_train": -0.03558381621062971,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.47579544322713985,
+        "auc_matang": 0.5197905195156134,
+        "kekuatan_sinyal_agustus": 0.024204556772860153,
+        "kekuatan_sinyal_matang": 0.01979051951561339,
+        "kolom": "v47",
+        "ks_train_test": 0.0036939742124879604,
+        "spearman_waktu_train": -0.0003456596371006961,
+        "status": "sinyal"
+      },
+      {
+        "auc_agustus": 0.48505149225416827,
+        "auc_matang": 0.4857636947007359,
+        "kekuatan_sinyal_agustus": 0.01494850774583173,
+        "kekuatan_sinyal_matang": 0.014236305299264118,
+        "kolom": "v30",
+        "ks_train_test": 0.004495964668049468,
+        "spearman_waktu_train": 0.0016548913164597767,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4775787304610216,
+        "auc_matang": 0.4861275170842875,
+        "kekuatan_sinyal_agustus": 0.022421269538978383,
+        "kekuatan_sinyal_matang": 0.013872482915712525,
+        "kolom": "v35",
+        "ks_train_test": 0.0035333930842568195,
+        "spearman_waktu_train": 0.0011350791727373327,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.49449709354487537,
+        "auc_matang": 0.5118724922103742,
+        "kekuatan_sinyal_agustus": 0.005502906455124634,
+        "kekuatan_sinyal_matang": 0.01187249221037423,
+        "kolom": "v25",
+        "ks_train_test": 0.0015897976624256183,
+        "spearman_waktu_train": 0.00046420002669834406,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.48826070392835536,
+        "auc_matang": 0.48828436851310564,
+        "kekuatan_sinyal_agustus": 0.011739296071644645,
+        "kekuatan_sinyal_matang": 0.011715631486894362,
+        "kolom": "v01",
+        "ks_train_test": 0.002198851268335522,
+        "spearman_waktu_train": -0.0018520642083475476,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4865598105019938,
+        "auc_matang": 0.48830072973062283,
+        "kekuatan_sinyal_agustus": 0.013440189498006183,
+        "kekuatan_sinyal_matang": 0.011699270269377171,
+        "kolom": "v27",
+        "ks_train_test": 0.004890615274192878,
+        "spearman_waktu_train": -0.0012736142790725177,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4906410556018681,
+        "auc_matang": 0.5101249131419662,
+        "kekuatan_sinyal_agustus": 0.009358944398131896,
+        "kekuatan_sinyal_matang": 0.010124913141966174,
+        "kolom": "v21",
+        "ks_train_test": 0.004103897540764623,
+        "spearman_waktu_train": 0.002025511395925514,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5054824824021786,
+        "auc_matang": 0.5099517565200395,
+        "kekuatan_sinyal_agustus": 0.0054824824021786345,
+        "kekuatan_sinyal_matang": 0.009951756520039545,
+        "kolom": "v31",
+        "ks_train_test": 0.002297451649295512,
+        "spearman_waktu_train": -0.00019773351797666418,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5048034117082143,
+        "auc_matang": 0.5094063936909171,
+        "kekuatan_sinyal_agustus": 0.0048034117082143,
+        "kekuatan_sinyal_matang": 0.009406393690917114,
+        "kolom": "v04",
+        "ks_train_test": 0.00014712705576647167,
+        "spearman_waktu_train": -0.0021953703960760494,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4908250270996566,
+        "auc_matang": 0.50920424386903,
+        "kekuatan_sinyal_agustus": 0.009174972900343414,
+        "kekuatan_sinyal_matang": 0.00920424386902996,
+        "kolom": "v41",
+        "ks_train_test": 0.0033334882095000795,
+        "spearman_waktu_train": 0.001594986459689739,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5076398747273079,
+        "auc_matang": 0.5078222804345778,
+        "kekuatan_sinyal_agustus": 0.0076398747273078715,
+        "kekuatan_sinyal_matang": 0.007822280434577777,
+        "kolom": "v45",
+        "ks_train_test": 0.004891039411817899,
+        "spearman_waktu_train": 0.002017484975002315,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4822251443732509,
+        "auc_matang": 0.49222140955621774,
+        "kekuatan_sinyal_agustus": 0.017774855626749075,
+        "kekuatan_sinyal_matang": 0.007778590443782263,
+        "kolom": "v05",
+        "ks_train_test": 0.002218429137370692,
+        "spearman_waktu_train": -0.0001688398991976496,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5254816995447412,
+        "auc_matang": 0.49245397992071455,
+        "kekuatan_sinyal_agustus": 0.02548169954474122,
+        "kekuatan_sinyal_matang": 0.007546020079285454,
+        "kolom": "v02",
+        "ks_train_test": 0.0020452660038197124,
+        "spearman_waktu_train": 0.0020215443139780156,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5004837826431204,
+        "auc_matang": 0.4927462053454582,
+        "kekuatan_sinyal_agustus": 0.00048378264312043395,
+        "kekuatan_sinyal_matang": 0.00725379465454179,
+        "kolom": "v49",
+        "ks_train_test": 0.0005428358081874807,
+        "spearman_waktu_train": -9.710819607543775e-05,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5121990504171816,
+        "auc_matang": 0.4944654637584081,
+        "kekuatan_sinyal_agustus": 0.012199050417181612,
+        "kekuatan_sinyal_matang": 0.005534536241591892,
+        "kolom": "v08",
+        "ks_train_test": 0.003430413738726268,
+        "spearman_waktu_train": 7.36259806806396e-05,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.49767448710242373,
+        "auc_matang": 0.5050479339643359,
+        "kekuatan_sinyal_agustus": 0.002325512897576265,
+        "kekuatan_sinyal_matang": 0.005047933964335893,
+        "kolom": "v39",
+        "ks_train_test": 0.0015422707356089749,
+        "spearman_waktu_train": -0.000531025896288935,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5019185432960857,
+        "auc_matang": 0.5049293961813688,
+        "kekuatan_sinyal_agustus": 0.0019185432960856508,
+        "kekuatan_sinyal_matang": 0.004929396181368784,
+        "kolom": "v22",
+        "ks_train_test": 0.0022090130588274803,
+        "spearman_waktu_train": 0.0017721874739032484,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5131422386079709,
+        "auc_matang": 0.50454698810307,
+        "kekuatan_sinyal_agustus": 0.013142238607970924,
+        "kekuatan_sinyal_matang": 0.004546988103069971,
+        "kolom": "v48",
+        "ks_train_test": 0.0022549813723184986,
+        "spearman_waktu_train": 0.0011141611403685094,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4689121498311625,
+        "auc_matang": 0.4956738968006976,
+        "kekuatan_sinyal_agustus": 0.031087850168837527,
+        "kekuatan_sinyal_matang": 0.004326103199302378,
+        "kolom": "v23",
+        "ks_train_test": 0.0026295640382509866,
+        "spearman_waktu_train": 0.0004550415039278481,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.49249142829239023,
+        "auc_matang": 0.49584726933844014,
+        "kekuatan_sinyal_agustus": 0.007508571707609768,
+        "kekuatan_sinyal_matang": 0.004152730661559856,
+        "kolom": "v44",
+        "ks_train_test": 0.00029047357242872884,
+        "spearman_waktu_train": -0.00020450188304768283,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5193289051506206,
+        "auc_matang": 0.5041063420254679,
+        "kekuatan_sinyal_agustus": 0.01932890515062058,
+        "kekuatan_sinyal_matang": 0.004106342025467891,
+        "kolom": "v36",
+        "ks_train_test": 0.0027767567484843214,
+        "spearman_waktu_train": 0.0027360355528169597,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5309860787019758,
+        "auc_matang": 0.5036529575195297,
+        "kekuatan_sinyal_agustus": 0.030986078701975783,
+        "kekuatan_sinyal_matang": 0.0036529575195296538,
+        "kolom": "v28",
+        "ks_train_test": 0.00223678029350477,
+        "spearman_waktu_train": 0.0006475508649950383,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4716593205960103,
+        "auc_matang": 0.5036057898930428,
+        "kekuatan_sinyal_agustus": 0.02834067940398971,
+        "kekuatan_sinyal_matang": 0.0036057898930428323,
+        "kolom": "v18",
+        "ks_train_test": 0.0025435141959106455,
+        "spearman_waktu_train": -0.00329662882058233,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5269817629096873,
+        "auc_matang": 0.496516319875384,
+        "kekuatan_sinyal_agustus": 0.026981762909687346,
+        "kekuatan_sinyal_matang": 0.003483680124615973,
+        "kolom": "v50",
+        "ks_train_test": 0.003838911855740146,
+        "spearman_waktu_train": -0.0002923799850779367,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.47052239456712436,
+        "auc_matang": 0.5032570350465311,
+        "kekuatan_sinyal_agustus": 0.029477605432875642,
+        "kekuatan_sinyal_matang": 0.003257035046531076,
+        "kolom": "v15",
+        "ks_train_test": 0.5018644064364115,
+        "spearman_waktu_train": 0.5778969484809683,
+        "status": "drift_noise"
+      },
+      {
+        "auc_agustus": 0.49572974521090835,
+        "auc_matang": 0.5029935808578699,
+        "kekuatan_sinyal_agustus": 0.004270254789091654,
+        "kekuatan_sinyal_matang": 0.0029935808578699374,
+        "kolom": "v32",
+        "ks_train_test": 0.0019843362861888814,
+        "spearman_waktu_train": 0.0007036660237816959,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4957839251464273,
+        "auc_matang": 0.5027061116291397,
+        "kekuatan_sinyal_agustus": 0.004216074853572727,
+        "kekuatan_sinyal_matang": 0.002706111629139696,
+        "kolom": "v40",
+        "ks_train_test": 0.004488590994622121,
+        "spearman_waktu_train": -0.000998672433343389,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5352945074799703,
+        "auc_matang": 0.502668250155763,
+        "kekuatan_sinyal_agustus": 0.035294507479970316,
+        "kekuatan_sinyal_matang": 0.0026682501557629967,
+        "kolom": "v37",
+        "ks_train_test": 0.005871374540776353,
+        "spearman_waktu_train": 0.00010833603674545392,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5012597803891112,
+        "auc_matang": 0.4973797442408091,
+        "kekuatan_sinyal_agustus": 0.0012597803891112314,
+        "kekuatan_sinyal_matang": 0.0026202557591908926,
+        "kolom": "v06",
+        "ks_train_test": 0.0018281556817527217,
+        "spearman_waktu_train": 0.00044430205287731574,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4853023166766849,
+        "auc_matang": 0.49757908171383286,
+        "kekuatan_sinyal_agustus": 0.014697683323315114,
+        "kekuatan_sinyal_matang": 0.0024209182861671397,
+        "kolom": "v16",
+        "ks_train_test": 0.0018453086613062775,
+        "spearman_waktu_train": -0.00048322776528307755,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5327380516383617,
+        "auc_matang": 0.5021165096451857,
+        "kekuatan_sinyal_agustus": 0.03273805163836174,
+        "kekuatan_sinyal_matang": 0.002116509645185727,
+        "kolom": "v24",
+        "ks_train_test": 1.5970989833857807e-05,
+        "spearman_waktu_train": -0.0007243253470732888,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5405215923320277,
+        "auc_matang": 0.5019974626153921,
+        "kekuatan_sinyal_agustus": 0.04052159233202768,
+        "kekuatan_sinyal_matang": 0.0019974626153921315,
+        "kolom": "v46",
+        "ks_train_test": 0.003496593720592134,
+        "spearman_waktu_train": 0.0015904121295576014,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4694515463565931,
+        "auc_matang": 0.5019455805245202,
+        "kekuatan_sinyal_agustus": 0.030548453643406914,
+        "kekuatan_sinyal_matang": 0.0019455805245202074,
+        "kolom": "v43",
+        "ks_train_test": 0.002274002538917408,
+        "spearman_waktu_train": 0.0012279502071277845,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5018032074676848,
+        "auc_matang": 0.5018788377403312,
+        "kekuatan_sinyal_agustus": 0.0018032074676848087,
+        "kekuatan_sinyal_matang": 0.0018788377403311518,
+        "kolom": "v17",
+        "ks_train_test": 0.0019971896307460213,
+        "spearman_waktu_train": 0.0012438213375445654,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5026866349570649,
+        "auc_matang": 0.49844099103970896,
+        "kekuatan_sinyal_agustus": 0.002686634957064893,
+        "kekuatan_sinyal_matang": 0.0015590089602910417,
+        "kolom": "v14",
+        "ks_train_test": 0.004329441217497787,
+        "spearman_waktu_train": 0.0013188263084766734,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5177598185631,
+        "auc_matang": 0.5015338853104441,
+        "kekuatan_sinyal_agustus": 0.01775981856310005,
+        "kekuatan_sinyal_matang": 0.001533885310444072,
+        "kolom": "v34",
+        "ks_train_test": 0.0016188493803529491,
+        "spearman_waktu_train": -0.0014466902522774548,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.4772472949756442,
+        "auc_matang": 0.49849427204733815,
+        "kekuatan_sinyal_agustus": 0.02275270502435578,
+        "kekuatan_sinyal_matang": 0.0015057279526618506,
+        "kolom": "v12",
+        "ks_train_test": 0.0024442385716647586,
+        "spearman_waktu_train": 0.0012880172543661796,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.466521372976924,
+        "auc_matang": 0.5013262867894362,
+        "kekuatan_sinyal_agustus": 0.033478627023076024,
+        "kekuatan_sinyal_matang": 0.0013262867894362484,
+        "kolom": "v13",
+        "ks_train_test": 0.002255973026877689,
+        "spearman_waktu_train": -0.0006515942747684261,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5196351109235353,
+        "auc_matang": 0.501131562778161,
+        "kekuatan_sinyal_agustus": 0.019635110923535315,
+        "kekuatan_sinyal_matang": 0.001131562778160955,
+        "kolom": "v10",
+        "ks_train_test": 0.005172362105097195,
+        "spearman_waktu_train": 0.0029903111685674454,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5083357652295807,
+        "auc_matang": 0.5010059523914069,
+        "kekuatan_sinyal_agustus": 0.008335765229580683,
+        "kekuatan_sinyal_matang": 0.0010059523914068835,
+        "kolom": "v33",
+        "ks_train_test": 0.004329852307954463,
+        "spearman_waktu_train": -0.0010590157218009133,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.49592139026179605,
+        "auc_matang": 0.5010052108989969,
+        "kekuatan_sinyal_agustus": 0.004078609738203953,
+        "kekuatan_sinyal_matang": 0.0010052108989968556,
+        "kolom": "v07",
+        "ks_train_test": 0.002980107471082294,
+        "spearman_waktu_train": -0.0006551490345468123,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5311848159761825,
+        "auc_matang": 0.4991865652868245,
+        "kekuatan_sinyal_agustus": 0.0311848159761825,
+        "kekuatan_sinyal_matang": 0.0008134347131755204,
+        "kolom": "v20",
+        "ks_train_test": 0.0020126408269776075,
+        "spearman_waktu_train": -0.0034112569351183995,
+        "status": "noise"
+      },
+      {
+        "auc_agustus": 0.5016991494370209,
+        "auc_matang": 0.5001496617151956,
+        "kekuatan_sinyal_agustus": 0.0016991494370208748,
+        "kekuatan_sinyal_matang": 0.00014966171519559257,
+        "kolom": "v09",
+        "ks_train_test": 0.00019015096525765163,
+        "spearman_waktu_train": 0.0011063307291053585,
+        "status": "noise"
+      }
+    ],
+    "signal_v_cols": [
+      "v03",
+      "v11",
+      "v19",
+      "v26",
+      "v29",
+      "v38",
+      "v42",
+      "v47"
+    ],
+    "v15_detail": {
+      "auc_agustus": 0.47052239456712436,
+      "auc_matang": 0.5032570350465311,
+      "kekuatan_sinyal_agustus": 0.029477605432875642,
+      "kekuatan_sinyal_matang": 0.003257035046531076,
+      "kolom": "v15",
+      "ks_train_test": 0.5018644064364115,
+      "spearman_waktu_train": 0.5778969484809683,
+      "status": "drift_noise"
+    }
+  },
+  "waktu": {
+    "test_max": "2025-10-31 23:57:22",
+    "test_min": "2025-09-01 00:01:51",
+    "test_terurut_waktu": false,
+    "train_max": "2025-08-31 23:58:04",
+    "train_min": "2025-01-01 00:02:53",
+    "train_terurut_waktu": false,
+    "volume_bulanan_test": {
+      "2025-09": 52384,
+      "2025-10": 54290
+    },
+    "volume_bulanan_train": {
+      "2025-01": 50432,
+      "2025-02": 46240,
+      "2025-03": 51048,
+      "2025-04": 47413,
+      "2025-05": 52331,
+      "2025-06": 50375,
+      "2025-07": 52334,
+      "2025-08": 52904
+    }
+  }
+}
