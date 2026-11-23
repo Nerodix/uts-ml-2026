@@ -11,9 +11,10 @@ meniru data uji Sep–Okt 2025) serta jendela Agustus untuk *label delay*:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import lightgbm as lgb
 import matplotlib.pyplot as plt
