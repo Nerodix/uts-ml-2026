@@ -2,9 +2,9 @@
 """Entrypoint perintah tunggal untuk mereproduksi seluruh pipeline UTS ML 2026.
 
 Contoh penggunaan:
-    python kode/run_all.py                 # Jalankan semua tahap + validasi output
-    python kode/run_all.py --check-env     # Verifikasi environment, dataset, dan versi pustaka
-    python kode/run_all.py --stages audit  # Jalankan tahap tertentu saja
+    python kode/run_all.py                   # Jalankan semua tahap + validasi output
+    python kode/run_all.py --check-env       # Verifikasi environment, dataset, dan versi pustaka
+    python kode/run_all.py --stages regresi  # Jalankan tahap tertentu saja
 """
 
 from __future__ import annotations
@@ -34,6 +34,10 @@ from src.utils import collect_environment_info, save_json, set_global_seed, time
 from src.validate_outputs import validate_all  # noqa: E402
 
 AVAILABLE_STAGES = ["audit", "regresi", "klasifikasi", "clustering", "validate"]
+
+# Tugas yang pipeline-nya sudah terintegrasi. Tambahkan "klasifikasi" / "clustering" di sini
+# (dan cabangnya di run_stage) saat PR tugas tersebut masuk, agar ikut divalidasi.
+TUGAS_SIAP = ["regresi"]
 
 
 def check_environment(save_report: bool = True) -> int:
@@ -88,11 +92,11 @@ def run_stage(stage: str) -> int:
         return 0
 
     if stage == "validate":
-        return validate_all()
+        return validate_all(TUGAS_SIAP)
 
-    raise NotImplementedError(
-        f"Tahap '{stage}' belum diimplementasikan. Akan ditambahkan melalui PR masing-masing task."
-    )
+    # Tahap yang belum punya pipeline dilewati (bukan galat) supaya perintah tunggal tetap tuntas.
+    print(f"[LEWATI] Tahap '{stage}' belum diimplementasikan (menyusul lewat PR tugas terkait).")
+    return 0
 
 
 def main() -> int:
