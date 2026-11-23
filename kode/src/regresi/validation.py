@@ -50,11 +50,15 @@ from src.regresi.preprocess import (  # noqa: E402
     fix_target_unit_errors,
 )
 from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
     configure_plotting,
+    label_batang,
+    miring,
     p90_coverage,
     pinball_loss,
     save_json,
     set_global_seed,
+    sumbu_koma,
     timer,
 )
 
@@ -307,9 +311,12 @@ def plot_perbandingan_validasi(
     ensure_dirs()
     configure_plotting()
 
-    labels = [
-        f["fold"].replace(" (", "\n(") for f in hasil_waktu["per_fold"]
-    ] + ["Rata-rata\nTime CV", "Rata-rata\nRandom 5-Fold"]
+    # Periode tiap fold tercantum pada tabel laporan, sehingga label cukup memuat nomornya.
+    n_fold = len(hasil_waktu["per_fold"])
+    labels = [f"{miring('Fold')} {i}" for i in range(1, n_fold + 1)] + [
+        "Rata-rata\nberbasis waktu",
+        "Rata-rata\nacak",
+    ]
 
     p50_vals = [f["pinball_p50"] for f in hasil_waktu["per_fold"]] + [
         hasil_waktu["ringkasan"]["pinball_p50_mean"],
@@ -324,53 +331,38 @@ def plot_perbandingan_validasi(
         hasil_random["ringkasan"]["p90_coverage_mean"] * 100.0,
     ]
 
-    fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.3))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.6))
     x = np.arange(len(labels))
-    w = 0.36
+    w = 0.38
+    batas_acak = n_fold + 0.5  # pemisah antara validasi berbasis waktu dan validasi acak
 
-    # Panel (a): Pinball P50 & P90
-    b1 = axes[0].bar(x - w / 2, p50_vals, width=w, color="#2563eb", label="Pinball P50")
-    b2 = axes[0].bar(x + w / 2, p90_vals, width=w, color="#f97316", label="Pinball P90")
-    for bars in (b1, b2):
-        for bar in bars:
-            h = bar.get_height()
-            axes[0].text(
-                bar.get_x() + bar.get_width() / 2,
-                h + 0.15,
-                f"{h:.2f}",
-                ha="center",
-                va="bottom",
-                fontsize=7.8,
-            )
-    axes[0].axvline(3.5, color="#6b7280", linestyle=":", linewidth=1.2)
-    axes[0].set_xticks(x)
-    axes[0].set_xticklabels(labels, fontsize=8.2)
-    axes[0].set_ylabel("Pinball Loss (lebih kecil lebih baik)")
-    axes[0].set_title("(a) Time-Based CV vs Random 5-Fold (Pinball Loss)")
-    axes[0].set_ylim(0, max(p50_vals + p90_vals) * 1.18)
-    axes[0].legend(fontsize=8.5)
+    # Panel (a): Pinball loss P50 dan P90
+    b1 = axes[0].bar(x - w / 2, p50_vals, width=w, color="#2563eb", label="P50")
+    b2 = axes[0].bar(x + w / 2, p90_vals, width=w, color="#f97316", label="P90")
+    label_batang(axes[0], b1, putar=True)
+    label_batang(axes[0], b2, putar=True)
+    axes[0].set_ylabel(f"{miring('Pinball loss')} (jam)")
+    axes[0].set_title(f"(a) {miring('Pinball Loss')} per Skema Validasi")
+    axes[0].set_ylim(0, max(p50_vals + p90_vals) * 1.28)
+    axes[0].legend(loc="upper right", ncol=2)
 
-    # Panel (b): P90 Coverage terhadap target 90%
-    bar_colors = ["#dc2626", "#2563eb", "#f59e0b", "#1d4ed8", "#16a34a"]
-    bc = axes[1].bar(x, cov_vals, width=0.55, color=bar_colors, alpha=0.88)
-    axes[1].axhline(90.0, color="#111827", linestyle="--", linewidth=1.3, label="Target Coverage 90%")
-    for bar in bc:
-        h = bar.get_height()
-        axes[1].text(
-            bar.get_x() + bar.get_width() / 2,
-            h + 0.4,
-            f"{h:.1f}%",
-            ha="center",
-            va="bottom",
-            fontsize=8.2,
-        )
-    axes[1].axvline(3.5, color="#6b7280", linestyle=":", linewidth=1.2)
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels(labels, fontsize=8.2)
-    axes[1].set_ylabel("P90 Coverage (%)")
-    axes[1].set_title("(b) Realisasi P90 Coverage per Skema Validasi")
+    # Panel (b): Cakupan P90 terhadap sasaran 90%
+    warna = ["#93c5fd"] * n_fold + ["#2563eb", "#f97316"]
+    bc = axes[1].bar(x, cov_vals, width=0.58, color=warna)
+    axes[1].axhline(90.0, color="#111827", linestyle="--", linewidth=0.9, label="Sasaran 90%")
+    label_batang(axes[1], bc, desimal=1)
+    axes[1].set_ylabel("Cakupan P90 (%)")
+    axes[1].set_title("(b) Cakupan P90 per Skema Validasi")
     axes[1].set_ylim(75, 96)
-    axes[1].legend(fontsize=8.5, loc="lower right")
+    axes[1].set_yticks(np.arange(75, 96, 5))
+    axes[1].legend(loc="upper left")
+
+    for ax in axes:
+        ax.axvline(batas_acak, color="#6b7280", linestyle=":", linewidth=0.9)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        ax.grid(axis="x", visible=False)
+    sumbu_koma(axes[0], "y")
 
     fig.tight_layout()
     out_path = FIGURES_DIR / "task1_1b_validation_comparison.png"

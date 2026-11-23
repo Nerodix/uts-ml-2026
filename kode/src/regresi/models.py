@@ -56,11 +56,15 @@ from src.regresi.features import Task1FeaturePipeline  # noqa: E402
 from src.regresi.preprocess import CATEGORICAL_COLUMNS, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
 from src.regresi.validation import TimeFold, buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
     configure_plotting,
+    label_batang,
+    miring,
     p90_coverage,
     pinball_loss,
     save_json,
     set_global_seed,
+    sumbu_koma,
     timer,
 )
 
@@ -705,17 +709,17 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
 
 
 def plot_perbandingan_model(summary_table: dict[str, Any]) -> Path:
-    """Buat grafik 2-panel perbandingan Pinball P50 & P90 seluruh model pada Time CV."""
+    """Buat grafik 2-panel perbandingan pinball loss P50 dan P90 semua model pada validasi berbasis waktu."""
     ensure_dirs()
     configure_plotting()
 
     order = [
-        ("baseline", "Baseline\n(Grup)"),
-        ("log_ridge", "Ridge\n(log-y)"),
-        ("lgbm", "LightGBM\nQuantile"),
-        ("catboost", "CatBoost\nMultiQ"),
-        ("xgboost", "XGBoost\nMultiQ"),
-        ("ensemble", "Ensemble\nBlend"),
+        ("baseline", "Model\ndasar"),
+        ("log_ridge", "Ridge"),
+        ("lgbm", "LightGBM"),
+        ("catboost", "CatBoost"),
+        ("xgboost", "XGBoost"),
+        ("ensemble", "Model\ngabungan"),
     ]
     labels = [lbl for _, lbl in order]
     p50_mean = [summary_table[k]["ringkasan"]["pinball_p50_mean"] for k, _ in order]
@@ -723,26 +727,26 @@ def plot_perbandingan_model(summary_table: dict[str, Any]) -> Path:
     p50_f3 = [summary_table[k]["ringkasan"]["fold3_pinball_p50"] for k, _ in order]
     p90_f3 = [summary_table[k]["ringkasan"]["fold3_pinball_p90"] for k, _ in order]
 
-    fig, axes = plt.subplots(1, 2, figsize=(13.2, 4.3))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
     x = np.arange(len(labels))
-    w = 0.36
+    w = 0.38
 
     for ax, v50, v90, title in [
-        (axes[0], p50_mean, p90_mean, "(a) Rata-rata 3-Fold Expanding Time CV"),
-        (axes[1], p50_f3, p90_f3, "(b) Fold 3 Terbaru (Jul–Agu 2025, Paling Mirip Test)"),
+        (axes[0], p50_mean, p90_mean, f"(a) Rata-rata Tiga {miring('Fold')}"),
+        (axes[1], p50_f3, p90_f3, f"(b) {miring('Fold')} 3 (Validasi Juli s.d. Agustus 2025)"),
     ]:
-        b1 = ax.bar(x - w / 2, v50, width=w, color="#2563eb", label="Pinball P50")
-        b2 = ax.bar(x + w / 2, v90, width=w, color="#f97316", label="Pinball P90")
-        for bars in (b1, b2):
-            for bar in bars:
-                h = bar.get_height()
-                ax.text(bar.get_x() + bar.get_width() / 2, h + 0.15, f"{h:.2f}", ha="center", va="bottom", fontsize=7.5)
+        b1 = ax.bar(x - w / 2, v50, width=w, color="#2563eb", label="P50")
+        b2 = ax.bar(x + w / 2, v90, width=w, color="#f97316", label="P90")
+        label_batang(ax, b1, putar=True)
+        label_batang(ax, b2, putar=True)
         ax.set_xticks(x)
-        ax.set_xticklabels(labels, fontsize=8.3)
-        ax.set_ylabel("Pinball Loss (lebih kecil lebih baik)")
+        ax.set_xticklabels(labels, fontsize=6.5)
+        ax.set_ylabel(f"{miring('Pinball loss')} (jam)")
         ax.set_title(title)
-        ax.set_ylim(0, max(v50 + v90) * 1.18)
-        ax.legend(fontsize=8.5)
+        ax.set_ylim(0, max(v50 + v90) * 1.22)
+        ax.grid(axis="x", visible=False)
+        sumbu_koma(ax, "y")
+        ax.legend(loc="upper right", ncol=2)
 
     fig.tight_layout()
     out_path = FIGURES_DIR / "task1_1c_model_comparison.png"

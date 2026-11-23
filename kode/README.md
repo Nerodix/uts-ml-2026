@@ -69,7 +69,11 @@ python kode/tests/test_core.py
 python kode/run_all.py
 ```
 
-*(Tahap `audit`, `regresi`, `klasifikasi`, dan `clustering` akan diintegrasikan bertahap ke `run_all.py` melalui masing-masing PR.)*
+Perintah ini menjalankan pipeline tiap tugas, lalu memvalidasi format berkas prediksi. Tahap yang belum diimplementasikan (`klasifikasi`, `clustering`) dilewati otomatis dan diintegrasikan lewat PR masing-masing; saat itu tambahkan juga nama tugasnya ke `TUGAS_SIAP` di `run_all.py`.
+
+## Konvensi Grafik
+
+Semua grafik dibuat pada ukuran cetaknya: `figsize=(LEBAR_GAMBAR, tinggi)` dengan `LEBAR_GAMBAR = 6,7` inci (sekitar 17 cm, selebar area teks), sehingga huruf 7 s.d. 8 pt di grafik tidak mengecil di laporan. Teks grafik juga mengikuti EYD lewat pembantu di `src/utils.py`: `configure_plotting()` (ukuran huruf seragam), `angka_id()` dan `label_batang()` (koma desimal pada angka), `sumbu_koma()` (koma desimal pada skala sumbu), `miring()` (istilah asing dicetak miring), dan `label_bulan()` (singkatan bulan Indonesia). Pakai pembantu yang sama untuk grafik Tugas 2 dan 3.
 
 ## Versi Pustaka & Random Seed
 

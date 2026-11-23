@@ -52,11 +52,16 @@ from src.regresi.preprocess import (  # noqa: E402
     fix_target_unit_errors,
 )
 from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
+    angka_id,
     configure_plotting,
+    label_batang,
+    miring,
     p90_coverage,
     pinball_loss,
     save_json,
     set_global_seed,
+    sumbu_koma,
     timer,
 )
 
@@ -435,6 +440,64 @@ class Task1FeaturePipeline:
         return [c for c in cols if c in df.columns]
 
 
+def plot_simulasi_kurir_baru(strategi: dict[str, Any], couriers: list[str]) -> Path:
+    """Buat grafik 2-panel hasil simulasi kurir yang disembunyikan dari data latih (Tugas 1d).
+
+    Parameters
+    ----------
+    strategi : dict[str, Any]
+        Metrik per strategi dan per kurir (kunci ``strategi`` pada ``task1_unseen_courier.json``).
+    couriers : list[str]
+        Kode kurir yang disembunyikan secara bergantian.
+
+    Returns
+    -------
+    Path
+        Path file PNG yang tersimpan di ``kode/figures/task1_1d_unseen_courier.png``.
+    """
+    ensure_dirs()
+    configure_plotting()
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
+    x = np.arange(len(couriers))
+    w = 0.26
+
+    daftar = [
+        ("tanpa_f35_fallback_global", "Tanpa f35 (rata-rata global)", "#dc2626"),
+        ("mitra_kurir_plus_f35", "ID kurir dan f35", "#2563eb"),
+        ("hanya_f35_tanpa_id_kurir", "Hanya f35 (tanpa ID kurir)", "#16a34a"),
+    ]
+    for i, (key, nama, warna) in enumerate(daftar):
+        per = strategi[key]["per_kurir_unseen"]
+        offset = (i - 1) * w
+        b = axes[0].bar(x + offset, [per[c]["pinball_p50"] for c in couriers], width=w, color=warna, label=nama)
+        axes[1].bar(x + offset, [per[c]["bias_median"] for c in couriers], width=w, color=warna)
+        label_batang(axes[0], b)
+
+    f35 = strategi[daftar[-1][0]]["per_kurir_unseen"]
+    lbl = [f"{c}\n(f35 = {angka_id(f35[c]['f35_median'], 2)})" for c in couriers]
+    tertinggi = max(strategi[key]["per_kurir_unseen"][c]["pinball_p50"] for key, _, _ in daftar for c in couriers)
+    axes[0].set_ylabel(f"{miring('Pinball loss')} P50 (jam)")
+    axes[0].set_title("(a) Galat pada Kurir yang Disembunyikan")
+    axes[0].set_ylim(0, tertinggi * 1.12)
+
+    axes[1].axhline(0.0, color="#111827", linestyle="--", linewidth=0.9)
+    axes[1].set_ylabel("Median selisih prediksi dan aktual (jam)")
+    axes[1].set_title("(b) Bias Prediksi P50")
+
+    for ax in axes:
+        ax.set_xticks(x)
+        ax.set_xticklabels(lbl)
+        ax.grid(axis="x", visible=False)
+        sumbu_koma(ax, "y")
+
+    fig.legend(loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.0), frameon=False)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig_path = FIGURES_DIR / "task1_1d_unseen_courier.png"
+    fig.savefig(fig_path)
+    plt.close(fig)
+    return fig_path
+
+
 def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
     """Simulasi *Leave-One-Courier-Out* untuk membuktikan strategi menangani ``K13`` (Tugas 1d).
 
@@ -517,49 +580,7 @@ def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
             "per_kurir_unseen": per_kurir,
         }
 
-    # Plot bukti simulasi unseen courier
-    ensure_dirs()
-    configure_plotting()
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.1))
-    couriers = heldout_couriers
-    x = np.arange(len(couriers))
-    w = 0.26
-
-    for idx_s, (key, title, col_hex) in enumerate(
-        [
-            ("tanpa_f35_fallback_global", "Tanpa f35 (fallback rata-rata)", "#dc2626"),
-            ("mitra_kurir_plus_f35", "Kategori unseen->NaN + f35", "#2563eb"),
-            ("hanya_f35_tanpa_id_kurir", "Murni f35 (tanpa ID kurir)", "#16a34a"),
-        ]
-    ):
-        p50_k = [strategi[key]["per_kurir_unseen"][c]["pinball_p50"] for c in couriers]
-        bias_k = [strategi[key]["per_kurir_unseen"][c]["bias_median"] for c in couriers]
-        offset = (idx_s - 1) * w
-        b1 = axes[0].bar(x + offset, p50_k, width=w, color=col_hex, label=title)
-        axes[1].bar(x + offset, bias_k, width=w, color=col_hex, label=title)
-        for bar in b1:
-            h = bar.get_height()
-            axes[0].text(bar.get_x() + bar.get_width() / 2, h + 0.15, f"{h:.2f}", ha="center", va="bottom", fontsize=7.2)
-
-    lbl_c = ["K08\n(cepat, f35=0,86)", "K02\n(lambat, f35=1,08)", "K07\n(shift, f35=1,28)"]
-    axes[0].set_xticks(x)
-    axes[0].set_xticklabels(lbl_c, fontsize=8.5)
-    axes[0].set_ylabel("Pinball Loss P50 (jam)")
-    axes[0].set_title("(a) Error pada Kurir Unseen (Simulasi K13)")
-    axes[0].set_ylim(0, max(strategi["tanpa_f35_fallback_global"]["per_kurir_unseen"][c]["pinball_p50"] for c in couriers) * 1.2)
-    axes[0].legend(fontsize=7.8)
-
-    axes[1].axhline(0.0, color="#111827", linestyle="--", linewidth=1.1)
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels(lbl_c, fontsize=8.5)
-    axes[1].set_ylabel("Bias Median Prediksi - Aktual (jam)")
-    axes[1].set_title("(b) Penghilangan Bias pada Kurir Unseen lewat f35")
-    axes[1].legend(fontsize=7.8)
-
-    fig.tight_layout()
-    fig_path = FIGURES_DIR / "task1_1d_unseen_courier.png"
-    fig.savefig(fig_path)
-    plt.close(fig)
+    fig_path = plot_simulasi_kurir_baru(strategi, heldout_couriers)
 
     out_json = RESULTS_DIR / "task1_unseen_courier.json"
     result = {

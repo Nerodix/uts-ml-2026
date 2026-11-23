@@ -8,58 +8,58 @@
   "n_val_unseen_rows": 18534,
   "strategi": {
     "hanya_f35_tanpa_id_kurir": {
-      "overall_p90_coverage": 0.8086,
-      "overall_pinball_p50": 7.7523,
-      "overall_pinball_p90": 5.0196,
+      "overall_p90_coverage": 0.8077,
+      "overall_pinball_p50": 7.7243,
+      "overall_pinball_p90": 5.0598,
       "per_kurir_unseen": {
         "K02": {
           "bias_median": -2.59,
           "f35_median": 1.079,
-          "p90_coverage": 0.848,
-          "pinball_p50": 6.9684,
-          "pinball_p90": 4.421
+          "p90_coverage": 0.8484,
+          "pinball_p50": 6.9682,
+          "pinball_p90": 4.4233
         },
         "K07": {
-          "bias_median": -11.55,
+          "bias_median": -11.27,
           "f35_median": 1.28,
-          "p90_coverage": 0.638,
-          "pinball_p50": 10.2884,
-          "pinball_p90": 7.038
+          "p90_coverage": 0.6329,
+          "pinball_p50": 10.2277,
+          "pinball_p90": 7.1659
         },
         "K08": {
-          "bias_median": 5.05,
+          "bias_median": 4.95,
           "f35_median": 0.855,
-          "p90_coverage": 0.9347,
-          "pinball_p50": 6.2236,
-          "pinball_p90": 3.7588
+          "p90_coverage": 0.9362,
+          "pinball_p50": 6.1843,
+          "pinball_p90": 3.765
         }
       }
     },
     "mitra_kurir_plus_f35": {
-      "overall_p90_coverage": 0.77,
-      "overall_pinball_p50": 8.2381,
-      "overall_pinball_p90": 5.478,
+      "overall_p90_coverage": 0.7707,
+      "overall_pinball_p50": 8.2899,
+      "overall_pinball_p90": 5.4851,
       "per_kurir_unseen": {
         "K02": {
-          "bias_median": -4.12,
+          "bias_median": -4.17,
           "f35_median": 1.079,
-          "p90_coverage": 0.8125,
-          "pinball_p50": 7.1325,
-          "pinball_p90": 4.6484
+          "p90_coverage": 0.8133,
+          "pinball_p50": 7.176,
+          "pinball_p90": 4.6408
         },
         "K07": {
-          "bias_median": -14.53,
+          "bias_median": -14.77,
           "f35_median": 1.28,
           "p90_coverage": 0.5575,
-          "pinball_p50": 11.3616,
-          "pinball_p90": 8.2268
+          "pinball_p50": 11.4343,
+          "pinball_p90": 8.2612
         },
         "K08": {
-          "bias_median": 6.62,
+          "bias_median": 6.64,
           "f35_median": 0.855,
-          "p90_coverage": 0.9385,
-          "pinball_p50": 6.599,
-          "pinball_p90": 3.7862
+          "p90_coverage": 0.9397,
+          "pinball_p50": 6.6413,
+          "pinball_p90": 3.7876
         }
       }
     },
