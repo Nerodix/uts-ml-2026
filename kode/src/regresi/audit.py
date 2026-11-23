@@ -35,7 +35,15 @@ from src.config import (  # noqa: E402
     ensure_dirs,
 )
 from src.regresi.audit_dampak import jalankan_semua_dampak  # noqa: E402
-from src.utils import configure_plotting, save_json, set_global_seed  # noqa: E402
+from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
+    angka_id,
+    configure_plotting,
+    label_bulan,
+    save_json,
+    set_global_seed,
+    sumbu_koma,
+)
 
 
 def cek_skema_kolom(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
@@ -440,44 +448,41 @@ def plot_bukti_leakage_scan(train: pd.DataFrame, test: pd.DataFrame) -> Path:
     ks_scan = float(stats.ks_2samp(train["jumlah_scan"], test["jumlah_scan"]).statistic)
     rho_scan = float(train["jumlah_scan"].corr(train["durasi_jam"], method="spearman"))
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.5))
 
-    # Panel (a): Distribusi jumlah_scan train vs test
-    bins = np.arange(0.5, 36.5, 1.0)
-    axes[0].hist(
-        np.clip(train["jumlah_scan"], 1, 35),
-        bins=bins,
-        density=True,
-        alpha=0.65,
-        color="#2563eb",
-        label=f"Train (med={train['jumlah_scan'].median():.0f}, max={train['jumlah_scan'].max()})",
-    )
-    axes[0].hist(
-        np.clip(test["jumlah_scan"], 1, 35),
-        bins=bins,
-        density=True,
-        alpha=0.75,
-        color="#dc2626",
-        label=f"Test (med={test['jumlah_scan'].median():.0f}, max={test['jumlah_scan'].max()})",
-    )
-    axes[0].set_title(f"(a) Sebaran jumlah_scan Train vs Test (KS = {ks_scan:.3f})")
-    axes[0].set_xlabel("jumlah_scan (dipotong tampilan di 35)")
-    axes[0].set_ylabel("Densitas")
-    axes[0].legend(fontsize=8.5)
+    # Panel (a): Sebaran jumlah_scan pada data latih dan data uji
+    batas = 35
+    bins = np.arange(0.5, batas + 1.5, 1.0)
+    for data, nama, warna, alpha in [(train, "Data latih", "#2563eb", 0.65), (test, "Data uji", "#dc2626", 0.75)]:
+        kolom = data["jumlah_scan"]
+        axes[0].hist(
+            np.clip(kolom, 1, batas),
+            bins=bins,
+            density=True,
+            alpha=alpha,
+            color=warna,
+            label=f"{nama} (median {kolom.median():.0f}; maks. {kolom.max():.0f})",
+        )
+    axes[0].set_title(f"(a) Sebaran jumlah_scan (KS = {angka_id(ks_scan, 3)})")
+    axes[0].set_xlabel(f"jumlah_scan (nilai di atas {batas} digabung)")
+    axes[0].set_ylabel("Kepadatan")
+    sumbu_koma(axes[0], "y")
+    axes[0].legend()
 
-    # Panel (b): Scatter jumlah_scan vs durasi_jam (sampel 5.000 baris, sumbu-y dibatasi 350 jam)
+    # Panel (b): Diagram pencar jumlah_scan dan durasi_jam (sampel 5.000 baris, sumbu y dibatasi 350 jam)
     samp = train.sample(5_000, random_state=SEED)
     axes[1].scatter(
         samp["jumlah_scan"],
         samp["durasi_jam"],
-        s=7,
+        s=3,
         alpha=0.22,
         color="#1d4ed8",
         edgecolors="none",
+        rasterized=True,
     )
-    axes[1].set_title(f"(b) jumlah_scan vs durasi_jam (Spearman = {rho_scan:.3f})")
+    axes[1].set_title(f"(b) Kaitan dengan durasi_jam (\u03c1 = {angka_id(rho_scan, 3)})")
     axes[1].set_xlabel("jumlah_scan pada data latih")
-    axes[1].set_ylabel("durasi_jam (jam, tampilan 0–350)")
+    axes[1].set_ylabel("durasi_jam (jam)")
     axes[1].set_ylim(0, 350)
 
     fig.tight_layout()
@@ -568,31 +573,38 @@ def plot_bukti_target_menit(train: pd.DataFrame, ambang_menit: float = 1000.0) -
     clean = y.loc[~corrupt_mask]
     corrupt_div60 = y.loc[corrupt_mask] / 60.0
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.5))
 
-    # Panel (a): Celah bersih pada skala log10
+    # Panel (a): Celah kosong pada skala log10
     axes[0].hist(
         np.log10(clean),
         bins=45,
         color="#2563eb",
         alpha=0.75,
-        label=f"Sah (<= {clean.max():.1f} jam)",
+        label=f"Wajar (paling lama {angka_id(clean.max(), 1)} jam)",
     )
     axes[0].hist(
         np.log10(y.loc[corrupt_mask]),
         bins=20,
         color="#dc2626",
         alpha=0.85,
-        label=f"Satuan menit (>1000, n={int(corrupt_mask.sum())})",
+        label=f"Tercatat dalam menit (n = {angka_id(int(corrupt_mask.sum()), 0)})",
     )
-    axes[0].axvline(np.log10(ambang_menit), color="#111827", linestyle="--", linewidth=1.2, label="Ambang 1.000 jam")
+    axes[0].axvline(
+        np.log10(ambang_menit),
+        color="#111827",
+        linestyle="--",
+        linewidth=0.9,
+        label=f"Ambang {angka_id(ambang_menit, 0)} jam",
+    )
     axes[0].set_yscale("log")
-    axes[0].set_title("(a) Celah Bersih durasi_jam Mentah (Skala log10)")
-    axes[0].set_xlabel("log10(durasi_jam mentah)")
+    axes[0].set_title("(a) Celah pada durasi_jam Mentah")
+    axes[0].set_xlabel(r"$\log_{10}$(durasi_jam mentah)")
     axes[0].set_ylabel("Jumlah paket (skala log)")
-    axes[0].legend(fontsize=8)
+    sumbu_koma(axes[0], "x")
+    axes[0].legend()
 
-    # Panel (b): Verifikasi distribusi sesudah dibagi 60
+    # Panel (b): Sebaran sesudah nilai di atas ambang dibagi 60
     axes[1].hist(
         clean,
         bins=60,
@@ -600,7 +612,7 @@ def plot_bukti_target_menit(train: pd.DataFrame, ambang_menit: float = 1000.0) -
         density=True,
         alpha=0.55,
         color="#2563eb",
-        label=f"Data bersih (med={clean.median():.1f} jam)",
+        label=f"Data wajar (median {angka_id(clean.median(), 1)} jam)",
     )
     axes[1].hist(
         corrupt_div60,
@@ -609,12 +621,14 @@ def plot_bukti_target_menit(train: pd.DataFrame, ambang_menit: float = 1000.0) -
         density=True,
         alpha=0.65,
         color="#16a34a",
-        label=f"Baris >1000 dibagi 60 (med={corrupt_div60.median():.1f} jam)",
+        label=f"Di atas ambang, dibagi 60 (median {angka_id(corrupt_div60.median(), 1)} jam)",
     )
-    axes[1].set_title("(b) Verifikasi Sebaran Setelah Koreksi / 60")
+    axes[1].set_title("(b) Sebaran setelah Dibagi 60")
     axes[1].set_xlabel("durasi_jam terkoreksi (jam)")
-    axes[1].set_ylabel("Densitas")
-    axes[1].legend(fontsize=8)
+    axes[1].set_ylabel("Kepadatan")
+    axes[1].set_ylim(top=axes[1].get_ylim()[1] * 1.22)
+    sumbu_koma(axes[1], "y")
+    axes[1].legend()
 
     fig.tight_layout()
     out_path = FIGURES_DIR / "task1_1a4_target_unit_error.png"
@@ -927,11 +941,15 @@ def plot_pergeseran_temporal(train: pd.DataFrame, test: pd.DataFrame) -> Path:
     piv_f35 = pergeseran["f35_per_kurir_bulan"].T
     piv_ant = pergeseran["antrean_per_hub_bulan"].T
     drift_f = pergeseran["ringkasan_drift_bulanan"]
-    months = list(drift_f.index)
+    periode = list(drift_f.index)
+    pos = np.arange(len(periode))
+    # Bulan-bulan sesudah data latih (September dan Oktober) diarsir sebagai periode uji
+    n_bulan_latih = pd.to_datetime(train["tgl_pickup"]).dt.to_period("M").nunique()
+    rho = {c: float(train[c].corr(train["durasi_jam"], method="spearman")) for c in ("f30", "f17")}
 
-    fig, axes = plt.subplots(1, 3, figsize=(14.0, 4.1))
+    fig, axes = plt.subplots(1, 3, figsize=(LEBAR_GAMBAR, 2.0))
 
-    # Panel (a): Shift K07 & unseen K13 pada f35
+    # Panel (a): f35 kurir K07 (bergeser) dan K13 (baru) dibandingkan kurir yang stabil
     for k, col, style in [
         ("K07", "#dc2626", "-o"),
         ("K13", "#9333ea", "-s"),
@@ -939,31 +957,30 @@ def plot_pergeseran_temporal(train: pd.DataFrame, test: pd.DataFrame) -> Path:
         ("K08", "#16a34a", "--v"),
     ]:
         if k in piv_f35.columns:
-            axes[0].plot(months, piv_f35[k], style, color=col, linewidth=2, markersize=5, label=k)
-    axes[0].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
-    axes[0].text(7.65, 0.92, "Test\n(Sep–Okt)", fontsize=8, color="#4b5563")
-    axes[0].set_title("(a) Shift Kurir K07 & Unseen K13 pada f35")
-    axes[0].set_ylabel("Median f35")
-    axes[0].tick_params(axis="x", rotation=45, labelsize=8)
-    axes[0].legend(fontsize=8, loc="upper left")
+            axes[0].plot(pos, piv_f35[k].reindex(periode), style, color=col, label=k)
+    axes[0].set_title("(a) Median f35 per Kurir")
+    axes[0].legend(loc="upper left", ncol=2, columnspacing=0.8)
 
-    # Panel (b): Antrean hub per bulan
+    # Panel (b): Antrean per pusat sortir asal
     for hub, col in [("JKT", "#dc2626"), ("MKS", "#2563eb"), ("SBY", "#f97316"), ("BDG", "#16a34a")]:
-        axes[1].plot(months, piv_ant[hub], "-o", color=col, linewidth=1.8, markersize=4, label=hub)
-    axes[1].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
-    axes[1].set_title("(b) Drift antrean_hub_asal per Hub")
-    axes[1].set_ylabel("Median antrean_hub_asal")
-    axes[1].tick_params(axis="x", rotation=45, labelsize=8)
-    axes[1].legend(fontsize=8)
+        axes[1].plot(pos, piv_ant[hub].reindex(periode), "-o", color=col, label=hub)
+    axes[1].set_title("(b) Median antrean_hub_asal")
+    axes[1].legend(loc="upper right", ncol=2, columnspacing=0.8)
 
-    # Panel (c): Drift noise f30 vs sinyal f17
-    axes[2].plot(months, drift_f["f30"], "-o", color="#dc2626", linewidth=2, markersize=4, label="f30 (drift noise, rho=-0,004)")
-    axes[2].plot(months, drift_f["f17"], "-s", color="#2563eb", linewidth=2, markersize=4, label="f17 (sinyal antrean, rho=+0,215)")
-    axes[2].axvline(7.5, color="#6b7280", linestyle=":", linewidth=1.2)
-    axes[2].set_title("(c) Drift Noise (f30) vs Sinyal (f17)")
-    axes[2].set_ylabel("Median nilai fitur")
-    axes[2].tick_params(axis="x", rotation=45, labelsize=8)
-    axes[2].legend(fontsize=8)
+    # Panel (c): f30 (bergeser tanpa sinyal) dibandingkan f17 (bergeser dan bersinyal)
+    axes[2].plot(pos, drift_f["f30"], "-o", color="#dc2626", label=f"f30 (\u03c1 = {angka_id(rho['f30'], 3)})")
+    axes[2].plot(pos, drift_f["f17"], "-s", color="#2563eb", label=f"f17 (\u03c1 = {angka_id(rho['f17'], 3)})")
+    axes[2].set_title("(c) Median f30 dan f17")
+    axes[2].legend(loc="upper left")
+
+    for ax in axes:
+        ax.axvspan(n_bulan_latih - 0.5, len(periode) - 0.5, color="#9ca3af", alpha=0.25, linewidth=0)
+        ax.set_xlim(-0.5, len(periode) - 0.5)
+        ax.set_xticks(pos)
+        # Label ditulis selang satu bulan agar muat tanpa diputar
+        ax.set_xticklabels([label_bulan(m) if i % 2 == 0 else "" for i, m in enumerate(periode)])
+        ax.grid(axis="x", visible=False)
+        sumbu_koma(ax, "y")
 
     fig.tight_layout()
     out_path = FIGURES_DIR / "task1_1a5_temporal_shifts.png"
@@ -1243,12 +1260,18 @@ def simpan_ringkasan_audit_1a(
     kal = cek_efek_kalender(train)
     dampak = hasil_dampak if hasil_dampak is not None else jalankan_semua_dampak(train, test)
 
+    # Statistik bukti (KS train-vs-test, Spearman ke target, median/maks) untuk kolom
+    # yang bukan "stabil", sebagai rincian tabel temuan audit.
+    kuadran = kelompokkan_kuadran_detektif(tabel_scr)
+    kolom_kunci = kuadran["tersangka_leakage"] + kuadran["drift_bersinyal"] + kuadran["drift_noise"]
+    statistik_kunci = tabel_scr.set_index("kolom").loc[kolom_kunci].to_dict(orient="index")
+
     ringkasan = {
         "task": "Tugas 1a — Audit Data & Pengukuran Dampak (Regresi)",
         "seed": SEED,
         "langkah_1a1_skema_waktu": audit_skema_dan_waktu(train, test),
         "langkah_1a2_tipe_missing": audit_tipe_dan_missing(train, test),
-        "langkah_1a3_kuadran_leakage_drift": kelompokkan_kuadran_detektif(tabel_scr),
+        "langkah_1a3_kuadran_leakage_drift": {**kuadran, "statistik_kolom_kunci": statistik_kunci},
         "langkah_1a4_target_dan_jarak": {
             "target": cek_anomali_target(train),
             "pemulihan_jarak": cek_pemulihan_rute_jarak(train, test),

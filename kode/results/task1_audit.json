@@ -202,6 +202,58 @@
       "hujan_tujuan_mm",
       "asuransi"
     ],
+    "statistik_kolom_kunci": {
+      "antrean_hub_asal": {
+        "ks_train_vs_test": 0.2611,
+        "spearman_target": 0.177,
+        "test_max": 61938.0,
+        "test_median": 2300.0,
+        "test_min": 0.0,
+        "train_max": 61805.0,
+        "train_median": 875.0,
+        "train_min": 0.0
+      },
+      "f17": {
+        "ks_train_vs_test": 0.1106,
+        "spearman_target": 0.2146,
+        "test_max": 2.401,
+        "test_median": 0.161,
+        "test_min": 0.0,
+        "train_max": 2.314,
+        "train_median": 0.096,
+        "train_min": 0.0
+      },
+      "f30": {
+        "ks_train_vs_test": 0.2271,
+        "spearman_target": -0.0036,
+        "test_max": 5.261,
+        "test_median": 1.094,
+        "test_min": -3.221,
+        "train_max": 5.436,
+        "train_median": 0.5,
+        "train_min": -4.053
+      },
+      "f35": {
+        "ks_train_vs_test": 0.0901,
+        "spearman_target": 0.1056,
+        "test_max": 1.481,
+        "test_median": 1.019,
+        "test_min": 0.679,
+        "train_max": 1.449,
+        "train_median": 1.006,
+        "train_min": 0.643
+      },
+      "jumlah_scan": {
+        "ks_train_vs_test": 0.9154,
+        "spearman_target": 0.769,
+        "test_max": 7.0,
+        "test_median": 1.0,
+        "test_min": 1.0,
+        "train_max": 97.0,
+        "train_median": 8.0,
+        "train_min": 1.0
+      }
+    },
     "tersangka_leakage": [
       "jumlah_scan"
     ]

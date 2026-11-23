@@ -51,12 +51,16 @@ from src.regresi.models import (  # noqa: E402
 from src.regresi.preprocess import DATE_COLUMN, ID_COLUMN, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
 from src.regresi.validation import buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
     configure_plotting,
+    label_batang,
     load_json,
+    miring,
     p90_coverage,
     pinball_loss,
     save_json,
     set_global_seed,
+    sumbu_koma,
     timer,
 )
 from src.validate_outputs import validate_regresi  # noqa: E402
@@ -133,37 +137,43 @@ def analisis_error_per_segmen(train: pd.DataFrame) -> dict[str, Any]:
 
 
 def plot_breakdown_error(breakdown: dict[str, Any]) -> Path:
-    """Buat grafik 3-panel breakdown error per layanan, pulau tujuan, dan mitra kurir."""
+    """Buat grafik 3-panel pinball loss menurut layanan, pulau tujuan, dan mitra kurir."""
     ensure_dirs()
     configure_plotting()
 
-    fig, axes = plt.subplots(1, 3, figsize=(15.0, 4.4))
-    w = 0.36
+    # Tata letak "constrained" memberi ruang label per panel (nama pulau lebih panjang daripada kode kurir)
+    fig, axes = plt.subplots(1, 3, figsize=(LEBAR_GAMBAR, 2.2), layout="constrained")
+    w = 0.42
 
     specs = [
-        (axes[0], breakdown["by_layanan"], "layanan", "(a) Error per Layanan"),
-        (axes[1], breakdown["by_pulau_tujuan"], "pulau_tujuan", "(b) Error per Pulau Tujuan"),
-        (axes[2], breakdown["by_mitra_kurir"], "mitra_kurir", "(c) Error per Mitra Kurir (Jul–Agu)"),
+        (axes[0], breakdown["by_layanan"], "layanan", "(a) Menurut Layanan"),
+        (axes[1], breakdown["by_pulau_tujuan"], "pulau_tujuan", "(b) Menurut Pulau Tujuan"),
+        (axes[2], breakdown["by_mitra_kurir"], "mitra_kurir", "(c) Menurut Mitra Kurir"),
     ]
     for ax, rows, key, title in specs:
-        labels = [r[key].replace("Bali-Nusa Tenggara", "Bali-NT") for r in rows]
+        labels = [str(r[key]) for r in rows]
+        if key == "layanan":
+            labels = [lbl.capitalize() for lbl in labels]
         v50 = [r["pinball_p50"] for r in rows]
         v90 = [r["pinball_p90"] for r in rows]
         y_pos = np.arange(len(labels))
-        ax.barh(y_pos - w / 2, v50, height=w, color="#2563eb", label="Pinball P50")
-        ax.barh(y_pos + w / 2, v90, height=w, color="#f97316", label="Pinball P90")
+        b50 = ax.barh(y_pos - w / 2, v50, height=w, color="#2563eb", label="P50")
+        b90 = ax.barh(y_pos + w / 2, v90, height=w, color="#f97316", label="P90")
+        # Panel kurir terlalu rapat untuk diberi angka; nilainya tercantum pada tabel lampiran laporan.
+        if len(rows) <= 8:
+            label_batang(ax, b50, mendatar=True, ukuran=5.8)
+            label_batang(ax, b90, mendatar=True, ukuran=5.8)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(labels, fontsize=8.5)
+        ax.set_yticklabels(labels, fontsize=6.5)
         ax.invert_yaxis()
-        ax.set_xlabel("Pinball Loss (jam)")
+        ax.set_xlabel(f"{miring('Pinball loss')} (jam)")
         ax.set_title(title)
-        for i, (a, b) in enumerate(zip(v50, v90)):
-            ax.text(a + 0.15, i - w / 2, f"{a:.2f}", va="center", fontsize=7.0)
-            ax.text(b + 0.15, i + w / 2, f"{b:.2f}", va="center", fontsize=7.0)
-        ax.set_xlim(0, max(v50 + v90) * 1.22)
-        ax.legend(fontsize=7.5, loc="lower right")
+        ax.set_xlim(0, max(v50 + v90) * 1.25)
+        ax.grid(axis="y", visible=False)
+        sumbu_koma(ax, "x")
 
-    fig.tight_layout()
+    handles, names = axes[0].get_legend_handles_labels()
+    fig.legend(handles, names, loc="outside upper center", ncol=2, frameon=False)
     out_path = FIGURES_DIR / "task1_1f_error_breakdown.png"
     fig.savefig(out_path)
     plt.close(fig)
@@ -224,23 +234,24 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
 
     top15 = list(mean_abs_50.head(15).index)
 
-    # Plot 2-panel: (a) Top-15 Mean |SHAP| P50 vs P90; (b) Scatter/Beeswarm arah efek top-10 P50
+    # Grafik 2-panel: (a) rata-rata |SHAP| 15 fitur terpenting; (b) arah pengaruh 10 fitur numerik pada P50
     ensure_dirs()
     configure_plotting()
-    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.2))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.3), gridspec_kw={"width_ratios": [1.0, 1.12]})
 
     y_pos = np.arange(len(top15))
-    w = 0.38
-    axes[0].barh(y_pos - w / 2, [mean_abs_50[f] for f in top15], height=w, color="#2563eb", label="Model P50 (median)")
-    axes[0].barh(y_pos + w / 2, [mean_abs_90[f] for f in top15], height=w, color="#f97316", label="Model P90 (batas 90%)")
+    w = 0.4
+    axes[0].barh(y_pos - w / 2, [mean_abs_50[f] for f in top15], height=w, color="#2563eb", label="Model P50")
+    axes[0].barh(y_pos + w / 2, [mean_abs_90[f] for f in top15], height=w, color="#f97316", label="Model P90")
     axes[0].set_yticks(y_pos)
-    axes[0].set_yticklabels(top15, fontsize=8.5)
+    axes[0].set_yticklabels(top15, fontsize=6.0)
     axes[0].invert_yaxis()
-    axes[0].set_xlabel("Rata-rata |SHAP| pada skala log(durasi_jam)")
-    axes[0].set_title("(a) Top-15 Penggerak Utama Prediksi P50 vs P90")
-    axes[0].legend(fontsize=8.5, loc="lower right")
+    axes[0].set_xlabel("Rata-rata nilai mutlak SHAP")
+    axes[0].set_title("(a) Lima Belas Fitur Terpenting")
+    axes[0].grid(axis="y", visible=False)
+    axes[0].legend(loc="lower right")
 
-    # Panel (b): Beeswarm arah efek Top-10 fitur numerik P50 (warna = nilai fitur tinggi vs rendah)
+    # Panel (b): sebaran nilai SHAP per paket (warna = nilai fitur rendah sampai tinggi)
     num_top10 = [f for f in top15 if pd.api.types.is_numeric_dtype(X_samp[f])][:10]
     rng = np.random.default_rng(SEED)
     for rank, feat in enumerate(num_top10):
@@ -255,20 +266,25 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
             np.full(len(sv), rank) + jitter,
             c=norm_v,
             cmap="coolwarm",
-            s=6,
+            s=2.5,
             alpha=0.45,
             edgecolors="none",
+            rasterized=True,
         )
-    axes[1].axvline(0.0, color="#111827", linestyle="--", linewidth=1.0)
+    axes[1].axvline(0.0, color="#111827", linestyle="--", linewidth=0.8)
     axes[1].set_yticks(np.arange(len(num_top10)))
-    axes[1].set_yticklabels(num_top10, fontsize=8.5)
+    axes[1].set_yticklabels(num_top10, fontsize=6.0)
     axes[1].invert_yaxis()
-    axes[1].set_xlabel("Nilai SHAP pada log(durasi_jam)  [← lebih cepat | lebih lambat →]")
-    axes[1].set_title("(b) Arah Pengaruh Top-10 Fitur Numerik (Model P50)")
+    axes[1].set_xlabel("Nilai SHAP (positif: durasi lebih lama)")
+    axes[1].set_title("(b) Arah Pengaruh pada Model P50")
+    axes[1].grid(axis="y", visible=False)
     cbar = fig.colorbar(sc, ax=axes[1], fraction=0.04, pad=0.02)
     cbar.set_ticks([0.0, 1.0])
     cbar.set_ticklabels(["Rendah", "Tinggi"])
-    cbar.set_label("Nilai fitur", fontsize=8)
+    cbar.set_label("Nilai fitur", labelpad=-8)
+    cbar.outline.set_linewidth(0.4)
+    for ax in axes:
+        sumbu_koma(ax, "x")
 
     fig.tight_layout()
     fig_path = FIGURES_DIR / "task1_1f_shap_summary.png"

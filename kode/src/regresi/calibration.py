@@ -42,7 +42,9 @@ from src.config import (  # noqa: E402
 )
 from src.regresi.preprocess import DATE_COLUMN  # noqa: E402
 from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
     configure_plotting,
+    label_batang,
     p90_coverage,
     pinball_loss,
     save_json,
@@ -315,70 +317,57 @@ def jalankan_eksperimen_kalibrasi(train: pd.DataFrame) -> dict[str, Any]:
 
 
 def plot_kalibrasi_conformal(per_model: dict[str, Any], best_method: str) -> Path:
-    """Buat grafik 2-panel dampak Conformal Prediction pada Agustus 2025."""
+    """Buat grafik 2-panel dampak kalibrasi konformal terhadap cakupan P90 pada Agustus 2025."""
     ensure_dirs()
     configure_plotting()
 
-    fig, axes = plt.subplots(1, 2, figsize=(12.4, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.8), sharey=True)
 
-    # Panel (a): Coverage sebelum vs sesudah CQR pada 3 model utama (Evaluasi Agustus)
-    models = [("lgbm", "LightGBM"), ("catboost", "CatBoost"), ("ensemble", "Ensemble")]
+    # Panel (a): Cakupan sebelum dan sesudah kalibrasi pada tiga model utama (evaluasi Agustus)
+    models = [("lgbm", "LightGBM"), ("catboost", "CatBoost"), ("ensemble", "Model gabungan")]
     x = np.arange(len(models))
     w = 0.20
     methods = [
         ("uncalibrated", "Tanpa kalibrasi", "#dc2626"),
-        ("additive_cqr", "Additive CQR", "#f59e0b"),
-        ("multiplicative_cqr", "Multiplicative CQR", "#2563eb"),
-        ("group_multiplicative_cqr", "Group-CQR (per layanan)", "#16a34a"),
+        ("additive_cqr", "CQR aditif", "#f59e0b"),
+        ("multiplicative_cqr", "CQR multiplikatif", "#2563eb"),
+        ("group_multiplicative_cqr", "CQR multiplikatif per layanan", "#16a34a"),
     ]
+    warna_metode = {mkey: color for mkey, _, color in methods}
     for i, (mkey, mlabel, color) in enumerate(methods):
         vals = [per_model[mk][mkey]["p90_coverage"] * 100.0 for mk, _ in models]
         offset = (i - 1.5) * w
         bars = axes[0].bar(x + offset, vals, width=w, color=color, label=mlabel, zorder=2)
-        for bar in bars:
-            h = bar.get_height()
-            y_txt = h + 0.30 if 89.4 <= h <= 90.05 else h + 0.16
-            axes[0].text(
-                bar.get_x() + bar.get_width() / 2, y_txt, f"{h:.1f}%",
-                ha="center", va="bottom", fontsize=6.9, zorder=4,
-            )
-    axes[0].axhline(90.0, color="#111827", linestyle="--", linewidth=1.2, label="Target 90%", zorder=3)
+        label_batang(axes[0], bars, desimal=1, putar=True, di_dalam=True)
     axes[0].set_xticks(x)
-    axes[0].set_xticklabels([lbl for _, lbl in models], fontsize=9)
-    axes[0].set_ylabel("P90 Coverage pada Agustus 2025 (%)")
-    axes[0].set_title("(a) Kalibrasi Coverage P90 (Kalibrasi Jul → Uji Agu)")
-    axes[0].set_ylim(84, 93.0)
-    axes[0].legend(fontsize=7.6, loc="lower right")
+    axes[0].set_xticklabels([lbl for _, lbl in models])
+    axes[0].set_title("(a) Cakupan P90 Menurut Model dan Metode")
 
-    # Panel (b): Coverage kondisional per layanan pada Ensemble (Sebelum vs Sesudah CQR terpilih)
+    # Panel (b): Cakupan per layanan pada model gabungan, sebelum dan sesudah metode terpilih
     ens = per_model["ensemble"]
     services = sorted(ens["uncalibrated"]["per_layanan"].keys())
     x2 = np.arange(len(services))
-    w2 = 0.34
+    w2 = 0.36
     before = [ens["uncalibrated"]["per_layanan"][s]["p90_coverage"] * 100.0 for s in services]
     after = [ens[best_method]["per_layanan"][s]["p90_coverage"] * 100.0 for s in services]
-    pretty_name = {
-        "additive_cqr": "Additive CQR",
-        "multiplicative_cqr": "Multiplicative CQR",
-        "group_multiplicative_cqr": "Group-CQR (per layanan)",
-    }.get(best_method, best_method)
-
-    b1 = axes[1].bar(x2 - w2 / 2, before, width=w2, color="#dc2626", label="Sebelum kalibrasi", zorder=2)
-    b2 = axes[1].bar(x2 + w2 / 2, after, width=w2, color="#16a34a", label=f"Sesudah {pretty_name}", zorder=2)
-    for bars in (b1, b2):
-        for bar in bars:
-            h = bar.get_height()
-            y_txt = h + 0.32 if 89.4 <= h <= 90.05 else h + 0.16
-            axes[1].text(bar.get_x() + bar.get_width() / 2, y_txt, f"{h:.1f}%", ha="center", va="bottom", fontsize=8, zorder=4)
-    axes[1].axhline(90.0, color="#111827", linestyle="--", linewidth=1.2, label="Target 90%", zorder=3)
+    b1 = axes[1].bar(x2 - w2 / 2, before, width=w2, color=warna_metode["uncalibrated"], zorder=2)
+    b2 = axes[1].bar(x2 + w2 / 2, after, width=w2, color=warna_metode[best_method], zorder=2)
+    label_batang(axes[1], b1, desimal=1, di_dalam=True)
+    label_batang(axes[1], b2, desimal=1, di_dalam=True)
     axes[1].set_xticks(x2)
-    axes[1].set_xticklabels(services, fontsize=9)
-    axes[1].set_ylabel("P90 Coverage per Layanan (%)")
-    axes[1].set_title("(b) Coverage Kondisional per Layanan (Ensemble, Agu 2025)")
-    axes[1].set_ylim(84, 93.0)
-    axes[1].legend(fontsize=8, loc="lower right")
+    axes[1].set_xticklabels([s.capitalize() for s in services])
+    axes[1].set_title("(b) Cakupan P90 per Layanan (Model Gabungan)")
 
-    fig.tight_layout()
+    for ax in axes:
+        garis = ax.axhline(90.0, color="#111827", linestyle="--", linewidth=0.9, zorder=3)
+        ax.set_ylim(84, 93.0)
+        ax.grid(axis="x", visible=False)
+    axes[0].set_ylabel("Cakupan P90 pada Agustus 2025 (%)")
+    garis.set_label("Sasaran 90%")
+
+    # Satu legenda untuk kedua panel: warna batang panel (b) mengikuti metode pada panel (a)
+    fig.legend(loc="upper center", ncol=5, bbox_to_anchor=(0.5, 1.0), frameon=False, columnspacing=1.0)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
     out_path = FIGURES_DIR / "task1_1e_conformal_calibration.png"
     fig.savefig(out_path)
     plt.close(fig)

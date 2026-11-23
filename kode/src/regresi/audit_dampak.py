@@ -42,7 +42,16 @@ from src.regresi.preprocess import (
     fix_target_unit_errors,
     identify_corrupt_jarak_mask,
 )
-from src.utils import configure_plotting, p90_coverage, pinball_loss
+from src.utils import (
+    LEBAR_GAMBAR,
+    angka_id,
+    configure_plotting,
+    label_batang,
+    miring,
+    p90_coverage,
+    pinball_loss,
+    sumbu_koma,
+)
 
 AUDIT_VAL_CUTOFF = "2025-07-01"
 
@@ -388,62 +397,48 @@ def plot_dampak_audit(hasil_dampak: dict[str, Any]) -> Path:
     ensure_dirs()
     configure_plotting()
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.6))
     w = 0.36
 
-    # Panel (a): Dampak leakage jumlah_scan
+    # Panel (a): Dampak kebocoran jumlah_scan
     e1 = hasil_dampak["exp1_leakage_jumlah_scan"]
-    lbl1 = ["Dengan scan\n(CV naif)", "Dengan scan\n(simulasi test)", "Tanpa scan\n(jujur)"]
-    p50_1 = [
-        e1["dengan_scan_cv_naif"]["pinball_p50"],
-        e1["dengan_scan_simulasi_test"]["pinball_p50"],
-        e1["tanpa_scan_jujur"]["pinball_p50"],
-    ]
-    p90_1 = [
-        e1["dengan_scan_cv_naif"]["pinball_p90"],
-        e1["dengan_scan_simulasi_test"]["pinball_p90"],
-        e1["tanpa_scan_jujur"]["pinball_p90"],
-    ]
+    lbl1 = ["Dengan\njumlah_scan,\nvalidasi naif", "Dengan\njumlah_scan,\nsimulasi data uji", "Tanpa\njumlah_scan"]
+    kunci1 = ["dengan_scan_cv_naif", "dengan_scan_simulasi_test", "tanpa_scan_jujur"]
+    p50_1 = [e1[k]["pinball_p50"] for k in kunci1]
+    p90_1 = [e1[k]["pinball_p90"] for k in kunci1]
     x1 = np.arange(len(lbl1))
-    b1 = axes[0].bar(x1 - w / 2, p50_1, width=w, color="#0284c7", label="Pinball P50")
-    b2 = axes[0].bar(x1 + w / 2, p90_1, width=w, color="#f97316", label="Pinball P90")
-    for bars in (b1, b2):
-        for bar in bars:
-            h = bar.get_height()
-            axes[0].text(bar.get_x() + bar.get_width() / 2, h + 0.3, f"{h:.2f}", ha="center", va="bottom", fontsize=8)
+    b1 = axes[0].bar(x1 - w / 2, p50_1, width=w, color="#2563eb", label="P50")
+    b2 = axes[0].bar(x1 + w / 2, p90_1, width=w, color="#f97316", label="P90")
+    label_batang(axes[0], b1)
+    label_batang(axes[0], b2)
     axes[0].set_xticks(x1)
-    axes[0].set_xticklabels(lbl1, fontsize=8.5)
-    axes[0].set_ylabel("Pinball Loss (lebih kecil lebih baik)")
-    axes[0].set_title("(a) Dampak Leakage jumlah_scan (Val Jul–Agu)")
-    axes[0].set_ylim(0, max(p50_1 + p90_1) * 1.18)
-    axes[0].legend(fontsize=8.5)
+    axes[0].set_xticklabels(lbl1)
+    axes[0].set_ylabel(f"{miring('Pinball loss')} (jam)")
+    axes[0].set_title("(a) Dampak Kebocoran jumlah_scan")
+    axes[0].set_ylim(0, max(p50_1 + p90_1) * 1.15)
+    axes[0].legend(loc="upper left")
 
-    # Panel (b): Dampak pemulihan sentinel jarak_km pada subset sentinel validasi
+    # Panel (b): Dampak pemulihan nilai penanda jarak_km pada baris validasi yang terdampak
     e3 = hasil_dampak["exp3_pemulihan_jarak_km"]
-    lbl2 = ["Pinball P50", "Pinball P90", "MAE P50"]
-    raw_v = [
-        e3["subset_sentinel_mentah"]["pinball_p50"],
-        e3["subset_sentinel_mentah"]["pinball_p90"],
-        e3["subset_sentinel_mentah"]["mae_p50"],
-    ]
-    rec_v = [
-        e3["subset_sentinel_dipulihkan"]["pinball_p50"],
-        e3["subset_sentinel_dipulihkan"]["pinball_p90"],
-        e3["subset_sentinel_dipulihkan"]["mae_p50"],
-    ]
+    lbl2 = [f"{miring('Pinball')} P50", f"{miring('Pinball')} P90", "MAE P50"]
+    kunci2 = ["pinball_p50", "pinball_p90", "mae_p50"]
+    raw_v = [e3["subset_sentinel_mentah"][k] for k in kunci2]
+    rec_v = [e3["subset_sentinel_dipulihkan"][k] for k in kunci2]
     x2 = np.arange(len(lbl2))
-    b3 = axes[1].bar(x2 - w / 2, raw_v, width=w, color="#dc2626", label="jarak_km mentah (0 / 9999)")
+    b3 = axes[1].bar(x2 - w / 2, raw_v, width=w, color="#dc2626", label="jarak_km mentah (0 atau 9999)")
     b4 = axes[1].bar(x2 + w / 2, rec_v, width=w, color="#16a34a", label="jarak_km dipulihkan dari rute")
-    for bars in (b3, b4):
-        for bar in bars:
-            h = bar.get_height()
-            axes[1].text(bar.get_x() + bar.get_width() / 2, h + 0.35, f"{h:.2f}", ha="center", va="bottom", fontsize=8)
+    label_batang(axes[1], b3)
+    label_batang(axes[1], b4)
     axes[1].set_xticks(x2)
-    axes[1].set_xticklabels(lbl2, fontsize=8.5)
-    axes[1].set_ylabel("Error pada baris sentinel (jam)")
-    axes[1].set_title(f"(b) Dampak Pemulihan jarak_km (n={e3['n_sentinel_validasi']} baris)")
-    axes[1].set_ylim(0, max(raw_v + rec_v) * 1.2)
-    axes[1].legend(fontsize=8.5)
+    axes[1].set_xticklabels(lbl2)
+    axes[1].set_ylabel("Galat (jam)")
+    axes[1].set_title(f"(b) Dampak Pemulihan jarak_km (n = {angka_id(e3['n_sentinel_validasi'], 0)})")
+    axes[1].set_ylim(0, max(raw_v + rec_v) * 1.32)
+    axes[1].legend(loc="upper left")
+
+    for ax in axes:
+        ax.grid(axis="x", visible=False)
+        sumbu_koma(ax, "y")
 
     fig.tight_layout()
     out_path = FIGURES_DIR / "task1_1a6_dampak_audit.png"
