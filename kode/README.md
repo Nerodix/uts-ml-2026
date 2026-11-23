@@ -11,16 +11,14 @@ kode/
 ├── uv.lock                    # Lockfile dependensi persis
 ├── requirements.txt           # Versi paket terkunci untuk pip
 ├── run_all.py                 # Entrypoint perintah tunggal seluruh pipeline
-├── src/
-│   ├── config.py              # Path, konstanta domain, dan SEED global (= 42)
-│   ├── utils.py               # Seeding, metrik UTS (pinball, coverage, cost), tema plot
-│   ├── validate_outputs.py    # Validator kontrak kolom/baris/range file prediksi
-│   ├── audit/                 # Audit data Tugas 1–3
-│   ├── regresi/               # Pipeline Tugas 1 (estimasi durasi pengiriman)
-│   ├── klasifikasi/           # Pipeline Tugas 2 (deteksi transaksi fraud)
-│   └── clustering/            # Pipeline Tugas 3 (segmentasi pelanggan)
-└── tests/
-    └── test_core.py           # Verifikasi unit metrik evaluasi dan validator output
+└── src/
+    ├── config.py              # Path, konstanta domain, dan SEED global (= 42)
+    ├── utils.py               # Seeding, metrik UTS (pinball, coverage, cost), tema plot
+    ├── validate_outputs.py    # Validator kontrak kolom/baris/range file prediksi
+    ├── audit/                 # Audit data Tugas 1–3
+    ├── regresi/               # Pipeline Tugas 1 (estimasi durasi pengiriman)
+    ├── klasifikasi/           # Pipeline Tugas 2 (deteksi transaksi fraud)
+    └── clustering/            # Pipeline Tugas 3 (segmentasi pelanggan)
 ```
 
 ## Prasyarat Data
@@ -60,7 +58,7 @@ pip install -r kode/requirements.txt
 
 ```bash
 python kode/run_all.py --check-env
-python kode/tests/test_core.py
+python kode/run_all.py --stages validate
 ```
 
 ### Menjalankan seluruh pipeline (satu perintah)
