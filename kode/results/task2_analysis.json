@@ -1,0 +1,440 @@
+{
+  "error_fold3_per_arketipe": [
+    {
+      "flag_rate_pct": 0.6647994829337355,
+      "fn": 27,
+      "fp": 181,
+      "grup": "Anomali Merchant & Lainnya",
+      "missed_loss_idr": 9074200.0,
+      "n_fraud": 62,
+      "n_trx": 32491,
+      "pr_auc": 0.4506095209831486,
+      "precision": 0.16203703703703703,
+      "recall": 0.5645161290322581,
+      "review_cost_idr": 5400000.0,
+      "total_cost_idr": 14474200.0,
+      "tp": 35
+    },
+    {
+      "flag_rate_pct": 0.5908932916232186,
+      "fn": 7,
+      "fp": 65,
+      "grup": "Gelombang QRIS",
+      "missed_loss_idr": 5736200.0,
+      "n_fraud": 10,
+      "n_trx": 11508,
+      "pr_auc": 0.18605495713429138,
+      "precision": 0.04411764705882353,
+      "recall": 0.3,
+      "review_cost_idr": 1700000.0,
+      "total_cost_idr": 7436200.0,
+      "tp": 3
+    },
+    {
+      "flag_rate_pct": 5.124414880512441,
+      "fn": 11,
+      "fp": 75,
+      "grup": "Pengambilalihan Akun (ATO)",
+      "missed_loss_idr": 1754000.0,
+      "n_fraud": 144,
+      "n_trx": 4059,
+      "pr_auc": 0.9304211639915706,
+      "precision": 0.6394230769230769,
+      "recall": 0.9236111111111112,
+      "review_cost_idr": 5200000.0,
+      "total_cost_idr": 6954000.0,
+      "tp": 133
+    },
+    {
+      "flag_rate_pct": 25.384615384615383,
+      "fn": 0,
+      "fp": 54,
+      "grup": "Merchant Kolusif (Nominal Besar)",
+      "missed_loss_idr": 0.0,
+      "n_fraud": 45,
+      "n_trx": 390,
+      "pr_auc": 0.7857694234994214,
+      "precision": 0.45454545454545453,
+      "recall": 1.0,
+      "review_cost_idr": 2475000.0,
+      "total_cost_idr": 2475000.0,
+      "tp": 45
+    },
+    {
+      "flag_rate_pct": 0.9264024704065877,
+      "fn": 49,
+      "fp": 5,
+      "grup": "Card Testing & Velocity",
+      "missed_loss_idr": 941200.0,
+      "n_fraud": 80,
+      "n_trx": 3886,
+      "pr_auc": 0.9227712448940448,
+      "precision": 0.8611111111111112,
+      "recall": 0.3875,
+      "review_cost_idr": 900000.0,
+      "total_cost_idr": 1841200.0,
+      "tp": 31
+    }
+  ],
+  "error_fold3_per_kanal": [
+    {
+      "flag_rate_pct": 0.8381328977907677,
+      "fn": 28,
+      "fp": 144,
+      "grup": "aplikasi",
+      "missed_loss_idr": 4490100.0,
+      "n_fraud": 79,
+      "n_trx": 23266,
+      "pr_auc": 0.7339744205311509,
+      "precision": 0.26153846153846155,
+      "recall": 0.6455696202531646,
+      "review_cost_idr": 4875000.0,
+      "total_cost_idr": 9365100.0,
+      "tp": 51
+    },
+    {
+      "flag_rate_pct": 2.38495642868063,
+      "fn": 36,
+      "fp": 76,
+      "grup": "kartu",
+      "missed_loss_idr": 4198800.0,
+      "n_fraud": 116,
+      "n_trx": 6541,
+      "pr_auc": 0.8664531374730079,
+      "precision": 0.5128205128205128,
+      "recall": 0.6896551724137931,
+      "review_cost_idr": 3900000.0,
+      "total_cost_idr": 8098800.0,
+      "tp": 80
+    },
+    {
+      "flag_rate_pct": 0.5908932916232186,
+      "fn": 7,
+      "fp": 65,
+      "grup": "qris",
+      "missed_loss_idr": 5736200.0,
+      "n_fraud": 10,
+      "n_trx": 11508,
+      "pr_auc": 0.18605495713429138,
+      "precision": 0.04411764705882353,
+      "recall": 0.3,
+      "review_cost_idr": 1700000.0,
+      "total_cost_idr": 7436200.0,
+      "tp": 3
+    },
+    {
+      "flag_rate_pct": 1.688627350646028,
+      "fn": 9,
+      "fp": 67,
+      "grup": "va",
+      "missed_loss_idr": 1796900.0,
+      "n_fraud": 74,
+      "n_trx": 7817,
+      "pr_auc": 0.8023259698506765,
+      "precision": 0.49242424242424243,
+      "recall": 0.8783783783783784,
+      "review_cost_idr": 3300000.0,
+      "total_cost_idr": 5096900.0,
+      "tp": 65
+    },
+    {
+      "flag_rate_pct": 2.373516552154903,
+      "fn": 14,
+      "fp": 28,
+      "grup": "web",
+      "missed_loss_idr": 1283600.0,
+      "n_fraud": 62,
+      "n_trx": 3202,
+      "pr_auc": 0.9248801598895762,
+      "precision": 0.631578947368421,
+      "recall": 0.7741935483870968,
+      "review_cost_idr": 1900000.0,
+      "total_cost_idr": 3183600.0,
+      "tp": 48
+    }
+  ],
+  "error_fold3_top10_kategori": [
+    {
+      "flag_rate_pct": 2.736051502145923,
+      "fn": 7,
+      "fp": 106,
+      "grup": "elektronik",
+      "missed_loss_idr": 6007100.0,
+      "n_fraud": 54,
+      "n_trx": 5592,
+      "pr_auc": 0.8142419034864027,
+      "precision": 0.30718954248366015,
+      "recall": 0.8703703703703703,
+      "review_cost_idr": 3825000.0,
+      "total_cost_idr": 9832100.0,
+      "tp": 47
+    },
+    {
+      "flag_rate_pct": 5.137614678899083,
+      "fn": 5,
+      "fp": 80,
+      "grup": "gadget",
+      "missed_loss_idr": 3118900.0,
+      "n_fraud": 37,
+      "n_trx": 2180,
+      "pr_auc": 0.7887803880897838,
+      "precision": 0.2857142857142857,
+      "recall": 0.8648648648648649,
+      "review_cost_idr": 2800000.0,
+      "total_cost_idr": 5918900.0,
+      "tp": 32
+    },
+    {
+      "flag_rate_pct": 2.1615472127417523,
+      "fn": 10,
+      "fp": 64,
+      "grup": "fashion",
+      "missed_loss_idr": 2901200.0,
+      "n_fraud": 22,
+      "n_trx": 3516,
+      "pr_auc": 0.48242925010331994,
+      "precision": 0.15789473684210525,
+      "recall": 0.5454545454545454,
+      "review_cost_idr": 1900000.0,
+      "total_cost_idr": 4801200.0,
+      "tp": 12
+    },
+    {
+      "flag_rate_pct": 0.7136060894386299,
+      "fn": 21,
+      "fp": 16,
+      "grup": "toko_online",
+      "missed_loss_idr": 1449000.0,
+      "n_fraud": 35,
+      "n_trx": 4204,
+      "pr_auc": 0.6790427162798895,
+      "precision": 0.4666666666666667,
+      "recall": 0.4,
+      "review_cost_idr": 750000.0,
+      "total_cost_idr": 2199000.0,
+      "tp": 14
+    },
+    {
+      "flag_rate_pct": 1.3759431868619618,
+      "fn": 9,
+      "fp": 27,
+      "grup": "kecantikan",
+      "missed_loss_idr": 1423700.0,
+      "n_fraud": 13,
+      "n_trx": 2253,
+      "pr_auc": 0.35668153748561277,
+      "precision": 0.12903225806451613,
+      "recall": 0.3076923076923077,
+      "review_cost_idr": 775000.0,
+      "total_cost_idr": 2198700.0,
+      "tp": 4
+    },
+    {
+      "flag_rate_pct": 1.6381507098653074,
+      "fn": 2,
+      "fp": 19,
+      "grup": "top_up_ewallet",
+      "missed_loss_idr": 498000.0,
+      "n_fraud": 28,
+      "n_trx": 2747,
+      "pr_auc": 0.9649586694932056,
+      "precision": 0.5777777777777777,
+      "recall": 0.9285714285714286,
+      "review_cost_idr": 1125000.0,
+      "total_cost_idr": 1623000.0,
+      "tp": 26
+    },
+    {
+      "flag_rate_pct": 2.190082644628099,
+      "fn": 13,
+      "fp": 11,
+      "grup": "voucher_game",
+      "missed_loss_idr": 204000.0,
+      "n_fraud": 55,
+      "n_trx": 2420,
+      "pr_auc": 0.9216506056133847,
+      "precision": 0.7924528301886793,
+      "recall": 0.7636363636363637,
+      "review_cost_idr": 1325000.0,
+      "total_cost_idr": 1529000.0,
+      "tp": 42
+    },
+    {
+      "flag_rate_pct": 6.918238993710692,
+      "fn": 1,
+      "fp": 34,
+      "grup": "emas",
+      "missed_loss_idr": 124200.0,
+      "n_fraud": 22,
+      "n_trx": 795,
+      "pr_auc": 0.8513278538333812,
+      "precision": 0.38181818181818183,
+      "recall": 0.9545454545454546,
+      "review_cost_idr": 1375000.0,
+      "total_cost_idr": 1499200.0,
+      "tp": 21
+    },
+    {
+      "flag_rate_pct": 0.5180314803745766,
+      "fn": 22,
+      "fp": 4,
+      "grup": "pulsa_data",
+      "missed_loss_idr": 379000.0,
+      "n_fraud": 44,
+      "n_trx": 5019,
+      "pr_auc": 0.9521395249374676,
+      "precision": 0.8461538461538461,
+      "recall": 0.5,
+      "review_cost_idr": 650000.0,
+      "total_cost_idr": 1029000.0,
+      "tp": 22
+    },
+    {
+      "flag_rate_pct": 0.19656019656019655,
+      "fn": 2,
+      "fp": 2,
+      "grup": "rumah_tangga",
+      "missed_loss_idr": 926300.0,
+      "n_fraud": 4,
+      "n_trx": 2035,
+      "pr_auc": 0.4451155342026996,
+      "precision": 0.5,
+      "recall": 0.5,
+      "review_cost_idr": 100000.0,
+      "total_cost_idr": 1026300.0,
+      "tp": 2
+    }
+  ],
+  "error_shift_agt11_21_qris": {
+    "flag_rate_pct": 1.7787524366471734,
+    "fn": 4,
+    "fp": 37,
+    "grup": "Gelombang QRIS",
+    "missed_loss_idr": 2869700.0,
+    "n_fraud": 40,
+    "n_trx": 4104,
+    "pr_auc": 0.6354869729436347,
+    "precision": 0.4931506849315068,
+    "recall": 0.9,
+    "review_cost_idr": 1825000.0,
+    "total_cost_idr": 4694700.0,
+    "tp": 36
+  },
+  "produksi_info": {
+    "decay_half_life_days": null,
+    "ensemble_weights": {
+      "catboost": 0.23865228832384522,
+      "lgbm": 0.6464912829852132,
+      "xgboost": 0.11485642869094165
+    },
+    "kalibrator": "beta_calibration",
+    "n_train_rows": 386364,
+    "w_recent": 3.0
+  },
+  "shap_top20": [
+    {
+      "fitur": "kategori_merchant",
+      "mean_abs_shap": 0.5816863430058486
+    },
+    {
+      "fitur": "merch_tx_30d",
+      "mean_abs_shap": 0.389317206189501
+    },
+    {
+      "fitur": "merch_days_since_first_tx",
+      "mean_abs_shap": 0.3070114613361783
+    },
+    {
+      "fitur": "jumlah_akun_per_perangkat",
+      "mean_abs_shap": 0.1957519978728456
+    },
+    {
+      "fitur": "merch_tx_7d",
+      "mean_abs_shap": 0.17617699578035204
+    },
+    {
+      "fitur": "merch_past_tx_count",
+      "mean_abs_shap": 0.1706370541286176
+    },
+    {
+      "fitur": "nominal",
+      "mean_abs_shap": 0.13736372446461825
+    },
+    {
+      "fitur": "user_past_tx_count",
+      "mean_abs_shap": 0.13693525729974812
+    },
+    {
+      "fitur": "ato_risk_sum",
+      "mean_abs_shap": 0.13339016490992212
+    },
+    {
+      "fitur": "persen_saldo",
+      "mean_abs_shap": 0.12318098269550419
+    },
+    {
+      "fitur": "v29",
+      "mean_abs_shap": 0.11646305942407878
+    },
+    {
+      "fitur": "menit_sejak_trx_terakhir",
+      "mean_abs_shap": 0.11602102178043225
+    },
+    {
+      "fitur": "collusive_risk_score",
+      "mean_abs_shap": 0.11518691471326839
+    },
+    {
+      "fitur": "jarak_lokasi_km",
+      "mean_abs_shap": 0.11352469757712634
+    },
+    {
+      "fitur": "kanal",
+      "mean_abs_shap": 0.11003929135255705
+    },
+    {
+      "fitur": "merch_nominal_vs_merch_mean",
+      "mean_abs_shap": 0.10502997218098827
+    },
+    {
+      "fitur": "umur_perangkat_hari",
+      "mean_abs_shap": 0.07495067659427311
+    },
+    {
+      "fitur": "umur_akun_hari",
+      "mean_abs_shap": 0.07148568295595852
+    },
+    {
+      "fitur": "user_burst_1j_vs_7h",
+      "mean_abs_shap": 0.07082079182349238
+    },
+    {
+      "fitur": "user_nominal_vs_max",
+      "mean_abs_shap": 0.06790777981706803
+    }
+  ],
+  "test_sanity": {
+    "flag_rate_pct": 1.3555318071882558,
+    "median_nominal_flagged_idr": 1100000.0,
+    "median_nominal_unflagged_idr": 124200.0,
+    "n_flagged": 1446,
+    "n_rows": 106674,
+    "non_qris_mean_prob_pct": 0.5882351338050587,
+    "per_kanal_flag_rate_pct": {
+      "aplikasi": 0.5085068966247855,
+      "kartu": 1.759618252311363,
+      "qris": 2.63918402039949,
+      "va": 1.4460861364350832,
+      "web": 1.7948717948717947
+    },
+    "prob_max": 0.9913258338708798,
+    "prob_mean_pct": 0.8046082091372954,
+    "prob_median": 3.4319868120543206e-05,
+    "prob_min": 1e-06,
+    "prob_q99": 0.18701103527802934,
+    "qris_bulat100k_flag_rate_pct": 93.70932754880694,
+    "qris_bulat100k_mean_prob_pct": 70.01667281450511,
+    "qris_bulat100k_n": 461,
+    "qris_normal_mean_prob_pct": 0.20134674103503403
+  }
+}

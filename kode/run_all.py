@@ -37,7 +37,7 @@ AVAILABLE_STAGES = ["audit", "regresi", "klasifikasi", "clustering", "validate"]
 
 # Tugas yang pipeline-nya sudah terintegrasi. Tambahkan "klasifikasi" / "clustering" di sini
 # (dan cabangnya di run_stage) saat PR tugas tersebut masuk, agar ikut divalidasi.
-TUGAS_SIAP = ["regresi"]
+TUGAS_SIAP = ["regresi", "klasifikasi"]
 
 
 def check_environment(save_report: bool = True) -> int:
@@ -89,6 +89,16 @@ def run_stage(stage: str) -> int:
         _run_python_script("src/regresi/models.py")
         _run_python_script("src/regresi/calibration.py")
         _run_python_script("src/regresi/analysis.py")
+        return 0
+
+    if stage == "klasifikasi":
+        _run_python_script("src/klasifikasi/audit.py", ["--save-json"])
+        _run_python_script("src/klasifikasi/validation.py")
+        _run_python_script("src/klasifikasi/features.py", ["--run-ablation"])
+        _run_python_script("src/klasifikasi/models.py")
+        _run_python_script("src/klasifikasi/shift.py")
+        _run_python_script("src/klasifikasi/calibration.py")
+        _run_python_script("src/klasifikasi/analysis.py")
         return 0
 
     if stage == "validate":
