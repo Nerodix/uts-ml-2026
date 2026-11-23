@@ -1,1 +1,1 @@
-"""Modul pipeline Tugas 2 — Klasifikasi deteksi fraud."""
+"""Pipeline Tugas 2 — Klasifikasi Deteksi Transaksi Fraud."""
