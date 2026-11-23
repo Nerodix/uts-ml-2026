@@ -990,18 +990,18 @@ def plot_pergeseran_temporal(train: pd.DataFrame, test: pd.DataFrame) -> Path:
 
 
 DAFTAR_CEK = (
-    "skema",
-    "duplikat",
+    "schema",
+    "duplicates",
     "id",
-    "waktu",
-    "tipe",
+    "time",
+    "types",
     "missing",
     "leakage",
     "target",
     "sentinel",
-    "kategori",
+    "category",
     "temporal",
-    "dampak",
+    "impact",
 )
 
 
@@ -1298,25 +1298,25 @@ def main() -> None:
     """Jalankan satu, beberapa, atau seluruh pemeriksaan audit Tugas 1a lewat CLI.
 
     Contoh penggunaan:
-        python kode/src/regresi/audit.py                 # Jalankan semua + ekspor JSON
-        python kode/src/regresi/audit.py --cek dampak    # Hanya 5 eksperimen ukur dampak
-        python kode/src/regresi/audit.py --cek target    # Hanya cek anomali target
+        python kode/src/regresi/audit.py                  # Run all checks + save JSON
+        python kode/src/regresi/audit.py --checks impact  # Run impact experiments only
+        python kode/src/regresi/audit.py --checks target  # Run target anomaly check only
     """
     set_global_seed(SEED)
     parser = argparse.ArgumentParser(
-        description="Audit data Tugas 1a (Regresi). Gunakan --cek untuk memilih fungsi tertentu."
+        description="Task 1a data audit (Regression). Use --checks to select specific checks."
     )
     parser.add_argument(
-        "--cek",
+        "--checks",
         nargs="+",
         choices=DAFTAR_CEK,
         default=list(DAFTAR_CEK),
-        help=f"Pilih satu atau lebih pemeriksaan (default: semua -> {', '.join(DAFTAR_CEK)}).",
+        help=f"Select one or more audit checks (default: all -> {', '.join(DAFTAR_CEK)}).",
     )
     parser.add_argument(
-        "--simpan-json",
+        "--save-json",
         action="store_true",
-        help="Simpan ringkasan lengkap Tugas 1a ke kode/results/task1_audit.json.",
+        help="Save Task 1a audit summary to kode/results/task1_audit.json.",
     )
     args = parser.parse_args()
 
@@ -1324,30 +1324,29 @@ def main() -> None:
     test = pd.read_csv(REGRESI_TEST_PATH)
 
     handlers = {
-        "skema": _tampilkan_skema,
-        "duplikat": _tampilkan_duplikat,
+        "schema": _tampilkan_skema,
+        "duplicates": _tampilkan_duplikat,
         "id": _tampilkan_keacakan_id,
-        "waktu": _tampilkan_waktu,
-        "tipe": _tampilkan_tipe,
+        "time": _tampilkan_waktu,
+        "types": _tampilkan_tipe,
         "missing": _tampilkan_missing,
         "leakage": _tampilkan_leakage,
         "target": _tampilkan_target,
         "sentinel": _tampilkan_sentinel,
-        "kategori": _tampilkan_kategori,
+        "category": _tampilkan_kategori,
         "temporal": _tampilkan_temporal,
-        "dampak": _tampilkan_dampak,
+        "impact": _tampilkan_dampak,
     }
 
     hasil_dampak: dict[str, Any] | None = None
-    for i, nama in enumerate(args.cek):
+    for i, nama in enumerate(args.checks):
         if i > 0:
             print()
         ret = handlers[nama](train, test)
-        if nama == "dampak":
+        if nama == "impact":
             hasil_dampak = ret
 
-    # Ekspor JSON otomatis saat menjalankan seluruh cek atau bila --simpan-json diaktifkan
-    if args.simpan_json or set(args.cek) == set(DAFTAR_CEK):
+    if args.save_json or set(args.checks) == set(DAFTAR_CEK):
         json_path = simpan_ringkasan_audit_1a(train, test, hasil_dampak=hasil_dampak)
         print(f"\nRingkasan lengkap Tugas 1a tersimpan di: {json_path.relative_to(KODE_DIR.parent)}")
 

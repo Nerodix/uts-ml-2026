@@ -425,12 +425,12 @@ def main() -> None:
     set_global_seed(SEED)
     ensure_dirs()
 
-    parser = argparse.ArgumentParser(description="Benchmark validasi Tugas 1b (Time CV vs Random K-Fold).")
+    parser = argparse.ArgumentParser(description="Task 1b validation benchmark (Time CV vs Random K-Fold).")
     parser.add_argument(
         "--mode",
-        choices=("time", "random", "semua"),
-        default="semua",
-        help="Pilih skema validasi yang ingin dijalankan (default: semua).",
+        choices=("time", "random", "all"),
+        default="all",
+        help="Validation scheme to run (default: all).",
     )
     args = parser.parse_args()
 
@@ -439,11 +439,11 @@ def main() -> None:
     hasil_waktu: dict[str, Any] | None = None
     hasil_random: dict[str, Any] | None = None
 
-    if args.mode in ("time", "semua"):
+    if args.mode in ("time", "all"):
         with timer("Evaluasi Expanding-Window Time-Based CV (3 fold)"):
             hasil_waktu = evaluasi_validasi_waktu(train, seed=SEED)
 
-    if args.mode in ("random", "semua"):
+    if args.mode in ("random", "all"):
         with timer("Evaluasi Random 5-Fold CV"):
             hasil_random = evaluasi_random_kfold(train, n_splits=5, seed=SEED)
 

@@ -83,9 +83,9 @@ def _run_python_script(rel_script: str, extra_args: list[str] | None = None) -> 
 
 def run_stage(stage: str) -> int:
     if stage == "regresi":
-        _run_python_script("src/regresi/audit.py", ["--simpan-json"])
+        _run_python_script("src/regresi/audit.py", ["--save-json"])
         _run_python_script("src/regresi/validation.py")
-        _run_python_script("src/regresi/features.py", ["--uji-unseen"])
+        _run_python_script("src/regresi/features.py", ["--test-unseen"])
         _run_python_script("src/regresi/models.py")
         _run_python_script("src/regresi/calibration.py")
         _run_python_script("src/regresi/analysis.py")

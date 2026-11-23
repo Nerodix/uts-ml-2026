@@ -1,20 +1,20 @@
 """Audit Label dan Fitur Tugas 2a — Klasifikasi Deteksi Transaksi Fraud.
 
 Dibangun modular dengan prinsip satu fungsi untuk satu pertanyaan audit:
-- ``skema``    : Dimensi, kesesuaian kolom, duplikat ID/baris, irisan train–test.
-- ``waktu``    : Rentang waktu, jumlah transaksi bulanan, dan status pengurutan baris.
-- ``id``       : Keacakan ``id_transaksi``, ``id_pengguna``, ``id_merchant``.
-- ``delay``    : Pembentukan label ``is_fraud`` & kurva *right-censoring* Agustus 2025.
-- ``leakage``  : Bukti forensik *post-transaction leakage* pada ``flag_review_manual``.
-- ``kualitas`` : Missingness terstruktur, anomali ``umur_merchant_hari < 0``,
-                 ``persen_saldo`` cap 50, entitas *unseen*, dan statistik kolom kunci.
-- ``v_scan``   : Screening 50 fitur anonim ``v01–v50`` (8 sinyal vs 42 noise + drift ``v15``).
-- ``shift``    : Pergeseran pola fraud bulanan (gelombang QRIS Agustus + 5 arketipe fraud).
-- ``dampak``   : 4 eksperimen dampak kuantitatif pada split kronologis matang.
+- ``schema``  : Dimensi, kesesuaian kolom, duplikat ID/baris, irisan train–test.
+- ``time``    : Rentang waktu, jumlah transaksi bulanan, dan status pengurutan baris.
+- ``id``      : Keacakan ``id_transaksi``, ``id_pengguna``, ``id_merchant``.
+- ``delay``   : Pembentukan label ``is_fraud`` & kurva *right-censoring* Agustus 2025.
+- ``leakage`` : Bukti forensik *post-transaction leakage* pada ``flag_review_manual``.
+- ``quality`` : Missingness terstruktur, anomali ``umur_merchant_hari < 0``,
+                ``persen_saldo`` cap 50, entitas *unseen*, dan statistik kolom kunci.
+- ``v_scan``  : Screening 50 fitur anonim ``v01–v50`` (8 sinyal vs 42 noise + drift ``v15``).
+- ``shift``   : Pergeseran pola fraud bulanan (gelombang QRIS Agustus + 5 arketipe fraud).
+- ``impact``  : 4 eksperimen dampak kuantitatif pada split kronologis matang.
 
 Jalankan langsung:
-    python kode/src/klasifikasi/audit.py --simpan-json
-    python kode/src/klasifikasi/audit.py --cek delay leakage
+    python kode/src/klasifikasi/audit.py --save-json
+    python kode/src/klasifikasi/audit.py --checks delay leakage
 """
 
 from __future__ import annotations
@@ -73,15 +73,15 @@ from src.utils import (  # noqa: E402
 )
 
 PILIHAN_CEK = (
-    "skema",
-    "waktu",
+    "schema",
+    "time",
     "id",
     "delay",
     "leakage",
-    "kualitas",
+    "quality",
     "v_scan",
     "shift",
-    "dampak",
+    "impact",
 )
 
 
@@ -1045,11 +1045,11 @@ def jalankan_audit_klasifikasi(
         train, test = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
 
     hasil: dict[str, Any] = {}
-    if "skema" in dipilih:
+    if "schema" in dipilih:
         with timer("2a.1 Skema & duplikat"):
             hasil["skema"] = cek_skema_dan_duplikat(train, test)
             print(f"  Train={hasil['skema']['train_shape']}, Test={hasil['skema']['test_shape']}, dup_id={hasil['skema']['dup_id_train']}")
-    if "waktu" in dipilih:
+    if "time" in dipilih:
         with timer("2a.2 Rentang waktu & urutan"):
             hasil["waktu"] = cek_rentang_waktu_dan_urutan(train, test)
             print(f"  Train terurut={hasil['waktu']['train_terurut_waktu']}, Test terurut={hasil['waktu']['test_terurut_waktu']}")
@@ -1073,7 +1073,7 @@ def jalankan_audit_klasifikasi(
                 f"(non-fraud={hasil['leakage_review']['laju_review_train_nonfraud_pct']:.2f}%), "
                 f"test={hasil['leakage_review']['laju_review_test_total_pct']:.2f}%"
             )
-    if "kualitas" in dipilih:
+    if "quality" in dipilih:
         with timer("2a.6 Kualitas fitur, missing, anomali, & unseen"):
             hasil["kualitas"] = cek_kualitas_fitur_dan_anomali(train, test)
             um = hasil["kualitas"]["umur_merchant_negatif"]
@@ -1097,7 +1097,7 @@ def jalankan_audit_klasifikasi(
                 f"  QRIS fraud Jan–Jul={ps['laju_qris_jan_jul_pct']:.3f}% -> Agt={ps['laju_qris_agustus_pct']:.3f}%; "
                 f"QRIS bulat 100rb di Agt fraud={ps['persen_bulat100k_pada_fraud_qris_agt']:.1f}%, di test={ps['n_qris_bulat100k_test_sep_okt']}"
             )
-    if "dampak" in dipilih:
+    if "impact" in dipilih:
         with timer("2a.9 Eksperimen dampak kuantitatif (4 temuan)"):
             hasil["dampak"] = jalankan_semua_dampak(train, seed=SEED, simpan_plot=True)
             lk = hasil["dampak"]["leakage_review_manual"]
@@ -1115,21 +1115,21 @@ def jalankan_audit_klasifikasi(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Audit label dan fitur Tugas 2a (Klasifikasi Fraud).")
+    parser = argparse.ArgumentParser(description="Task 2a label and feature audit (Fraud Detection).")
     parser.add_argument(
-        "--cek",
+        "--checks",
         nargs="+",
         choices=list(PILIHAN_CEK),
         default=None,
-        help="Pilih subset audit tertentu (kosongkan untuk menjalankan seluruh audit).",
+        help="Run a specific subset of audit checks (omit to run all).",
     )
     parser.add_argument(
-        "--simpan-json",
+        "--save-json",
         action="store_true",
-        help="Simpan ringkasan hasil audit ke kode/results/task2_audit.json.",
+        help="Save audit summary to kode/results/task2_audit.json.",
     )
     args = parser.parse_args()
-    jalankan_audit_klasifikasi(cek_list=args.cek, simpan_json=args.simpan_json or args.cek is None)
+    jalankan_audit_klasifikasi(cek_list=args.checks, simpan_json=args.save_json or args.checks is None)
     return 0
 
 

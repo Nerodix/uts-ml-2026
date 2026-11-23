@@ -561,17 +561,17 @@ def simpan_plot_perbandingan_validasi(
 
 
 def jalankan_validasi_klasifikasi(
-    mode: str = "semua",
+    mode: str = "all",
     simpan_json: bool = True,
 ) -> dict[str, Any]:
     """Jalankan eksperimen perbandingan validasi Tugas 2b sesuai mode pilihan.
 
     Parameters
     ----------
-    mode : {'time', 'random', 'censored', 'semua'}, default='semua'
+    mode : {'time', 'random', 'censored', 'all'}, default='all'
         Skema validasi yang dieksekusi.
     simpan_json : bool, default=True
-        Bila ``True`` (dan ``mode == 'semua'``), simpan hasil ke ``task2_validation.json``.
+        Bila ``True`` (dan ``mode == 'all'``), simpan hasil ke ``task2_validation.json``.
 
     Returns
     -------
@@ -597,7 +597,7 @@ def jalankan_validasi_klasifikasi(
         }
     }
 
-    if mode in ("time", "semua"):
+    if mode in ("time", "all"):
         with timer("2b.1 Expanding-Window Time CV Matang (3 Fold: Mei, Jun, Jul)"):
             hasil["time_cv_matang"] = evaluasi_time_cv_matang(train_df, seed=SEED)
             tc = hasil["time_cv_matang"]
@@ -606,7 +606,7 @@ def jalankan_validasi_klasifikasi(
                 f"Biaya/10k={tc['mean_cost_per_10k_tx_idr']:,.0f} Rp, rasio={tc['mean_ratio_pred_to_obs']:.2f}"
             )
 
-    if mode in ("random", "semua"):
+    if mode in ("random", "all"):
         with timer("2b.2 Pembanding Stratified Random 5-Fold CV (Jan–Jul Matang)"):
             hasil["random_cv_matang"] = evaluasi_random_stratified_cv(train_df, n_splits=5, seed=SEED)
             rc = hasil["random_cv_matang"]
@@ -615,7 +615,7 @@ def jalankan_validasi_klasifikasi(
                 f"Biaya/10k={rc['mean_cost_per_10k_tx_idr']:,.0f} Rp"
             )
 
-    if mode in ("censored", "semua"):
+    if mode in ("censored", "all"):
         with timer("2b.3 Evaluasi Naif pada Agustus Tersensor (Agt 1–31 & 15–31)"):
             hasil["validasi_agustus_tersensor"] = evaluasi_validasi_agustus_tersensor(train_df, seed=SEED)
             ac = hasil["validasi_agustus_tersensor"]
@@ -629,7 +629,7 @@ def jalankan_validasi_klasifikasi(
                 f"  Agt 15–31 berat : PR-AUC={ac['agt_akhir_15_31_berat']['pr_auc']:.4f}, rasio={ac['agt_akhir_15_31_berat']['ratio_pred_to_obs']:.2f}"
             )
 
-    if mode == "semua":
+    if mode == "all":
         tc = hasil["time_cv_matang"]
         rc = hasil["random_cv_matang"]
         ac = hasil["validasi_agustus_tersensor"]
@@ -655,15 +655,15 @@ def jalankan_validasi_klasifikasi(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validasi berbasis waktu anti-censoring Tugas 2b.")
+    parser = argparse.ArgumentParser(description="Task 2b anti-censoring time-based validation.")
     parser.add_argument(
         "--mode",
-        choices=["time", "random", "censored", "semua"],
-        default="semua",
-        help="Pilih mode validasi yang dijalankan.",
+        choices=["time", "random", "censored", "all"],
+        default="all",
+        help="Validation mode to run (default: all).",
     )
     args = parser.parse_args()
-    jalankan_validasi_klasifikasi(mode=args.mode, simpan_json=(args.mode == "semua"))
+    jalankan_validasi_klasifikasi(mode=args.mode, simpan_json=(args.mode == "all"))
     return 0
 
 
