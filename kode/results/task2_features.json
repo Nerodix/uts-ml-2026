@@ -1,0 +1,122 @@
+{
+  "ablasi": [
+    {
+      "mean_cost_per_10k_idr": 7208806.526217555,
+      "mean_pr_auc": 0.7766511279964118,
+      "mean_roc_auc": 0.986263453302897,
+      "n_features": 43,
+      "qris_shift_pr_auc": 0.5751388097249236,
+      "std_pr_auc": 0.027393800682882954,
+      "tahap": "dasar"
+    },
+    {
+      "mean_cost_per_10k_idr": 7203261.173569643,
+      "mean_pr_auc": 0.7809815799509655,
+      "mean_roc_auc": 0.9855787411211278,
+      "n_features": 59,
+      "qris_shift_pr_auc": 0.5920894601568286,
+      "std_pr_auc": 0.03231687481671918,
+      "tahap": "plus_domain"
+    },
+    {
+      "mean_cost_per_10k_idr": 7433115.711838807,
+      "mean_pr_auc": 0.7844634730553727,
+      "mean_roc_auc": 0.9861773339275167,
+      "n_features": 72,
+      "qris_shift_pr_auc": 0.6128939194110115,
+      "std_pr_auc": 0.02783748473539824,
+      "tahap": "plus_user"
+    },
+    {
+      "mean_cost_per_10k_idr": 6101238.094971669,
+      "mean_pr_auc": 0.8056457735703598,
+      "mean_roc_auc": 0.990491928148693,
+      "n_features": 90,
+      "qris_shift_pr_auc": 0.6159903965351494,
+      "std_pr_auc": 0.028899265376083744,
+      "tahap": "plus_merchant"
+    },
+    {
+      "mean_cost_per_10k_idr": 6189499.396855782,
+      "mean_pr_auc": 0.8069208342225483,
+      "mean_roc_auc": 0.9911009403703295,
+      "n_features": 94,
+      "qris_shift_pr_auc": 0.5660782860825893,
+      "std_pr_auc": 0.02840766616997742,
+      "tahap": "lengkap_2c"
+    }
+  ],
+  "alasan_pemilihan": "Himpunan 90 fitur kausal bebas-label (plus_merchant) memberi biaya terendah dan PR-AUC tertinggi pada gelombang QRIS baru, sekaligus kebal terhadap jeda konfirmasi label pada merchant baru di data uji Sep–Okt.",
+  "jumlah_fitur_terpilih": 90,
+  "kausalitas_terverifikasi": true,
+  "rincian_kelompok": {
+    "dasar_bersih_dan_flag": 43,
+    "interaksi_domain": 16,
+    "risiko_historis_lag25h_diuji": 4,
+    "riwayat_kausal_merchant": 18,
+    "riwayat_kausal_pengguna": 13
+  },
+  "tahap_terpilih": "plus_merchant",
+  "top_fitur_perilaku": [
+    {
+      "fitur": "ato_risk_sum",
+      "gain_ribu": 35.057665658315024
+    },
+    {
+      "fitur": "user_burst_1j_vs_7h",
+      "gain_ribu": 23.85004110956192
+    },
+    {
+      "fitur": "collusive_risk_score",
+      "gain_ribu": 13.808220024983088
+    },
+    {
+      "fitur": "refund_x_umur_merchant_inv",
+      "gain_ribu": 11.562441262364388
+    },
+    {
+      "fitur": "merch_tx_30d",
+      "gain_ribu": 8.807932774623236
+    },
+    {
+      "fitur": "merch_tx_7d",
+      "gain_ribu": 8.062704351623852
+    },
+    {
+      "fitur": "merch_past_tx_count",
+      "gain_ribu": 3.7689964584112166
+    },
+    {
+      "fitur": "qris_x_log_nominal",
+      "gain_ribu": 2.235389934579531
+    },
+    {
+      "fitur": "merch_nominal_vs_merch_mean",
+      "gain_ribu": 2.198586685935656
+    },
+    {
+      "fitur": "log_menit_sejak_trx",
+      "gain_ribu": 2.1100485417048134
+    },
+    {
+      "fitur": "log_nominal",
+      "gain_ribu": 1.6989330218235652
+    },
+    {
+      "fitur": "merch_past_mean_nominal",
+      "gain_ribu": 1.489722538948059
+    },
+    {
+      "fitur": "user_nominal_vs_max",
+      "gain_ribu": 1.4378854235013325
+    },
+    {
+      "fitur": "merch_days_since_first_tx",
+      "gain_ribu": 1.2588089923461276
+    },
+    {
+      "fitur": "merch_past_mean_persen_saldo",
+      "gain_ribu": 0.9327416527271271
+    }
+  ]
+}
