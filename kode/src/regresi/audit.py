@@ -1346,7 +1346,7 @@ def main() -> None:
         if nama == "impact":
             hasil_dampak = ret
 
-    if args.tulis_json or set(args.checks) == set(DAFTAR_CEK):
+    if args.save_json or set(args.checks) == set(DAFTAR_CEK):
         json_path = simpan_ringkasan_audit_1a(train, test, hasil_dampak=hasil_dampak)
         print(f"\nRingkasan lengkap Tugas 1a tersimpan di: {json_path.relative_to(KODE_DIR.parent)}")
 

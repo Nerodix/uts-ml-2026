@@ -607,7 +607,7 @@ def main() -> int:
             "anomalies": anom_res,
             "submission": csv_meta,
         }
-        if args.tulis_json:
+        if args.save_json:
             tulis_json(report, RESULTS_DIR / "task3_analysis.json")
 
         print(

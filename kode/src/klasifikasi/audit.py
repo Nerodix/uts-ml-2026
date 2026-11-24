@@ -1129,7 +1129,7 @@ def main() -> int:
         help="Save audit summary to kode/results/task2_audit.json.",
     )
     args = parser.parse_args()
-    jalankan_audit_klasifikasi(cek_list=args.checks, simpan_json=args.tulis_json or args.checks is None)
+    jalankan_audit_klasifikasi(cek_list=args.checks, simpan_json=args.save_json or args.checks is None)
     return 0
 
 

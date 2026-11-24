@@ -407,7 +407,7 @@ def main() -> int:
             "stability_across_k": k_stab,
             "final_model_stability": final_stab,
         }
-        if args.tulis_json:
+        if args.save_json:
             tulis_json(report, RESULTS_DIR / "task3_stability.json")
 
         print("=== Stabilitas Subsampling 80% Lintas K (66 pasangan ARI) ===")

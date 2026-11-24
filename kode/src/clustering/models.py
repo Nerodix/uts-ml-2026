@@ -509,7 +509,7 @@ def main() -> int:
             "k_selection": k_res,
             "method_comparison_k6": meth_res,
         }
-        if args.tulis_json:
+        if args.save_json:
             tulis_json(report, RESULTS_DIR / "task3_models.json")
 
         print("=== Ringkasan Pemindaian K (PCA-12) ===")

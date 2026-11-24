@@ -749,7 +749,7 @@ def main() -> int:
         fig_path = FIGURES_DIR / "task3_3a_preprocessing.png"
         buat_grafik_prapemrosesan(df, is_bot, df_canon, audit_res, fig_path)
 
-        if args.tulis_json:
+        if args.save_json:
             tulis_json(audit_res, RESULTS_DIR / "task3_preprocess.json")
 
         bot = audit_res["bot_prescreening"]

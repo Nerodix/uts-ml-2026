@@ -559,7 +559,7 @@ def main() -> int:
             buat_grafik_seleksi_fitur(screening, ablation, fig_path)
             print(f"Figur         : {fig_path.name}")
 
-        if args.tulis_json:
+        if args.save_json:
             tulis_json(report, RESULTS_DIR / "task3_features.json")
 
         print(
