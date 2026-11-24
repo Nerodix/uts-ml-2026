@@ -48,7 +48,7 @@ from src.regresi.preprocess import (  # noqa: E402
     TARGET_COLUMN,
     BeratImputer,
     RouteDistanceImputer,
-    fix_target_unit_errors,
+    perbaiki_satuan_target,
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
@@ -526,8 +526,8 @@ def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
     tr_sub = tr_full.loc[~tr_full["mitra_kurir"].isin(heldout_couriers)].reset_index(drop=True)
     va_unseen = va_full.loc[va_full["mitra_kurir"].isin(heldout_couriers)].reset_index(drop=True)
 
-    y_tr, _ = fix_target_unit_errors(tr_sub[TARGET_COLUMN])
-    y_va, _ = fix_target_unit_errors(va_unseen[TARGET_COLUMN])
+    y_tr, _ = perbaiki_satuan_target(tr_sub[TARGET_COLUMN])
+    y_va, _ = perbaiki_satuan_target(va_unseen[TARGET_COLUMN])
 
     pipe = Task1FeaturePipeline(seed=SEED)
     X_tr_all = pipe.fit_transform(tr_sub, y_tr)

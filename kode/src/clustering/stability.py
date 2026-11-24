@@ -120,7 +120,7 @@ def _name_clusters_deterministic(df_pool: pd.DataFrame, labels: np.ndarray) -> d
     return mapping
 
 
-def evaluate_stability_across_k(
+def evaluasi_stabilitas_lintas_k(
     Z_pca: np.ndarray,
     k_values: tuple[int, ...] = K_STABILITY_RANGE,
     n_runs: int = N_RUNS_KSCAN,
@@ -173,7 +173,7 @@ def evaluate_stability_across_k(
     }
 
 
-def evaluate_final_model_stability(
+def evaluasi_stabilitas_model_final(
     df_normal: pd.DataFrame,
     X_26d: np.ndarray,
     k: int = 6,
@@ -393,10 +393,10 @@ def main() -> int:
         df = muat_data_clustering()
         bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
 
-        k_stab = evaluate_stability_across_k(
+        k_stab = evaluasi_stabilitas_lintas_k(
             bundle["Z_pca"], k_values=K_STABILITY_RANGE, n_runs=N_RUNS_KSCAN, seed=SEED
         )
-        final_stab = evaluate_final_model_stability(
+        final_stab = evaluasi_stabilitas_model_final(
             bundle["df_normal"], bundle["X_weighted_26d"], k=6, n_runs=N_RUNS_FINAL, seed=SEED
         )
 

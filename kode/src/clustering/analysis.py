@@ -121,7 +121,7 @@ SEGMENT_CATALOG: dict[int, dict[str, str]] = {
 }
 
 
-def fit_final_gmm_and_order_segments(
+def latih_gmm_final_dan_urutkan_segmen(
     df_normal: pd.DataFrame,
     X_26d: np.ndarray,
     k: int = FINAL_K,
@@ -185,7 +185,7 @@ def fit_final_gmm_and_order_segments(
     }
 
 
-def build_segment_profiles(
+def bangun_profil_segmen(
     df_normal: pd.DataFrame,
     labels: np.ndarray,
     max_posterior: np.ndarray,
@@ -254,7 +254,7 @@ def build_segment_profiles(
     return profiles
 
 
-def analyze_anomalies(
+def analisis_anomali(
     df: pd.DataFrame,
     is_bot: np.ndarray,
     bot_summary: dict[str, Any],
@@ -572,13 +572,13 @@ def main() -> int:
         df = muat_data_clustering()
         bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
 
-        fit_res = fit_final_gmm_and_order_segments(
+        fit_res = latih_gmm_final_dan_urutkan_segmen(
             bundle["df_normal"], bundle["X_weighted_26d"], k=FINAL_K, seed=SEED
         )
-        profiles = build_segment_profiles(
+        profiles = bangun_profil_segmen(
             bundle["df_normal"], fit_res["labels"], fit_res["max_posterior"]
         )
-        anom_res = analyze_anomalies(
+        anom_res = analisis_anomali(
             df, bundle["is_bot"], bundle["bot_summary"], fit_res["log_likelihood"]
         )
 

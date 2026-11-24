@@ -292,7 +292,7 @@ def bandingkan_pendekatan_imbalance(
     }
 
 
-def fit_predict_logreg(
+def latih_prediksi_logreg(
     tr_df: pd.DataFrame,
     va_df: pd.DataFrame,
     c_val: float = 0.2,
@@ -323,7 +323,7 @@ def fit_predict_logreg(
     return pipe.predict_proba(va_df[FEATURE_LIST])[:, 1]
 
 
-def fit_predict_lgbm(
+def latih_prediksi_lgbm(
     tr_df: pd.DataFrame,
     va_df: pd.DataFrame,
     params: dict[str, Any],
@@ -335,7 +335,7 @@ def fit_predict_lgbm(
     return clf, clf.predict_proba(va_df[FEATURE_LIST])[:, 1]
 
 
-def fit_predict_catboost(
+def latih_prediksi_catboost(
     tr_df: pd.DataFrame,
     va_df: pd.DataFrame,
     params: dict[str, Any],
@@ -358,7 +358,7 @@ def fit_predict_catboost(
     return clf, clf.predict_proba(X_va)[:, 1]
 
 
-def fit_predict_xgboost(
+def latih_prediksi_xgboost(
     tr_df: pd.DataFrame,
     va_df: pd.DataFrame,
     params: dict[str, Any],
@@ -417,7 +417,7 @@ def bandingkan_dan_tuning_model(
         for c_val in (0.05, 0.2, 1.0):
             ps, ms = [], []
             for pf in folds:
-                p = fit_predict_logreg(pf.tr_df, pf.va_df, c_val=c_val, seed=seed)
+                p = latih_prediksi_logreg(pf.tr_df, pf.va_df, c_val=c_val, seed=seed)
                 ps.append(p)
                 ms.append(hitung_metrik_prediksi(pf.y_va, p, pf.nom_va))
             sc = float(np.mean([r["pr_auc"] for r in ms]))
@@ -449,7 +449,7 @@ def bandingkan_dan_tuning_model(
             }
             ps, ms = [], []
             for pf in folds:
-                _, p = fit_predict_lgbm(pf.tr_df, pf.va_df, full_cfg)
+                _, p = latih_prediksi_lgbm(pf.tr_df, pf.va_df, full_cfg)
                 ps.append(p)
                 ms.append(hitung_metrik_prediksi(pf.y_va, p, pf.nom_va))
             sc = float(np.mean([r["pr_auc"] for r in ms]))
@@ -477,7 +477,7 @@ def bandingkan_dan_tuning_model(
             }
             ps, ms = [], []
             for pf in folds:
-                _, p = fit_predict_catboost(pf.tr_df, pf.va_df, full_cfg)
+                _, p = latih_prediksi_catboost(pf.tr_df, pf.va_df, full_cfg)
                 ps.append(p)
                 ms.append(hitung_metrik_prediksi(pf.y_va, p, pf.nom_va))
             sc = float(np.mean([r["pr_auc"] for r in ms]))
@@ -509,7 +509,7 @@ def bandingkan_dan_tuning_model(
             }
             ps, ms = [], []
             for pf in folds:
-                _, p = fit_predict_xgboost(pf.tr_df, pf.va_df, full_cfg)
+                _, p = latih_prediksi_xgboost(pf.tr_df, pf.va_df, full_cfg)
                 ps.append(p)
                 ms.append(hitung_metrik_prediksi(pf.y_va, p, pf.nom_va))
             sc = float(np.mean([r["pr_auc"] for r in ms]))

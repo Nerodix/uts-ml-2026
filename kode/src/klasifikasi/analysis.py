@@ -52,9 +52,9 @@ from src.klasifikasi.features import (  # noqa: E402
     bangun_fitur_bebas_label,
 )
 from src.klasifikasi.models import (  # noqa: E402
-    fit_predict_catboost,
-    fit_predict_lgbm,
-    fit_predict_xgboost,
+    latih_prediksi_catboost,
+    latih_prediksi_lgbm,
+    latih_prediksi_xgboost,
     gabung_prediksi_logit,
 )
 from src.klasifikasi.preprocess import (  # noqa: E402
@@ -315,7 +315,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
             sw_s = np.where(is_aug_s, w_rec, np.power(0.5, d_s / float(hl)))
 
         lgb_cfg = {**models_meta["best_configs"]["lgbm"], "n_jobs": N_JOBS, "random_state": SEED}
-        _, p_va_s = fit_predict_lgbm(tr_sal, va_sal, lgb_cfg, sample_weight=sw_s)
+        _, p_va_s = latih_prediksi_lgbm(tr_sal, va_sal, lgb_cfg, sample_weight=sw_s)
         va_sal["arketipe"] = tetapkan_arketipe_fraud(va_sal)
         flg_va_s = aturan_keputusan_bayes(p_va_s, va_sal["nominal"].to_numpy(dtype=np.float64))
         by_ark_shift = _ringkas_grup(
@@ -355,9 +355,9 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         cb_cfg = {**models_meta["best_configs"]["catboost"], "thread_count": N_JOBS, "random_seed": SEED}
         xgb_cfg = {**models_meta["best_configs"]["xgboost"], "n_jobs": N_JOBS, "random_state": SEED}
 
-        clf_lgb_prod, p_te_lgb = fit_predict_lgbm(tr_prod_al, te_prod_al, lgb_cfg, sample_weight=sw_prod)
-        _, p_te_cb = fit_predict_catboost(tr_prod_al, te_prod_al, cb_cfg, sample_weight=sw_prod)
-        _, p_te_xgb = fit_predict_xgboost(tr_prod_al, te_prod_al, xgb_cfg, sample_weight=sw_prod)
+        clf_lgb_prod, p_te_lgb = latih_prediksi_lgbm(tr_prod_al, te_prod_al, lgb_cfg, sample_weight=sw_prod)
+        _, p_te_cb = latih_prediksi_catboost(tr_prod_al, te_prod_al, cb_cfg, sample_weight=sw_prod)
+        _, p_te_xgb = latih_prediksi_xgboost(tr_prod_al, te_prod_al, xgb_cfg, sample_weight=sw_prod)
 
         w_map = models_meta["best_configs"]["ensemble"]["weights_final_all3"]
         w_vec = np.array([w_map["lgbm"], w_map["catboost"], w_map["xgboost"]], dtype=np.float64)

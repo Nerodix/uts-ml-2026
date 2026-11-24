@@ -48,7 +48,7 @@ from src.regresi.models import (  # noqa: E402
     latih_prediksi_catboost,
     latih_prediksi_lgbm,
 )
-from src.regresi.preprocess import DATE_COLUMN, ID_COLUMN, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
+from src.regresi.preprocess import DATE_COLUMN, ID_COLUMN, TARGET_COLUMN, perbaiki_satuan_target  # noqa: E402
 from src.regresi.validation import buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
@@ -205,7 +205,7 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
     fold3 = buat_fold_waktu(train)[-1]
     tr_raw = train.iloc[fold3.train_idx].reset_index(drop=True)
     va_raw = train.iloc[fold3.val_idx].reset_index(drop=True)
-    y_tr, _ = fix_target_unit_errors(tr_raw[TARGET_COLUMN])
+    y_tr, _ = perbaiki_satuan_target(tr_raw[TARGET_COLUMN])
 
     pipe = Task1FeaturePipeline(seed=SEED)
     X_tr = pipe.fit_transform(tr_raw, y_tr)
@@ -331,7 +331,7 @@ def latih_final_dan_prediksi_test(
     w90 = models_meta["models"]["ensemble"]["weights_p90_final_all3"]
     cal_params = cal_meta["final_calibration_params"]
 
-    y_tr_clean, _ = fix_target_unit_errors(train[TARGET_COLUMN])
+    y_tr_clean, _ = perbaiki_satuan_target(train[TARGET_COLUMN])
     pipe = Task1FeaturePipeline(seed=SEED)
     X_tr = pipe.fit_transform(train, y_tr_clean)
     X_te = pipe.transform(test)
