@@ -1,0 +1,424 @@
+{
+  "anomalies": {
+    "activity_axis_ratios": {
+      "durasi_sesi_menit": {
+        "bot_median": 0.6,
+        "fold_ratio_bot_over_normal": 0.075,
+        "normal_median": 8.01
+      },
+      "klik_iklan_30h": {
+        "bot_median": 200.0,
+        "fold_ratio_bot_over_normal": 40.0,
+        "normal_median": 5.0
+      },
+      "sesi_per_minggu": {
+        "bot_median": 241.11,
+        "fold_ratio_bot_over_normal": 44.322,
+        "normal_median": 5.44
+      },
+      "wishlist": {
+        "bot_median": 150.0,
+        "fold_ratio_bot_over_normal": 16.667,
+        "normal_median": 9.0
+      }
+    },
+    "bot_min_posterior": 0.9999999999810356,
+    "decision_rationale": "Tepat 1.800 akun (1,50%) dilabeli -1 sebagai anomali bot/click-farm karena terpisah oleh celah kosong mutlak pada 4 indikator integritas aktivitas secara serempak (44x sesi/minggu, 40x klik iklan, 17x wishlist, durasi sesi 13x lebih singkat). Ekor log-likelihood GMM pada 118.200 pelanggan sisanya naik monoton halus tanpa puncak anomali sekunder, sehingga pemangkasan kuantil tambahan dihindari agar pelanggan valid berekor berat tidak salah dilabeli -1.",
+    "four_indicator_vote_counts": {
+      "0": 118161,
+      "1": 39,
+      "4": 1800
+    },
+    "n_anomalies_minus_1": 1800,
+    "n_assigned_segments": 118200,
+    "non_activity_comparison": {
+      "bot_median_belanja_idr": 1112550.0,
+      "bot_median_rasio_konversi": 0.005,
+      "bot_median_umur": 33.0,
+      "normal_median_belanja_idr": 1137050.0,
+      "normal_median_rasio_konversi": 0.096,
+      "normal_median_umur": 33.0
+    },
+    "non_bot_gmm_loglik_quantiles": {
+      "min": -49.013,
+      "q0005": -41.956,
+      "q0010": -40.682,
+      "q0050": -37.363,
+      "q0100": -35.869,
+      "q0200": -34.414,
+      "q0500": -32.367,
+      "q5000": -25.544
+    },
+    "non_bot_tail_2pct_hist_counts": [
+      2,
+      4,
+      5,
+      20,
+      40,
+      78,
+      138,
+      316,
+      576,
+      1185
+    ],
+    "non_bot_tail_2pct_hist_edges": [
+      -49.01,
+      -47.55,
+      -46.09,
+      -44.63,
+      -43.17,
+      -41.71,
+      -40.25,
+      -38.79,
+      -37.33,
+      -35.87,
+      -34.41
+    ],
+    "normal_max_posterior": 6.007865393240832e-191,
+    "pct_anomalies_minus_1": 1.5
+  },
+  "final_model": {
+    "algorithm": "GaussianMixture",
+    "converged": true,
+    "covariance_type": "full",
+    "feature_space": "selected_26d_weighted",
+    "frac_posterior_gt_0p9": 0.8456,
+    "k": 6,
+    "mean_max_posterior": 0.9476,
+    "n_iter": 6,
+    "reg_covar": 0.01
+  },
+  "segment_profiles": [
+    {
+      "cluster": 0,
+      "f0_pct": 0.65,
+      "ios_pct": 15.7,
+      "marketing_action": "Kirim notifikasi push flash sale malam (20.00–23.00) dengan voucher bertingkat berbasis minimum transaksi (mis. Rp 150 ribu) untuk menaikkan nilai keranjang pada kategori fashion, kecantikan, dan voucher digital tanpa menggerus margin.",
+      "mean_posterior": 0.9407,
+      "mean_retur_90h": 0.79,
+      "mean_ulasan_90h": 1.4,
+      "median_belanja_90h_idr": 761200.0,
+      "median_frekuensi_90h": 8.0,
+      "median_item_per_pesanan": 2.0,
+      "median_keranjang_idr": 101600.0,
+      "median_lama_member_bulan": 13.5,
+      "median_persen_cod": 0.27,
+      "median_persen_flash_sale": 0.71,
+      "median_persen_paylater": 0.171,
+      "median_persen_voucher": 0.857,
+      "median_rasio_konversi": 0.091,
+      "median_recency_hari": 9.0,
+      "median_sesi_per_minggu": 6.37,
+      "median_umur": 25.0,
+      "n_customers": 29022,
+      "name": "Pemburu Promo & Flash Sale Malam",
+      "pct_of_normal": 24.55,
+      "pct_of_total_120k": 24.19,
+      "peak_time_share": 0.423,
+      "peak_time_slot": "malam",
+      "revenue_share_pct": 9.33,
+      "short_name": "Pemburu Promo Malam",
+      "time_shares": {
+        "malam": 0.423,
+        "pagi": 0.193,
+        "siang": 0.192,
+        "sore": 0.192
+      },
+      "top_lift_categories": [
+        {
+          "category": "voucher_digital",
+          "lift_vs_avg": 1.62,
+          "mean_share": 0.1101
+        },
+        {
+          "category": "fashion",
+          "lift_vs_avg": 1.45,
+          "mean_share": 0.2044
+        },
+        {
+          "category": "kecantikan",
+          "lift_vs_avg": 1.44,
+          "mean_share": 0.131
+        }
+      ]
+    },
+    {
+      "cluster": 1,
+      "f0_pct": 0.01,
+      "ios_pct": 21.1,
+      "marketing_action": "Tawarkan langganan isi ulang otomatis (auto-replenish) pagi hari untuk paket makanan/minuman, kebutuhan rumah tangga, dan ibu & bayi disertai poin loyalti serta gratis ongkir berjenjang.",
+      "mean_posterior": 0.9492,
+      "mean_retur_90h": 0.66,
+      "mean_ulasan_90h": 2.83,
+      "median_belanja_90h_idr": 3149350.0,
+      "median_frekuensi_90h": 14.0,
+      "median_item_per_pesanan": 4.0,
+      "median_keranjang_idr": 227200.0,
+      "median_lama_member_bulan": 18.8,
+      "median_persen_cod": 0.205,
+      "median_persen_flash_sale": 0.225,
+      "median_persen_paylater": 0.119,
+      "median_persen_voucher": 0.382,
+      "median_rasio_konversi": 0.177,
+      "median_recency_hari": 6.1,
+      "median_sesi_per_minggu": 6.21,
+      "median_umur": 38.0,
+      "n_customers": 29460,
+      "name": "Keluarga Pembeli Rutin Pagi",
+      "pct_of_normal": 24.92,
+      "pct_of_total_120k": 24.55,
+      "peak_time_share": 0.388,
+      "peak_time_slot": "pagi",
+      "revenue_share_pct": 48.55,
+      "short_name": "Keluarga Rutin Pagi",
+      "time_shares": {
+        "malam": 0.186,
+        "pagi": 0.388,
+        "siang": 0.241,
+        "sore": 0.185
+      },
+      "top_lift_categories": [
+        {
+          "category": "ibu_bayi",
+          "lift_vs_avg": 1.64,
+          "mean_share": 0.0967
+        },
+        {
+          "category": "makanan_minuman",
+          "lift_vs_avg": 1.58,
+          "mean_share": 0.2353
+        },
+        {
+          "category": "rumah_tangga",
+          "lift_vs_avg": 1.39,
+          "mean_share": 0.1266
+        }
+      ]
+    },
+    {
+      "cluster": 2,
+      "f0_pct": 22.06,
+      "ios_pct": 23.7,
+      "marketing_action": "Jalankan kampanye win-back lewat WhatsApp/email dengan voucher gratis ongkir COD bernilai terjangkau dan masa berlaku 7 hari untuk memicu kembali transaksi pertama pelanggan berisiko churn.",
+      "mean_posterior": 0.9725,
+      "mean_retur_90h": 0.58,
+      "mean_ulasan_90h": 0.31,
+      "median_belanja_90h_idr": 267400.0,
+      "median_frekuensi_90h": 2.0,
+      "median_item_per_pesanan": 2.0,
+      "median_keranjang_idr": 178000.0,
+      "median_lama_member_bulan": 25.1,
+      "median_persen_cod": 0.448,
+      "median_persen_flash_sale": 0.308,
+      "median_persen_paylater": 0.17,
+      "median_persen_voucher": 0.425,
+      "median_rasio_konversi": 0.058,
+      "median_recency_hari": 52.0,
+      "median_sesi_per_minggu": 1.99,
+      "median_umur": 36.0,
+      "n_customers": 23839,
+      "name": "Pelanggan Pasif / Dormant COD",
+      "pct_of_normal": 20.17,
+      "pct_of_total_120k": 19.87,
+      "peak_time_share": 0.251,
+      "peak_time_slot": "sore",
+      "revenue_share_pct": 3.35,
+      "short_name": "Pasif / Dormant COD",
+      "time_shares": {
+        "malam": 0.251,
+        "pagi": 0.249,
+        "siang": 0.249,
+        "sore": 0.251
+      },
+      "top_lift_categories": [
+        {
+          "category": "kesehatan",
+          "lift_vs_avg": 1.2,
+          "mean_share": 0.0431
+        },
+        {
+          "category": "otomotif",
+          "lift_vs_avg": 1.2,
+          "mean_share": 0.0327
+        },
+        {
+          "category": "olahraga",
+          "lift_vs_avg": 1.2,
+          "mean_share": 0.0428
+        }
+      ]
+    },
+    {
+      "cluster": 3,
+      "f0_pct": 0.82,
+      "ios_pct": 73.1,
+      "marketing_action": "Berikan keanggotaan VIP non-diskon: prioritas pengiriman same-day, perpanjangan garansi resmi, dan akses awal (early access) peluncuran elektronik, perabot, serta gadget premium.",
+      "mean_posterior": 0.9562,
+      "mean_retur_90h": 0.58,
+      "mean_ulasan_90h": 1.36,
+      "median_belanja_90h_idr": 4744600.0,
+      "median_frekuensi_90h": 8.0,
+      "median_item_per_pesanan": 2.0,
+      "median_keranjang_idr": 637700.0,
+      "median_lama_member_bulan": 19.6,
+      "median_persen_cod": 0.091,
+      "median_persen_flash_sale": 0.14,
+      "median_persen_paylater": 0.085,
+      "median_persen_voucher": 0.138,
+      "median_rasio_konversi": 0.116,
+      "median_recency_hari": 7.4,
+      "median_sesi_per_minggu": 5.0,
+      "median_umur": 40.0,
+      "n_customers": 15092,
+      "name": "Pelanggan Premium / Affluent iOS",
+      "pct_of_normal": 12.77,
+      "pct_of_total_120k": 12.58,
+      "peak_time_share": 0.311,
+      "peak_time_slot": "siang",
+      "revenue_share_pct": 30.33,
+      "short_name": "Premium / Affluent iOS",
+      "time_shares": {
+        "malam": 0.2,
+        "pagi": 0.206,
+        "siang": 0.311,
+        "sore": 0.283
+      },
+      "top_lift_categories": [
+        {
+          "category": "elektronik",
+          "lift_vs_avg": 2.18,
+          "mean_share": 0.1397
+        },
+        {
+          "category": "perabot",
+          "lift_vs_avg": 1.7,
+          "mean_share": 0.0673
+        },
+        {
+          "category": "gadget_aksesoris",
+          "lift_vs_avg": 1.67,
+          "mean_share": 0.107
+        }
+      ]
+    },
+    {
+      "cluster": 4,
+      "f0_pct": 0.71,
+      "ios_pct": 13.1,
+      "marketing_action": "Sediakan panduan ukuran interaktif dan ulasan foto terverifikasi pada halaman fashion serta insentif tukar ukuran berbasis saldo toko (store credit) agar biaya logistik retur turun tanpa kehilangan volume PayLater.",
+      "mean_posterior": 0.914,
+      "mean_retur_90h": 2.71,
+      "mean_ulasan_90h": 1.39,
+      "median_belanja_90h_idr": 1381100.0,
+      "median_frekuensi_90h": 8.0,
+      "median_item_per_pesanan": 2.0,
+      "median_keranjang_idr": 183400.0,
+      "median_lama_member_bulan": 10.7,
+      "median_persen_cod": 0.265,
+      "median_persen_flash_sale": 0.563,
+      "median_persen_paylater": 0.833,
+      "median_persen_voucher": 0.579,
+      "median_rasio_konversi": 0.09,
+      "median_recency_hari": 9.0,
+      "median_sesi_per_minggu": 6.41,
+      "median_umur": 26.0,
+      "n_customers": 11272,
+      "name": "Pembeli Impulsif PayLater & Retur Tinggi",
+      "pct_of_normal": 9.54,
+      "pct_of_total_120k": 9.39,
+      "peak_time_share": 0.38,
+      "peak_time_slot": "malam",
+      "revenue_share_pct": 6.54,
+      "short_name": "Impulsif PayLater",
+      "time_shares": {
+        "malam": 0.38,
+        "pagi": 0.186,
+        "siang": 0.189,
+        "sore": 0.246
+      },
+      "top_lift_categories": [
+        {
+          "category": "fashion",
+          "lift_vs_avg": 1.6,
+          "mean_share": 0.2258
+        },
+        {
+          "category": "gadget_aksesoris",
+          "lift_vs_avg": 1.47,
+          "mean_share": 0.0939
+        },
+        {
+          "category": "kecantikan",
+          "lift_vs_avg": 1.24,
+          "mean_share": 0.1129
+        }
+      ]
+    },
+    {
+      "cluster": 5,
+      "f0_pct": 10.45,
+      "ios_pct": 24.4,
+      "marketing_action": "Aktifkan alur onboarding terpandu dengan pengingat keranjang tertinggal (abandoned cart) otomatis disertai kupon transaksi pertama dan jaminan pengembalian mudah untuk mengonversi tingginya sesi browsing menjadi pembelian.",
+      "mean_posterior": 0.9281,
+      "mean_retur_90h": 0.84,
+      "mean_ulasan_90h": 0.51,
+      "median_belanja_90h_idr": 415500.0,
+      "median_frekuensi_90h": 3.0,
+      "median_item_per_pesanan": 2.0,
+      "median_keranjang_idr": 156400.0,
+      "median_lama_member_bulan": 2.9,
+      "median_persen_cod": 0.414,
+      "median_persen_flash_sale": 0.372,
+      "median_persen_paylater": 0.167,
+      "median_persen_voucher": 0.529,
+      "median_rasio_konversi": 0.018,
+      "median_recency_hari": 12.0,
+      "median_sesi_per_minggu": 11.55,
+      "median_umur": 30.0,
+      "n_customers": 9515,
+      "name": "Member Baru Window-Shopper",
+      "pct_of_normal": 8.05,
+      "pct_of_total_120k": 7.93,
+      "peak_time_share": 0.251,
+      "peak_time_slot": "siang",
+      "revenue_share_pct": 1.9,
+      "short_name": "Window-Shopper Baru",
+      "time_shares": {
+        "malam": 0.251,
+        "pagi": 0.251,
+        "siang": 0.251,
+        "sore": 0.248
+      },
+      "top_lift_categories": [
+        {
+          "category": "lainnya",
+          "lift_vs_avg": 1.21,
+          "mean_share": 0.0639
+        },
+        {
+          "category": "hobi",
+          "lift_vs_avg": 1.21,
+          "mean_share": 0.0432
+        },
+        {
+          "category": "olahraga",
+          "lift_vs_avg": 1.19,
+          "mean_share": 0.0424
+        }
+      ]
+    }
+  ],
+  "submission": {
+    "cluster_counts": {
+      "-1": 1800,
+      "0": 29022,
+      "1": 29460,
+      "2": 23839,
+      "3": 15092,
+      "4": 11272,
+      "5": 9515
+    },
+    "n_rows": 120000,
+    "output_file": "cluster.csv"
+  }
+}

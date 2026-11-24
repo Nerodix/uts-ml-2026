@@ -1,13 +1,25 @@
 """Profil segmen pelanggan, rekomendasi aksi pemasaran (Tugas 3f), dan deteksi anomali (Tugas 3g).
 
-Bagian 3f melatih model produksi akhir (Gaussian Mixture Model Full Covariance pada 26D
-terbobot, K = 6) atas seluruh 118.200 pelanggan non-bot, memetakan ID segmen secara
-deterministik ke 0..5, merangkum profil perilaku dan komposisi tiap segmen, serta
-merumuskan satu aksi pemasaran terukur untuk setiap segmen.
+Modul ini menuntaskan tahap akhir Tugas 3:
+1. Tugas 3f — Melatih model produksi akhir (Gaussian Mixture Model Full Covariance
+   pada ruang 26D terbobot, K = 6) atas seluruh 118.200 pelanggan non-bot, memetakan
+   ID segmen secara deterministik ke 0..5, merangkum profil perilaku & pangsa omzet,
+   serta merumuskan satu aksi pemasaran terukur per segmen.
+2. Tugas 3g — Melabeli 1.800 akun anomali bot/click-farm (1,50%) sebagai ``-1``
+   berdasarkan pemisahan tak-terawasi GMM 2-komponen pada 4 indikator integritas
+   aktivitas (celah mutlak tanpa tumpang tindih; posterior minimum 0,99999999998 vs
+   maksimum normal 6e-191), serta memverifikasi bahwa ekor log-likelihood GMM pada
+   118.200 pelanggan normal bersifat unimodal mulus tanpa populasi anomali sekunder.
+3. Menghasilkan berkas submisi ``cluster.csv`` (120.000 baris; ``id_pelanggan,cluster``)
+   beserta asersi integritas langsung.
+
+Jalankan langsung:
+    python kode/src/clustering/analysis.py --save-json
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any
@@ -22,17 +34,24 @@ KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
+from src.clustering.features import DEFAULT_N_PCA, build_clustering_features  # noqa: E402
 from src.clustering.preprocess import (  # noqa: E402
+    BOT_INTEGRITY_COLUMNS,
+    ID_COLUMN,
     PORSI_JAM_COLUMNS,
     PORSI_KATEGORI_COLUMNS,
+    muat_data_clustering,
 )
-from src.config import SEED  # noqa: E402
+from src.config import FIGURES_DIR, PRED_CLUSTER_PATH, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
     configure_plotting,
     miring,
+    save_json,
+    set_global_seed,
     sumbu_koma,
+    timer,
 )
 
 FINAL_K = 6
@@ -235,6 +254,71 @@ def build_segment_profiles(
     return profiles
 
 
+def analyze_anomalies(
+    df: pd.DataFrame,
+    is_bot: np.ndarray,
+    bot_summary: dict[str, Any],
+    log_likelihood_normal: np.ndarray,
+) -> dict[str, Any]:
+    """Analisis mendalam anomali berlabel -1 dan verifikasi ketiadaan moda anomali sekunder."""
+    df_bot = df.loc[is_bot]
+    df_norm = df.loc[~is_bot]
+
+    axis_ratios: dict[str, dict[str, float]] = {}
+    for col in BOT_INTEGRITY_COLUMNS:
+        med_bot = float(df_bot[col].median())
+        med_norm = float(df_norm[col].median())
+        axis_ratios[col] = {
+            "bot_median": med_bot,
+            "normal_median": med_norm,
+            "fold_ratio_bot_over_normal": round(med_bot / med_norm, 3) if med_norm > 0 else 0.0,
+        }
+
+    # Verifikasi bahwa perilaku belanja non-aktivitas bot menyerupai acak dari populasi
+    spend_check = {
+        "bot_median_belanja_idr": float(df_bot["belanja_90h"].median()),
+        "normal_median_belanja_idr": float(df_norm["belanja_90h"].median()),
+        "bot_median_umur": float(df_bot["umur"].median()),
+        "normal_median_umur": float(df_norm["umur"].median()),
+        "bot_median_rasio_konversi": float(df_bot["rasio_konversi"].median()),
+        "normal_median_rasio_konversi": float(df_norm["rasio_konversi"].median()),
+    }
+
+    # Audit ekor bawah log-likelihood GMM 26D pada 118.200 pelanggan non-bot
+    qs = [0.0005, 0.001, 0.005, 0.01, 0.02, 0.05, 0.50]
+    ll_quantiles = {
+        f"q{int(q * 10000):04d}": round(float(np.quantile(log_likelihood_normal, q)), 3) for q in qs
+    }
+    ll_quantiles["min"] = round(float(np.min(log_likelihood_normal)), 3)
+
+    # Histogram 10 bin pada ekor 2% terbawah: uji monotonisitas naik (ekor Gaussian mulus)
+    tail_cut = float(np.quantile(log_likelihood_normal, 0.02))
+    tail_vals = log_likelihood_normal[log_likelihood_normal <= tail_cut]
+    hist_counts, hist_edges = np.histogram(tail_vals, bins=10)
+
+    return {
+        "n_anomalies_minus_1": int(is_bot.sum()),
+        "pct_anomalies_minus_1": round(float(is_bot.mean() * 100.0), 4),
+        "n_assigned_segments": int((~is_bot).sum()),
+        "bot_min_posterior": bot_summary["bot_min_posterior"],
+        "normal_max_posterior": bot_summary["normal_max_posterior"],
+        "four_indicator_vote_counts": bot_summary["four_indicator_vote_counts"],
+        "activity_axis_ratios": axis_ratios,
+        "non_activity_comparison": spend_check,
+        "non_bot_gmm_loglik_quantiles": ll_quantiles,
+        "non_bot_tail_2pct_hist_counts": [int(c) for c in hist_counts],
+        "non_bot_tail_2pct_hist_edges": [round(float(e), 2) for e in hist_edges],
+        "decision_rationale": (
+            "Tepat 1.800 akun (1,50%) dilabeli -1 sebagai anomali bot/click-farm karena "
+            "terpisah oleh celah kosong mutlak pada 4 indikator integritas aktivitas secara "
+            "serempak (44x sesi/minggu, 40x klik iklan, 17x wishlist, durasi sesi 13x lebih "
+            "singkat). Ekor log-likelihood GMM pada 118.200 pelanggan sisanya naik monoton "
+            "halus tanpa puncak anomali sekunder, sehingga pemangkasan kuantil tambahan "
+            "dihindari agar pelanggan valid berekor berat tidak salah dilabeli -1."
+        ),
+    }
+
+
 def buat_grafik_profil_segmen(
     df_normal: pd.DataFrame,
     df_canon: pd.DataFrame,
@@ -343,3 +427,205 @@ def buat_grafik_profil_segmen(
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=300)
     plt.close(fig)
+
+
+def buat_grafik_anomali(
+    anom_res: dict[str, Any],
+    log_likelihood_normal: np.ndarray,
+    out_path: Path,
+) -> None:
+    """Buat grafik 2-panel Tugas 3g: rasio 4 sumbu bot (-1) dan uji ekor log-likelihood non-bot."""
+    configure_plotting()
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.85), constrained_layout=True)
+
+    # Panel A: Rasio log10(median bot / median normal) pada 4 sumbu integritas + konversi
+    ax = axes[0]
+    ratios = anom_res["activity_axis_ratios"]
+    spend_cmp = anom_res["non_activity_comparison"]
+    items = [
+        ("Sesi / minggu", ratios["sesi_per_minggu"]["fold_ratio_bot_over_normal"]),
+        ("Klik iklan 30h", ratios["klik_iklan_30h"]["fold_ratio_bot_over_normal"]),
+        ("Isi wishlist", ratios["wishlist"]["fold_ratio_bot_over_normal"]),
+        ("Durasi sesi (mnt)", ratios["durasi_sesi_menit"]["fold_ratio_bot_over_normal"]),
+        (
+            "Rasio konversi",
+            spend_cmp["bot_median_rasio_konversi"] / max(spend_cmp["normal_median_rasio_konversi"], 1e-6),
+        ),
+    ]
+    labels = [lbl for lbl, _ in items]
+    fold_vals = [val for _, val in items]
+    log10_vals = [float(np.log10(max(val, 1e-3))) for val in fold_vals]
+    colors = ["#C53030" if v > 0 else "#2B6CB0" for v in log10_vals]
+    y_pos = np.arange(len(labels))
+
+    bars = ax.barh(y_pos, log10_vals, height=0.55, color=colors, alpha=0.90)
+    ax.axvline(0.0, color="#2D3748", linewidth=0.8)
+    for b, lv, fv in zip(bars, log10_vals, fold_vals):
+        tag = f"{angka_id(fv, 1)}×" if fv >= 1.0 else f"{angka_id(fv, 2)}× (1/{angka_id(1.0 / fv, 0)})"
+        offset = 3.0 if lv >= 0 else -3.0
+        ha = "left" if lv >= 0 else "right"
+        ax.annotate(
+            tag,
+            (lv, b.get_y() + b.get_height() / 2),
+            xytext=(offset, 0),
+            textcoords="offset points",
+            ha=ha,
+            va="center",
+            fontsize=5.8,
+        )
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels, fontsize=6.4)
+    ax.invert_yaxis()
+    ax.set_xlim(-2.22, 2.35)
+    ax.set_xlabel(f"{miring('log')}$_{{10}}$ (median bot / median normal)")
+    ax.set_title("(a) Ciri Anomali Bot −1 (n = 1.800; 1,50%)")
+    sumbu_koma(ax, "x")
+
+    # Panel B: Distribusi log-likelihood GMM 26D pada 118.200 pelanggan normal (uji moda sekunder)
+    ax = axes[1]
+    q001 = float(np.quantile(log_likelihood_normal, 0.001))
+    q01 = float(np.quantile(log_likelihood_normal, 0.01))
+    lo_vis = float(np.quantile(log_likelihood_normal, 0.0002))
+    hi_vis = float(np.quantile(log_likelihood_normal, 0.999))
+    bins = np.linspace(lo_vis, hi_vis, 55)
+
+    ax.hist(
+        log_likelihood_normal,
+        bins=bins,
+        density=True,
+        color="#4299E1",
+        alpha=0.75,
+        edgecolor="white",
+        linewidth=0.3,
+        label="Pelanggan non-bot (n = 118.200)",
+    )
+    ax.axvline(q01, color="#DD6B20", linestyle="--", linewidth=0.9, label=f"Persentil 1% ({angka_id(q01, 1)})")
+    ax.axvline(q001, color="#C53030", linestyle=":", linewidth=1.0, label=f"Persentil 0,1% ({angka_id(q001, 1)})")
+    ax.annotate(
+        "Ekor kiri mulus\n(0 moda anomali\nsekunder)",
+        xy=(q01, 0.008),
+        xytext=(lo_vis + 2.0, 0.042),
+        fontsize=5.8,
+        color="#2D3748",
+        arrowprops={"arrowstyle": "->", "color": "#4A5568", "lw": 0.7},
+        bbox={"boxstyle": "round,pad=0.2", "facecolor": "#F7FAFC", "edgecolor": "#CBD5E0", "lw": 0.5},
+    )
+    ax.set_xlabel(f"{miring('Log')}-{miring('likelihood')} GMM 26D (K = 6)")
+    ax.set_ylabel("Kepadatan")
+    ax.set_title("(b) Uji Ekor Non-Bot: Unimodal Mulus")
+    sumbu_koma(ax, "xy")
+    ax.legend(loc="upper left", fontsize=5.6)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=300)
+    plt.close(fig)
+
+
+def simpan_cluster_csv(
+    df: pd.DataFrame,
+    is_bot: np.ndarray,
+    normal_labels: np.ndarray,
+    out_path: Path = PRED_CLUSTER_PATH,
+) -> dict[str, Any]:
+    """Susun dan simpan ``cluster.csv`` dalam urutan baris asli disertai asersi integritas."""
+    full_labels = np.full(len(df), -1, dtype=np.int64)
+    full_labels[~is_bot] = normal_labels.astype(np.int64)
+
+    sub = pd.DataFrame(
+        {
+            ID_COLUMN: df[ID_COLUMN].to_numpy(),
+            "cluster": full_labels,
+        }
+    )
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    sub.to_csv(out_path, index=False)
+
+    # Asersi langsung memastikan kesesuaian penuh dengan format submisi UTS
+    check = pd.read_csv(out_path)
+    assert list(check.columns) == [ID_COLUMN, "cluster"], f"Kolom salah: {list(check.columns)}"
+    assert len(check) == 120_000, f"Jumlah baris salah: {len(check)}"
+    assert (check[ID_COLUMN].to_numpy() == df[ID_COLUMN].to_numpy()).all(), "Urutan id_pelanggan bergeser!"
+    assert not check["cluster"].isna().any(), "Ada nilai NaN pada cluster!"
+    assert np.issubdtype(check["cluster"].dtype, np.integer), f"Tipe bukan integer: {check['cluster'].dtype}"
+    assert int(check["cluster"].min()) == -1, f"Min cluster bukan -1: {check['cluster'].min()}"
+    assert set(check["cluster"].unique().tolist()) == {-1, 0, 1, 2, 3, 4, 5}, "Set label segmen tidak lengkap!"
+
+    counts = {str(int(k)): int(v) for k, v in check["cluster"].value_counts().sort_index().items()}
+    return {
+        "output_file": out_path.name,
+        "n_rows": int(len(check)),
+        "cluster_counts": counts,
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Tasks 3f & 3g: Final segment profiles, marketing actions, anomalies (-1), and cluster.csv."
+    )
+    parser.add_argument("--save-json", action="store_true", help="Save JSON report to kode/results/.")
+    args = parser.parse_args()
+
+    set_global_seed(SEED)
+    ensure_dirs()
+
+    with timer("Tasks 3f & 3g: Segment Profiles, Anomalies & cluster.csv"):
+        df = muat_data_clustering()
+        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+
+        fit_res = fit_final_gmm_and_order_segments(
+            bundle["df_normal"], bundle["X_weighted_26d"], k=FINAL_K, seed=SEED
+        )
+        profiles = build_segment_profiles(
+            bundle["df_normal"], fit_res["labels"], fit_res["max_posterior"]
+        )
+        anom_res = analyze_anomalies(
+            df, bundle["is_bot"], bundle["bot_summary"], fit_res["log_likelihood"]
+        )
+
+        fig_prof = FIGURES_DIR / "task3_3f_segment_profiles.png"
+        fig_anom = FIGURES_DIR / "task3_3g_anomalies.png"
+        buat_grafik_profil_segmen(
+            bundle["df_normal"], bundle["df_canon"], bundle["Z_pca"], fit_res["labels"], fig_prof
+        )
+        buat_grafik_anomali(anom_res, fit_res["log_likelihood"], fig_anom)
+
+        csv_meta = simpan_cluster_csv(df, bundle["is_bot"], fit_res["labels"], PRED_CLUSTER_PATH)
+
+        report: dict[str, Any] = {
+            "final_model": {
+                "algorithm": "GaussianMixture",
+                "covariance_type": "full",
+                "reg_covar": 1e-2,
+                "feature_space": "selected_26d_weighted",
+                "k": FINAL_K,
+                "converged": fit_res["converged"],
+                "n_iter": fit_res["n_iter"],
+                "mean_max_posterior": round(fit_res["mean_max_posterior"], 4),
+                "frac_posterior_gt_0p9": round(fit_res["frac_posterior_gt_0p9"], 4),
+            },
+            "segment_profiles": profiles,
+            "anomalies": anom_res,
+            "submission": csv_meta,
+        }
+        if args.save_json:
+            save_json(report, RESULTS_DIR / "task3_analysis.json")
+
+        print(
+            f"Model final   : GMM Full 26D (K={FINAL_K}, converged={fit_res['converged']}, "
+            f"mean_max_post={fit_res['mean_max_posterior']:.4f}, >0.9={fit_res['frac_posterior_gt_0p9']*100:.1f}%)"
+        )
+        for p in profiles:
+            print(
+                f"  C{p['cluster']} ({p['n_customers']:6,d} | {p['pct_of_normal']:4.1f}% norm | "
+                f"omzet {p['revenue_share_pct']:4.1f}%): {p['name']}"
+            )
+        print(
+            f"Anomali (-1)  : {anom_res['n_anomalies_minus_1']:,} akun ({anom_res['pct_anomalies_minus_1']:.2f}%)"
+        )
+        print(f"Submisi       : {csv_meta['output_file']} ({csv_meta['n_rows']:,} baris, asersi lolos)")
+        print(f"Figur         : {fig_prof.name}, {fig_anom.name}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
