@@ -69,7 +69,7 @@ Perintah ini menjalankan seluruh pipeline Tugas 1 (`regresi`), Tugas 2 (`klasifi
 
 ## Notebook per Tugas
 
-Folder `kode/notebooks/` berisi satu notebook untuk setiap tugas. Setiap butir menjalankan modul yang sama dengan `run_all.py`, lalu menampilkan ringkasan angka dari `kode/results/` beserta grafiknya sehingga alur pengerjaan bisa diikuti butir demi butir.
+Folder `kode/notebooks/` berisi satu notebook untuk setiap tugas. Setiap butir memanggil fungsi-fungsi di `kode/src/` secara berurutan (urutannya sama dengan `run_all.py`), menampilkan hasil yang dikembalikan setiap fungsi beserta grafiknya, lalu menyimpan JSON hasil seperti pipeline utama, sehingga alur pengerjaan bisa diikuti butir demi butir.
 
 | Notebook | Isi |
 | --- | --- |
@@ -82,7 +82,7 @@ cd kode
 uv run --with jupyterlab jupyter lab notebooks/
 ```
 
-Jalankan sel secara berurutan dari atas karena butir 1e–1f dan 2f–2g memakai prediksi *out-of-fold* yang ditulis butir 1c dan 2d ke `kode/cache/`. Notebook menulis ulang `kode/results/`, `kode/figures/`, dan ketiga berkas prediksi; hasilnya sama dengan `run_all.py`, kecuali selisih pembulatan *floating point* yang sangat kecil (orde 10⁻⁶ atau lebih kecil) dan tidak mengubah kolom `tandai` maupun label klaster.
+Jalankan sel secara berurutan dari atas: data dan ruang fitur yang dimuat di butir awal dipakai ulang oleh butir berikutnya, dan butir 1e–1f serta 2f–2g memakai prediksi *out-of-fold* yang ditulis butir 1c dan 2d ke `kode/cache/`. Notebook menulis ulang `kode/results/`, `kode/figures/`, dan ketiga berkas prediksi; hasilnya sama dengan `run_all.py`, kecuali selisih pembulatan *floating point* yang sangat kecil (orde 10⁻⁶ atau lebih kecil) dan tidak mengubah kolom `tandai` maupun label klaster.
 
 ## Konvensi Grafik
 
