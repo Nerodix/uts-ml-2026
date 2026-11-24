@@ -28,17 +28,17 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
-from src.utils import collect_environment_info, save_json, set_global_seed, timer  # noqa: E402
+from src.utils import kumpulkan_info_lingkungan, tulis_json, atur_seed_global, catat_waktu  # noqa: E402
 
 AVAILABLE_STAGES = ["regresi", "klasifikasi", "clustering"]
 
 
 def check_environment(save_report: bool = True) -> int:
     """Verifikasi ketersediaan dataset, versi pustaka, dan seed global."""
-    ensure_dirs()
-    env_info = collect_environment_info()
+    siapkan_direktori()
+    env_info = kumpulkan_info_lingkungan()
     required_files = [
         REGRESI_TRAIN_PATH,
         REGRESI_TEST_PATH,
@@ -56,7 +56,7 @@ def check_environment(save_report: bool = True) -> int:
         print(f"  - {pkg:<18} {ver}")
 
     if save_report:
-        save_json(env_info, RESULTS_DIR / "environment.json")
+        tulis_json(env_info, RESULTS_DIR / "environment.json")
 
     if missing:
         print("\nPERINGATAN: File dataset berikut belum ditemukan:")
@@ -123,8 +123,8 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
     if args.check_env:
         return check_environment(save_report=True)
@@ -134,7 +134,7 @@ def main() -> int:
         return env_rc
 
     for stage in args.stages:
-        with timer(f"Stage: {stage}"):
+        with catat_waktu(f"Stage: {stage}"):
             rc = run_stage(stage)
             if rc != 0:
                 return rc

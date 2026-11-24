@@ -32,16 +32,16 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.audit_dampak import jalankan_semua_dampak  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_bulan,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
 )
 
@@ -442,8 +442,8 @@ def plot_bukti_leakage_scan(train: pd.DataFrame, test: pd.DataFrame) -> Path:
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1a3_leakage_scan.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     ks_scan = float(stats.ks_2samp(train["jumlah_scan"], test["jumlah_scan"]).statistic)
     rho_scan = float(train["jumlah_scan"].corr(train["durasi_jam"], method="spearman"))
@@ -565,8 +565,8 @@ def plot_bukti_target_menit(train: pd.DataFrame, ambang_menit: float = 1000.0) -
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1a4_target_unit_error.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     y = train["durasi_jam"]
     corrupt_mask = y > ambang_menit
@@ -934,8 +934,8 @@ def plot_pergeseran_temporal(train: pd.DataFrame, test: pd.DataFrame) -> Path:
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1a5_temporal_shifts.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     pergeseran = cek_pergeseran_bulanan(train, test)
     piv_f35 = pergeseran["f35_per_kurir_bulan"].T
@@ -1254,7 +1254,7 @@ def simpan_ringkasan_audit_1a(
     Path
         Path file JSON yang tersimpan.
     """
-    ensure_dirs()
+    siapkan_direktori()
     tabel_scr = screening_kolom_numerik(train, test)
     kat = cek_kolom_kategorikal(train, test)
     kal = cek_efek_kalender(train)
@@ -1290,7 +1290,7 @@ def simpan_ringkasan_audit_1a(
         "langkah_1a6_pengukuran_dampak": dampak,
     }
     out_path = RESULTS_DIR / "task1_audit.json"
-    save_json(ringkasan, out_path)
+    tulis_json(ringkasan, out_path)
     return out_path
 
 
@@ -1302,7 +1302,7 @@ def main() -> None:
         python kode/src/regresi/audit.py --checks impact  # Run impact experiments only
         python kode/src/regresi/audit.py --checks target  # Run target anomaly check only
     """
-    set_global_seed(SEED)
+    atur_seed_global(SEED)
     parser = argparse.ArgumentParser(
         description="Task 1a data audit (Regression). Use --checks to select specific checks."
     )

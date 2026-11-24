@@ -36,7 +36,7 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
@@ -51,15 +51,15 @@ from src.regresi.preprocess import (  # noqa: E402
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    p90_coverage,
-    pinball_loss,
-    save_json,
-    set_global_seed,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 # Definisi 3 fold Expanding-Window berhorizon 2 bulan (meniru test Sep–Okt 2025)
@@ -195,9 +195,9 @@ def _evaluasi_satu_fold(
     return {
         "n_train": int(len(tr_df)),
         "n_val": int(len(va_df)),
-        "pinball_p50": round(pinball_loss(y_va, p50, 0.5), 4),
-        "pinball_p90": round(pinball_loss(y_va, p90, 0.9), 4),
-        "p90_coverage": round(p90_coverage(y_va, p90), 4),
+        "pinball_p50": round(hitung_pinball_loss(y_va, p50, 0.5), 4),
+        "pinball_p90": round(hitung_pinball_loss(y_va, p90, 0.9), 4),
+        "p90_coverage": round(hitung_cakupan_p90(y_va, p90), 4),
         "mae_p50": round(float(mean_absolute_error(y_va, p50)), 4),
     }
 
@@ -308,8 +308,8 @@ def plot_perbandingan_validasi(
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1b_validation_comparison.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     # Periode tiap fold tercantum pada tabel laporan, sehingga label cukup memuat nomornya.
     n_fold = len(hasil_waktu["per_fold"])
@@ -422,8 +422,8 @@ def _cetak_ringkasan(hasil_waktu: dict[str, Any] | None, hasil_random: dict[str,
 
 def main() -> None:
     """Jalankan benchmark validasi Tugas 1b dari CLI."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
     parser = argparse.ArgumentParser(description="Task 1b validation benchmark (Time CV vs Random K-Fold).")
     parser.add_argument(
@@ -440,11 +440,11 @@ def main() -> None:
     hasil_random: dict[str, Any] | None = None
 
     if args.mode in ("time", "all"):
-        with timer("Evaluasi Expanding-Window Time-Based CV (3 fold)"):
+        with catat_waktu("Evaluasi Expanding-Window Time-Based CV (3 fold)"):
             hasil_waktu = evaluasi_validasi_waktu(train, seed=SEED)
 
     if args.mode in ("random", "all"):
-        with timer("Evaluasi Random 5-Fold CV"):
+        with catat_waktu("Evaluasi Random 5-Fold CV"):
             hasil_random = evaluasi_random_kfold(train, n_splits=5, seed=SEED)
 
     _cetak_ringkasan(hasil_waktu, hasil_random)
@@ -452,7 +452,7 @@ def main() -> None:
     if hasil_waktu is not None and hasil_random is not None:
         fig_path = plot_perbandingan_validasi(hasil_waktu, hasil_random)
         out_json = RESULTS_DIR / "task1_validation.json"
-        save_json(
+        tulis_json(
             {
                 "task": "Tugas 1b — Desain Validasi Berbasis Waktu vs Random K-Fold",
                 "seed": SEED,

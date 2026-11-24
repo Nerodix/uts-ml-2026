@@ -38,7 +38,7 @@ from src.config import (  # noqa: E402
     N_JOBS,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
@@ -48,7 +48,7 @@ from src.klasifikasi.preprocess import (  # noqa: E402
     TARGET_COLUMN,
     TIME_COLUMN,
     USER_ID_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     muat_data_klasifikasi,
     tambah_flag_kualitas_data,
 )
@@ -58,13 +58,13 @@ from src.klasifikasi.validation import (  # noqa: E402
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     label_batang,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 # Stride detik per entitas (~317 tahun >> rentang data 10 bulan) agar jendela tidak lintas entitas
@@ -665,7 +665,7 @@ def _evaluasi_konfigurasi_fitur(
         va_f = train_base.iloc[f.val_idx]
         if pakai_lag_risiko:
             tr_f, va_f = tambah_fitur_risiko_lag25h(tr_f, va_f, label_cutoff=f.train_end)
-        tr_al, [va_al] = align_categorical_dtypes(tr_f, [va_f], cat_cols=CATEGORICAL_COLUMNS)
+        tr_al, [va_al] = samakan_tipe_kategori(tr_f, [va_f], cat_cols=CATEGORICAL_COLUMNS)
         clf = lgb.LGBMClassifier(**params)
         clf.fit(tr_al[fitur], tr_al[TARGET_COLUMN].to_numpy(dtype=np.int8))
         prob = np.clip(clf.predict_proba(va_al[fitur])[:, 1], 1e-7, 1.0 - 1e-7)
@@ -674,7 +674,7 @@ def _evaluasi_konfigurasi_fitur(
         flg = (prob * nom_va > FRAUD_REVIEW_COST_IDR).astype(np.int8)
         pr_list.append(float(average_precision_score(y_va, prob)))
         roc_list.append(float(roc_auc_score(y_va, prob)))
-        cost_list.append(float(fraud_total_cost(y_va, flg, nom_va) / len(y_va) * 10_000.0))
+        cost_list.append(float(hitung_biaya_total_fraud(y_va, flg, nom_va) / len(y_va) * 10_000.0))
         gain_total += clf.booster_.feature_importance(importance_type="gain")
 
     # Cek tambahan pada gelombang QRIS Agustus (latih Jan–Jul + Agt 1–10 -> eval Agt 11–21 QRIS)
@@ -684,7 +684,7 @@ def _evaluasi_konfigurasi_fitur(
     va_sq = va_s[va_s["kanal"] == "qris"]
     if pakai_lag_risiko:
         tr_s, va_sq = tambah_fitur_risiko_lag25h(tr_s, va_sq, label_cutoff="2025-08-10")
-    tr_sal, [va_sal] = align_categorical_dtypes(tr_s, [va_sq], cat_cols=CATEGORICAL_COLUMNS)
+    tr_sal, [va_sal] = samakan_tipe_kategori(tr_s, [va_sq], cat_cols=CATEGORICAL_COLUMNS)
     clf_s = lgb.LGBMClassifier(**params)
     clf_s.fit(tr_sal[fitur], tr_sal[TARGET_COLUMN].to_numpy(dtype=np.int8))
     p_sq = clf_s.predict_proba(va_sal[fitur])[:, 1]
@@ -707,7 +707,7 @@ def simpan_plot_fitur_perilaku(
     output_path: Path = FIGURES_DIR / "task2_2c_behavioral_features.png",
 ) -> Path:
     """Gambar figur 2 panel ablasi fitur perilaku kausal 2c & top fitur perilaku."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75), gridspec_kw={"width_ratios": [1.08, 1.0]})
 
     # Panel A: Progresi PR-AUC (Time CV Matang & QRIS Agt 11–21)
@@ -743,7 +743,7 @@ def simpan_plot_fitur_perilaku(
     sumbu_koma(ax1, "x")
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -751,10 +751,10 @@ def simpan_plot_fitur_perilaku(
 
 def jalankan_ablasi_fitur(save_json_flag: bool = True) -> dict[str, Any]:
     """Jalankan verifikasi anti-leakage kausalitas dan ablasi 5 tahap fitur Tugas 2c."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Muat data & verifikasi kausalitas ketat (Tugas 2c)"):
+    with catat_waktu("Muat data & verifikasi kausalitas ketat (Tugas 2c)"):
         train_raw, _ = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
         verifikasi_kausalitas_fitur(train_raw)
         print("  Verifikasi kausalitas LULUS: mutasi masa depan mengubah fitur masa lalu sebesar 0,0.")
@@ -771,7 +771,7 @@ def jalankan_ablasi_fitur(save_json_flag: bool = True) -> dict[str, Any]:
     ablasi: list[dict[str, Any]] = []
     gain_lengkap = pd.Series(dtype=float)
     for kode, lbl, cols, lag_flag in tahapan:
-        with timer(f"2c Ablasi: {kode} ({len(cols)} fitur)"):
+        with catat_waktu(f"2c Ablasi: {kode} ({len(cols)} fitur)"):
             met, gain = _evaluasi_konfigurasi_fitur(train_feat, cols, lag_flag, seed=SEED)
             met["tahap"] = kode
             met["label_pendek"] = lbl
@@ -806,7 +806,7 @@ def jalankan_ablasi_fitur(save_json_flag: bool = True) -> dict[str, Any]:
         "top_fitur_perilaku": top_gain,
     }
     if save_json_flag:
-        save_json(hasil, RESULTS_DIR / "task2_features.json")
+        tulis_json(hasil, RESULTS_DIR / "task2_features.json")
         print("[SAVED] task2_features.json")
     return hasil
 

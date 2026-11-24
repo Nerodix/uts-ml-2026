@@ -38,7 +38,7 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
@@ -53,15 +53,15 @@ from src.regresi.preprocess import (  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    p90_coverage,
-    pinball_loss,
-    save_json,
-    set_global_seed,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 # Tanggal kembar e-commerce 2024–2025 (12.12, 1.1, 2.2, ..., 12.12)
@@ -454,8 +454,8 @@ def plot_simulasi_kurir_baru(strategi: dict[str, Any], couriers: list[str]) -> P
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1d_unseen_courier.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
     x = np.arange(len(couriers))
     w = 0.26
@@ -566,16 +566,16 @@ def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
             mask = (va_unseen["mitra_kurir"] == k).to_numpy()
             per_kurir[k] = {
                 "f35_median": round(float(va_unseen.loc[mask, "f35"].median()), 3),
-                "pinball_p50": round(pinball_loss(y_va[mask], p50[mask], 0.5), 4),
-                "pinball_p90": round(pinball_loss(y_va[mask], p90[mask], 0.9), 4),
+                "pinball_p50": round(hitung_pinball_loss(y_va[mask], p50[mask], 0.5), 4),
+                "pinball_p90": round(hitung_pinball_loss(y_va[mask], p90[mask], 0.9), 4),
                 "bias_median": round(float(np.median(p50[mask] - y_va[mask])), 2),
-                "p90_coverage": round(p90_coverage(y_va[mask], p90[mask]), 4),
+                "p90_coverage": round(hitung_cakupan_p90(y_va[mask], p90[mask]), 4),
             }
 
         strategi[label] = {
-            "overall_pinball_p50": round(pinball_loss(y_va, p50, 0.5), 4),
-            "overall_pinball_p90": round(pinball_loss(y_va, p90, 0.9), 4),
-            "overall_p90_coverage": round(p90_coverage(y_va, p90), 4),
+            "overall_pinball_p50": round(hitung_pinball_loss(y_va, p50, 0.5), 4),
+            "overall_pinball_p90": round(hitung_pinball_loss(y_va, p90, 0.9), 4),
+            "overall_p90_coverage": round(hitung_cakupan_p90(y_va, p90), 4),
             "per_kurir_unseen": per_kurir,
         }
 
@@ -589,20 +589,20 @@ def uji_kategori_unseen_kurir(train: pd.DataFrame) -> dict[str, Any]:
         "strategi": strategi,
         "figure": fig_path.name,
     }
-    save_json(result, out_json)
+    tulis_json(result, out_json)
     return result
 
 
 def main() -> None:
     """Jalankan uji simulasi kategori unseen kurir dari CLI."""
-    set_global_seed(SEED)
+    atur_seed_global(SEED)
     parser = argparse.ArgumentParser(description="Task 1d feature engineering and unseen courier test.")
     parser.add_argument("--test-unseen", action="store_true", help="Run Leave-One-Courier-Out simulation.")
     args = parser.parse_args()
 
     if args.test_unseen:
         train = pd.read_csv(REGRESI_TRAIN_PATH)
-        with timer("Simulasi Leave-One-Courier-Out (K08, K02, K07)"):
+        with catat_waktu("Simulasi Leave-One-Courier-Out (K08, K02, K07)"):
             res = uji_kategori_unseen_kurir(train)
         print("\n=== HASIL SIMULASI KURIR UNSEEN (TUGAS 1d) ===")
         for nama, s in res["strategi"].items():

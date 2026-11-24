@@ -41,19 +41,19 @@ KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
-from src.clustering.features import DEFAULT_N_PCA, build_clustering_features  # noqa: E402
+from src.clustering.features import DEFAULT_N_PCA, bangun_fitur_clustering  # noqa: E402
 from src.clustering.preprocess import muat_data_clustering  # noqa: E402
-from src.config import FIGURES_DIR, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.config import FIGURES_DIR, RESULTS_DIR, SEED, siapkan_direktori  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 SELECTED_K = 6
@@ -344,7 +344,7 @@ def buat_grafik_metode_dan_k(
     out_path: Path,
 ) -> None:
     """Buat grafik 2x2 pemilihan jumlah klaster K (3d) dan perbandingan metode (3c)."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(2, 2, figsize=(LEBAR_GAMBAR, 4.95), constrained_layout=True)
 
     rows = k_res["k_scan"]
@@ -481,12 +481,12 @@ def main() -> int:
     parser.add_argument("--save-json", action="store_true", help="Save JSON report to kode/results/.")
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Tasks 3c & 3d: Methods Comparison & K Selection"):
+    with catat_waktu("Tasks 3c & 3d: Methods Comparison & K Selection"):
         df = muat_data_clustering()
-        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+        bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
         X_26d, Z_pca = bundle["X_weighted_26d"], bundle["Z_pca"]
 
         k_res = scan_k_selection(Z_pca, k_values=K_CANDIDATES, seed=SEED)
@@ -510,7 +510,7 @@ def main() -> int:
             "method_comparison_k6": meth_res,
         }
         if args.save_json:
-            save_json(report, RESULTS_DIR / "task3_models.json")
+            tulis_json(report, RESULTS_DIR / "task3_models.json")
 
         print("=== Ringkasan Pemindaian K (PCA-12) ===")
         for r in k_res["k_scan"]:

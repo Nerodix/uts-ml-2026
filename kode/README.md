@@ -86,7 +86,7 @@ Jalankan sel secara berurutan dari atas: data dan ruang fitur yang dimuat di but
 
 ## Konvensi Grafik
 
-Semua grafik dibuat pada ukuran cetaknya: `figsize=(LEBAR_GAMBAR, tinggi)` dengan `LEBAR_GAMBAR = 6,7` inci (sekitar 17 cm, selebar area teks), sehingga huruf 7 s.d. 8 pt di grafik tidak mengecil di laporan. Teks grafik juga mengikuti EYD lewat pembantu di `src/utils.py`: `configure_plotting()` (ukuran huruf seragam), `angka_id()` dan `label_batang()` (koma desimal pada angka), `sumbu_koma()` (koma desimal pada skala sumbu), `miring()` (istilah asing dicetak miring), dan `label_bulan()` (singkatan bulan Indonesia). Pakai pembantu yang sama untuk grafik Tugas 2 dan 3.
+Semua grafik dibuat pada ukuran cetaknya: `figsize=(LEBAR_GAMBAR, tinggi)` dengan `LEBAR_GAMBAR = 6,7` inci (sekitar 17 cm, selebar area teks), sehingga huruf 7 s.d. 8 pt di grafik tidak mengecil di laporan. Teks grafik juga mengikuti EYD lewat pembantu di `src/utils.py`: `atur_gaya_grafik()` (ukuran huruf seragam), `angka_id()` dan `label_batang()` (koma desimal pada angka), `sumbu_koma()` (koma desimal pada skala sumbu), `miring()` (istilah asing dicetak miring), dan `label_bulan()` (singkatan bulan Indonesia). Pakai pembantu yang sama untuk grafik Tugas 2 dan 3.
 
 ## Versi Pustaka & Random Seed
 

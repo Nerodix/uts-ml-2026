@@ -65,16 +65,16 @@ from src.clustering.preprocess import (  # noqa: E402
     muat_data_clustering,
     praproses_fitur_kanonik,
 )
-from src.config import FIGURES_DIR, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.config import FIGURES_DIR, RESULTS_DIR, SEED, siapkan_direktori  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 # 13 fitur perilaku inti tertransformasi (bobot blok = 1,0)
@@ -141,7 +141,7 @@ def _sarle_bimodality_coeff(x: np.ndarray) -> float:
     return float((skew * skew + 1.0) / denom)
 
 
-def build_clustering_features(
+def bangun_fitur_clustering(
     df: pd.DataFrame,
     n_pca_components: int = DEFAULT_N_PCA,
     seed: int = SEED,
@@ -220,7 +220,7 @@ def _classify_raw_feature(col: str) -> str:
     return "selected_core_behavior"
 
 
-def screen_all_features(df_normal: pd.DataFrame, seed: int = SEED) -> list[dict[str, Any]]:
+def saring_semua_fitur(df_normal: pd.DataFrame, seed: int = SEED) -> list[dict[str, Any]]:
     """Saring seluruh 59 fitur kandidat pada pelanggan non-bot dengan 3 metrik kuantitatif."""
     cand_cols = [c for c in df_normal.columns if c != ID_COLUMN]
 
@@ -364,7 +364,7 @@ def _eval_clustering_config(
     }
 
 
-def run_feature_ablation(
+def uji_ablasi_fitur(
     df_normal: pd.DataFrame,
     feat_bundle: dict[str, Any],
     seed: int = SEED,
@@ -415,7 +415,7 @@ def buat_grafik_seleksi_fitur(
     out_path: Path,
 ) -> None:
     """Buat grafik 2-panel Tugas 3b: penyaringan fitur (termasuk jebakan n06/n13) & ablasi."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 3.05), constrained_layout=True)
 
     # Panel A: OOF Ridge R^2 vs Sarle Bimodality Coefficient (mengungkap jebakan n06 & n13!)
@@ -509,17 +509,17 @@ def main() -> int:
     parser.add_argument("--save-json", action="store_true", help="Save compact JSON report to kode/results/.")
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Task 3b: Feature Selection & Block Weighting"):
+    with catat_waktu("Task 3b: Feature Selection & Block Weighting"):
         df = muat_data_clustering()
-        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
-        screening = screen_all_features(bundle["df_normal"], seed=SEED)
+        bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+        screening = saring_semua_fitur(bundle["df_normal"], seed=SEED)
 
         ablation: dict[str, dict[str, Any]] = {}
         if args.run_ablation:
-            ablation = run_feature_ablation(bundle["df_normal"], bundle, seed=SEED)
+            ablation = uji_ablasi_fitur(bundle["df_normal"], bundle, seed=SEED)
 
         # Ringkas statistik penyaringan per kategori status
         by_status: dict[str, list[dict[str, Any]]] = {}
@@ -560,7 +560,7 @@ def main() -> int:
             print(f"Figur         : {fig_path.name}")
 
         if args.save_json:
-            save_json(report, RESULTS_DIR / "task3_features.json")
+            tulis_json(report, RESULTS_DIR / "task3_features.json")
 
         print(
             f"Seleksi fitur : 59 kandidat -> 26D terbobot -> PCA-{DEFAULT_N_PCA} "

@@ -54,7 +54,7 @@ from src.config import (  # noqa: E402
     N_JOBS,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
@@ -63,21 +63,21 @@ from src.klasifikasi.preprocess import (  # noqa: E402
     SNAPSHOT_TIMESTAMP,
     TARGET_COLUMN,
     TIME_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     hitung_hari_sebelum_snapshot,
     tambah_flag_kualitas_data,
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     label_batang,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 # 3 Fold Expanding-Window Matang (100% di luar jendela right-censoring Agustus)
@@ -255,7 +255,7 @@ def _evaluasi_fold(
 ) -> dict[str, Any]:
     """Latih probe LightGBM dan hitung metrik PR-AUC, ROC-AUC, kalibrasi, serta biaya."""
     cat_in_f = [c for c in CATEGORICAL_COLUMNS if c in fitur]
-    tr_al, [va_al] = align_categorical_dtypes(tr_df, [va_df], cat_cols=cat_in_f)
+    tr_al, [va_al] = samakan_tipe_kategori(tr_df, [va_df], cat_cols=cat_in_f)
     clf = lgb.LGBMClassifier(**_lgbm_val_params(seed))
     clf.fit(tr_al[fitur], tr_al[TARGET_COLUMN].to_numpy(dtype=np.int8))
     prob = np.clip(clf.predict_proba(va_al[fitur])[:, 1], 1e-7, 1.0 - 1e-7)
@@ -264,8 +264,8 @@ def _evaluasi_fold(
     nom_va = va_al["nominal"].to_numpy(dtype=np.float64)
     flagged = (prob * nom_va > FRAUD_REVIEW_COST_IDR).astype(np.int8)
 
-    cost = fraud_total_cost(y_va, flagged, nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
-    cost_none = fraud_total_cost(y_va, np.zeros_like(y_va), nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost = hitung_biaya_total_fraud(y_va, flagged, nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost_none = hitung_biaya_total_fraud(y_va, np.zeros_like(y_va), nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
     obs_rate = float(np.mean(y_va))
     mean_prob = float(np.mean(prob))
 
@@ -429,7 +429,7 @@ def evaluasi_validasi_agustus_tersensor(
         "agt_akhir_15_31_berat": train_df[w >= pd.Timestamp("2025-08-15")],
     }
 
-    tr_al, aligned = align_categorical_dtypes(tr_jj, list(irisan.values()), cat_cols=CATEGORICAL_COLUMNS)
+    tr_al, aligned = samakan_tipe_kategori(tr_jj, list(irisan.values()), cat_cols=CATEGORICAL_COLUMNS)
     clf = lgb.LGBMClassifier(**_lgbm_val_params(seed))
     clf.fit(tr_al[fitur], tr_al[TARGET_COLUMN].to_numpy(dtype=np.int8))
 
@@ -439,8 +439,8 @@ def evaluasi_validasi_agustus_tersensor(
         y_va = sub[TARGET_COLUMN].to_numpy(dtype=np.int8)
         nom_va = sub["nominal"].to_numpy(dtype=np.float64)
         flagged = (prob * nom_va > FRAUD_REVIEW_COST_IDR).astype(np.int8)
-        cost = fraud_total_cost(y_va, flagged, nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
-        cost_none = fraud_total_cost(y_va, np.zeros_like(y_va), nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
+        cost = hitung_biaya_total_fraud(y_va, flagged, nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
+        cost_none = hitung_biaya_total_fraud(y_va, np.zeros_like(y_va), nom_va, review_cost=FRAUD_REVIEW_COST_IDR)
         obs_rate = float(np.mean(y_va))
         mean_prob = float(np.mean(prob))
         out[nama] = {
@@ -478,7 +478,7 @@ def simpan_plot_perbandingan_validasi(
     Path
         Path gambar tersimpan.
     """
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75))
 
     tc = hasil["time_cv_matang"]
@@ -554,7 +554,7 @@ def simpan_plot_perbandingan_validasi(
     ax1.legend(loc="upper left", fontsize=6.0)
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -578,10 +578,10 @@ def jalankan_validasi_klasifikasi(
     dict[str, Any]
         Ringkasan hasil validasi Tugas 2b.
     """
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Muat & siapkan data latih klasifikasi"):
+    with catat_waktu("Muat & siapkan data latih klasifikasi"):
         train_raw = pd.read_csv(KLASIFIKASI_TRAIN_PATH)
         train_raw["waktu_dt"] = pd.to_datetime(train_raw[TIME_COLUMN])
         train_df = tambah_flag_kualitas_data(train_raw)
@@ -598,7 +598,7 @@ def jalankan_validasi_klasifikasi(
     }
 
     if mode in ("time", "all"):
-        with timer("2b.1 Expanding-Window Time CV Matang (3 Fold: Mei, Jun, Jul)"):
+        with catat_waktu("2b.1 Expanding-Window Time CV Matang (3 Fold: Mei, Jun, Jul)"):
             hasil["time_cv_matang"] = evaluasi_time_cv_matang(train_df, seed=SEED)
             tc = hasil["time_cv_matang"]
             print(
@@ -607,7 +607,7 @@ def jalankan_validasi_klasifikasi(
             )
 
     if mode in ("random", "all"):
-        with timer("2b.2 Pembanding Stratified Random 5-Fold CV (Jan–Jul Matang)"):
+        with catat_waktu("2b.2 Pembanding Stratified Random 5-Fold CV (Jan–Jul Matang)"):
             hasil["random_cv_matang"] = evaluasi_random_stratified_cv(train_df, n_splits=5, seed=SEED)
             rc = hasil["random_cv_matang"]
             print(
@@ -616,7 +616,7 @@ def jalankan_validasi_klasifikasi(
             )
 
     if mode in ("censored", "all"):
-        with timer("2b.3 Evaluasi Naif pada Agustus Tersensor (Agt 1–31 & 15–31)"):
+        with catat_waktu("2b.3 Evaluasi Naif pada Agustus Tersensor (Agt 1–31 & 15–31)"):
             hasil["validasi_agustus_tersensor"] = evaluasi_validasi_agustus_tersensor(train_df, seed=SEED)
             ac = hasil["validasi_agustus_tersensor"]
             print(
@@ -648,7 +648,7 @@ def jalankan_validasi_klasifikasi(
         simpan_plot_perbandingan_validasi(hasil)
         if simpan_json:
             out_path = RESULTS_DIR / "task2_validation.json"
-            save_json(hasil, out_path)
+            tulis_json(hasil, out_path)
             print(f"[SAVED] {out_path.name}")
 
     return hasil

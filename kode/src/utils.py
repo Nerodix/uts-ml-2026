@@ -39,14 +39,14 @@ TRACKED_PACKAGES = [
 ]
 
 
-def set_global_seed(seed: int = SEED) -> None:
+def atur_seed_global(seed: int = SEED) -> None:
     """Kunci random seed Python dan NumPy untuk reproduksibilitas."""
     os.environ["PYTHONHASHSEED"] = str(seed)
     random.seed(seed)
     np.random.seed(seed)
 
 
-def pinball_loss(y_true: np.ndarray, y_pred: np.ndarray, q: float) -> float:
+def hitung_pinball_loss(y_true: np.ndarray, y_pred: np.ndarray, q: float) -> float:
     """Hitung quantile (pinball) loss pada kuantil q in (0, 1)."""
     y_t = np.asarray(y_true, dtype=np.float64)
     y_p = np.asarray(y_pred, dtype=np.float64)
@@ -54,14 +54,14 @@ def pinball_loss(y_true: np.ndarray, y_pred: np.ndarray, q: float) -> float:
     return float(np.mean(np.maximum(q * diff, (q - 1.0) * diff)))
 
 
-def p90_coverage(y_true: np.ndarray, y_pred_p90: np.ndarray) -> float:
+def hitung_cakupan_p90(y_true: np.ndarray, y_pred_p90: np.ndarray) -> float:
     """Proporsi observasi aktual yang berada <= prediksi P90 (target 0.90)."""
     y_t = np.asarray(y_true, dtype=np.float64)
     y_p = np.asarray(y_pred_p90, dtype=np.float64)
     return float(np.mean(y_t <= y_p))
 
 
-def fraud_total_cost(
+def hitung_biaya_total_fraud(
     y_true: np.ndarray,
     flagged: np.ndarray,
     nominal: np.ndarray,
@@ -79,7 +79,7 @@ def fraud_total_cost(
     return missed_fraud_loss + review_total
 
 
-def save_json(data: Any, path: Path) -> None:
+def tulis_json(data: Any, path: Path) -> None:
     """Simpan dictionary/list ke JSON dengan format rapi dan deterministik."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:
@@ -87,7 +87,7 @@ def save_json(data: Any, path: Path) -> None:
         fh.write("\n")
 
 
-def load_json(path: Path) -> Any:
+def baca_json(path: Path) -> Any:
     """Muat file JSON."""
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
@@ -105,7 +105,7 @@ def _json_default(obj: Any) -> Any:
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def collect_environment_info() -> dict[str, Any]:
+def kumpulkan_info_lingkungan() -> dict[str, Any]:
     """Kumpulkan versi Python, seed, dan pustaka ML utama untuk reproduksibilitas."""
     versions: dict[str, str] = {}
     for pkg in TRACKED_PACKAGES:
@@ -127,7 +127,7 @@ UKURAN_NILAI = 6.2  # ukuran huruf angka di atas batang
 BULAN_SINGKAT = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"]
 
 
-def configure_plotting() -> None:
+def atur_gaya_grafik() -> None:
     """Set gaya grafik matplotlib/seaborn yang seragam untuk laporan.
 
     Ukuran huruf dipilih untuk gambar selebar ``LEBAR_GAMBAR`` inci, yaitu ukuran
@@ -298,7 +298,7 @@ def label_batang(
 
 
 @contextmanager
-def timer(label: str) -> Iterator[None]:
+def catat_waktu(label: str) -> Iterator[None]:
     """Context manager untuk mencatat durasi eksekusi tiap tahap."""
     t0 = time.perf_counter()
     print(f"[START] {label}")

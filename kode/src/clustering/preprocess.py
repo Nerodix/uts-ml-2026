@@ -52,17 +52,17 @@ KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
-from src.config import CLUSTERING_PATH, FIGURES_DIR, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.config import CLUSTERING_PATH, FIGURES_DIR, RESULTS_DIR, SEED, siapkan_direktori  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 ID_COLUMN = "id_pelanggan"
@@ -189,7 +189,7 @@ def transformasi_clr(shares: np.ndarray, eps: float = CLR_EPS) -> np.ndarray:
     return log_arr - np.mean(log_arr, axis=1, keepdims=True)
 
 
-def winsorize_kuantil(
+def winsorisasi_kuantil(
     values: np.ndarray,
     lo_q: float = WINSOR_LO,
     hi_q: float = WINSOR_HI,
@@ -292,7 +292,7 @@ def praproses_fitur_kanonik(
     for col in LOG_POSITIVE_COLUMNS:
         raw = df_normal[col].to_numpy(dtype=np.float64)
         skew_before[col] = float(stats.skew(raw[~np.isnan(raw)]))
-        clipped, lo, hi = winsorize_kuantil(raw)
+        clipped, lo, hi = winsorisasi_kuantil(raw)
         winsor_bounds[col] = [lo, hi]
         if col == "rata2_keranjang":
             # Tunda imputasi hingga fitur prediktor lain tersedia
@@ -594,7 +594,7 @@ def buat_grafik_prapemrosesan(
     out_path: Path,
 ) -> None:
     """Buat grafik 2x2 ringkasan audit & prapemrosesan Tugas 3a."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(2, 2, figsize=(LEBAR_GAMBAR, 4.9), constrained_layout=True)
 
     # Panel A: Pemisahan bot vs normal pada ruang aktivitas (sesi vs durasi)
@@ -736,10 +736,10 @@ def main() -> int:
     parser.add_argument("--save-json", action="store_true", help="Save JSON summary to kode/results/.")
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Task 3a: Preprocessing & Data Quality Audit"):
+    with catat_waktu("Task 3a: Preprocessing & Data Quality Audit"):
         df = muat_data_clustering()
         is_bot, _ = deteksi_anomali_bot_aktivitas(df, seed=SEED)
         df_norm = df.loc[~is_bot].copy()
@@ -750,7 +750,7 @@ def main() -> int:
         buat_grafik_prapemrosesan(df, is_bot, df_canon, audit_res, fig_path)
 
         if args.save_json:
-            save_json(audit_res, RESULTS_DIR / "task3_preprocess.json")
+            tulis_json(audit_res, RESULTS_DIR / "task3_preprocess.json")
 
         bot = audit_res["bot_prescreening"]
         zc = audit_res["zero_cliff_experiment"]

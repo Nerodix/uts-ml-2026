@@ -38,21 +38,21 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.preprocess import DATE_COLUMN  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
-    p90_coverage,
-    pinball_loss,
-    save_json,
-    set_global_seed,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
+    tulis_json,
+    atur_seed_global,
 )
 
 
-def conformal_quantile(scores: np.ndarray, alpha: float = 0.10) -> float:
+def kuantil_conformal(scores: np.ndarray, alpha: float = 0.10) -> float:
     """Hitung kuantil konformal sampel-terbatas ``ceil((n+1)*(1-alpha))/n``.
 
     Parameters
@@ -85,7 +85,7 @@ class AdditiveCQR:
     def fit(self, y_cal: np.ndarray, p90_cal: np.ndarray) -> AdditiveCQR:
         """Pelajari koreksi aditif ``delta`` dari residual ``y - p90`` di set kalibrasi."""
         scores = np.asarray(y_cal, dtype=np.float64) - np.asarray(p90_cal, dtype=np.float64)
-        self.delta_ = conformal_quantile(scores, alpha=self.alpha)
+        self.delta_ = kuantil_conformal(scores, alpha=self.alpha)
         return self
 
     def transform(self, p50: np.ndarray, p90: np.ndarray) -> np.ndarray:
@@ -109,7 +109,7 @@ class MultiplicativeCQR:
         """Pelajari faktor pengali konformal dari rasio ``y / p90`` di set kalibrasi."""
         denom = np.maximum(np.asarray(p90_cal, dtype=np.float64), 1e-3)
         ratios = np.asarray(y_cal, dtype=np.float64) / denom
-        self.factor_ = conformal_quantile(ratios, alpha=self.alpha)
+        self.factor_ = kuantil_conformal(ratios, alpha=self.alpha)
         return self
 
     def transform(self, p50: np.ndarray, p90: np.ndarray) -> np.ndarray:
@@ -141,11 +141,11 @@ class GroupMultiplicativeCQR:
         ratios = y_arr / denom
         g_arr = np.asarray(groups_cal, dtype=str)
 
-        self.global_factor_ = conformal_quantile(ratios, alpha=self.alpha)
+        self.global_factor_ = kuantil_conformal(ratios, alpha=self.alpha)
         self.group_factors_ = {}
         for g in sorted(np.unique(g_arr).tolist()):
             mask = g_arr == g
-            self.group_factors_[g] = conformal_quantile(ratios[mask], alpha=self.alpha)
+            self.group_factors_[g] = kuantil_conformal(ratios[mask], alpha=self.alpha)
         return self
 
     def transform(
@@ -171,13 +171,13 @@ def _eval_p90(
     for lay in sorted(np.unique(layanan).tolist()):
         m = layanan == lay
         per_layanan[lay] = {
-            "pinball_p90": round(pinball_loss(y_true[m], p90[m], 0.9), 4),
-            "p90_coverage": round(p90_coverage(y_true[m], p90[m]), 4),
+            "pinball_p90": round(hitung_pinball_loss(y_true[m], p90[m], 0.9), 4),
+            "p90_coverage": round(hitung_cakupan_p90(y_true[m], p90[m]), 4),
         }
     return {
-        "pinball_p90": round(pinball_loss(y_true, p90, 0.9), 4),
-        "p90_coverage": round(p90_coverage(y_true, p90), 4),
-        "abs_cov_gap_pct": round(abs(p90_coverage(y_true, p90) - 0.90) * 100.0, 2),
+        "pinball_p90": round(hitung_pinball_loss(y_true, p90, 0.9), 4),
+        "p90_coverage": round(hitung_cakupan_p90(y_true, p90), 4),
+        "abs_cov_gap_pct": round(abs(hitung_cakupan_p90(y_true, p90) - 0.90) * 100.0, 2),
         "median_interval_width": round(float(np.median(p90 - p50)), 2),
         "per_layanan": per_layanan,
     }
@@ -202,7 +202,7 @@ def jalankan_eksperimen_kalibrasi(train: pd.DataFrame) -> dict[str, Any]:
         Hasil evaluasi Agustus (sebelum vs sesudah CQR), pemilihan metode terbaik,
         parameter kalibrasi final untuk Sep–Okt, dan nama file figur.
     """
-    ensure_dirs()
+    siapkan_direktori()
     oof_path = CACHE_DIR / "task1_oof.npz"
     if not oof_path.exists():
         raise FileNotFoundError(
@@ -312,14 +312,14 @@ def jalankan_eksperimen_kalibrasi(train: pd.DataFrame) -> dict[str, Any]:
         "final_calibration_params": final_params,
         "figure": fig_path.name,
     }
-    save_json(result, RESULTS_DIR / "task1_calibration.json")
+    tulis_json(result, RESULTS_DIR / "task1_calibration.json")
     return result
 
 
 def plot_kalibrasi_conformal(per_model: dict[str, Any], best_method: str) -> Path:
     """Buat grafik 2-panel dampak kalibrasi konformal terhadap cakupan P90 pada Agustus 2025."""
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.8), sharey=True)
 
@@ -376,7 +376,7 @@ def plot_kalibrasi_conformal(per_model: dict[str, Any], best_method: str) -> Pat
 
 def main() -> None:
     """Jalankan eksperimen kalibrasi CQR Tugas 1e dari CLI."""
-    set_global_seed(SEED)
+    atur_seed_global(SEED)
     train = pd.read_csv(REGRESI_TRAIN_PATH)
     res = jalankan_eksperimen_kalibrasi(train)
 

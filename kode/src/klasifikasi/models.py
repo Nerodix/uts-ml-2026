@@ -60,7 +60,7 @@ from src.config import (  # noqa: E402
     N_JOBS,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.features import (  # noqa: E402
     SELECTED_TASK2_FEATURES,
@@ -69,21 +69,21 @@ from src.klasifikasi.features import (  # noqa: E402
 from src.klasifikasi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
     TARGET_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     muat_data_klasifikasi,
 )
 from src.klasifikasi.validation import FraudTimeFold, buat_fold_waktu_matang  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     label_batang,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 FEATURE_LIST = list(SELECTED_TASK2_FEATURES)
@@ -109,7 +109,7 @@ def siapkan_fold_matang(train_feat: pd.DataFrame) -> list[PreparedFraudFold]:
     for f in folds:
         tr_raw = train_feat.iloc[f.train_idx]
         va_raw = train_feat.iloc[f.val_idx]
-        tr_al, [va_al] = align_categorical_dtypes(tr_raw, [va_raw], cat_cols=CATEGORICAL_COLUMNS)
+        tr_al, [va_al] = samakan_tipe_kategori(tr_raw, [va_raw], cat_cols=CATEGORICAL_COLUMNS)
         prepared.append(
             PreparedFraudFold(
                 fold=f,
@@ -139,8 +139,8 @@ def hitung_metrik_prediksi(
     else:
         flg = (p * nom > FRAUD_REVIEW_COST_IDR).astype(np.int8)
 
-    cost = fraud_total_cost(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
-    cost_none = fraud_total_cost(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost = hitung_biaya_total_fraud(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost_none = hitung_biaya_total_fraud(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
     tp = int(((y == 1) & (flg == 1)).sum())
     return {
         "pr_auc": float(average_precision_score(y, p)),
@@ -412,7 +412,7 @@ def bandingkan_dan_tuning_model(
     best_configs: dict[str, Any] = {}
 
     # 1) Baseline Logistic Regression (tuning C)
-    with timer("2d.2 Baseline Logistic Regression (tuning C)"):
+    with catat_waktu("2d.2 Baseline Logistic Regression (tuning C)"):
         best_lr_pr, best_c, best_lr_preds, best_lr_mets = -1.0, 0.2, [], []
         for c_val in (0.05, 0.2, 1.0):
             ps, ms = [], []
@@ -429,7 +429,7 @@ def bandingkan_dan_tuning_model(
         print(f"  LogReg (C={best_c}): PR-AUC={ringkasan_model['logreg']['mean_pr_auc']:.4f}, Biaya/10k={ringkasan_model['logreg']['mean_cost_per_10k_idr']:,.0f}")
 
     # 2) LightGBM (tuning dalam Time CV)
-    with timer("2d.3 LightGBM (tuning dalam 3-Fold Time CV)"):
+    with catat_waktu("2d.3 LightGBM (tuning dalam 3-Fold Time CV)"):
         lgb_grid = [
             {"num_leaves": 31, "min_child_samples": 40, "colsample_bytree": 0.75, "reg_lambda": 5.0, "n_estimators": 500, "learning_rate": 0.03},
             {"num_leaves": 63, "min_child_samples": 60, "colsample_bytree": 0.65, "reg_lambda": 10.0, "n_estimators": 550, "learning_rate": 0.03},
@@ -461,7 +461,7 @@ def bandingkan_dan_tuning_model(
         print(f"  LightGBM terbaik: PR-AUC={ringkasan_model['lgbm']['mean_pr_auc']:.4f}, Biaya/10k={ringkasan_model['lgbm']['mean_cost_per_10k_idr']:,.0f}")
 
     # 3) CatBoost (tuning dalam Time CV)
-    with timer("2d.4 CatBoost (tuning dalam 3-Fold Time CV)"):
+    with catat_waktu("2d.4 CatBoost (tuning dalam 3-Fold Time CV)"):
         cb_grid = [
             {"depth": 6, "l2_leaf_reg": 6.0, "iterations": 750, "learning_rate": 0.04},
             {"depth": 5, "l2_leaf_reg": 10.0, "iterations": 850, "learning_rate": 0.035},
@@ -489,7 +489,7 @@ def bandingkan_dan_tuning_model(
         print(f"  CatBoost terbaik: PR-AUC={ringkasan_model['catboost']['mean_pr_auc']:.4f}, Biaya/10k={ringkasan_model['catboost']['mean_cost_per_10k_idr']:,.0f}")
 
     # 4) XGBoost (tuning dalam Time CV)
-    with timer("2d.5 XGBoost (tuning dalam 3-Fold Time CV)"):
+    with catat_waktu("2d.5 XGBoost (tuning dalam 3-Fold Time CV)"):
         xgb_grid = [
             {"max_depth": 5, "min_child_weight": 20, "colsample_bytree": 0.75, "reg_lambda": 5.0, "n_estimators": 500, "learning_rate": 0.03},
             {"max_depth": 6, "min_child_weight": 35, "colsample_bytree": 0.70, "reg_lambda": 10.0, "n_estimators": 550, "learning_rate": 0.03},
@@ -559,7 +559,7 @@ def simpan_plot_imbalance_dan_model(
     output_path: Path = FIGURES_DIR / "task2_2d_imbalance_and_models.png",
 ) -> Path:
     """Gambar figur 2 panel perbandingan pendekatan imbalance & keluarga model Tugas 2d."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.85))
 
     # Panel A: Perbandingan Pendekatan Class Imbalance (PR-AUC & Biaya/10k transaksi)
@@ -642,7 +642,7 @@ def simpan_plot_imbalance_dan_model(
         )
 
     fig.tight_layout(w_pad=1.6)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -650,15 +650,15 @@ def simpan_plot_imbalance_dan_model(
 
 def jalankan_pemodelan_klasifikasi(save_json_flag: bool = True) -> dict[str, Any]:
     """Jalankan eksperimen imbalance 2d, tuning multi-model, dan simpan cache OOF."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Muat data & bangun fitur kausal 2c"):
+    with catat_waktu("Muat data & bangun fitur kausal 2c"):
         train_raw, _ = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
         train_feat, _ = bangun_fitur_bebas_label(train_raw, None)
         folds = siapkan_fold_matang(train_feat)
 
-    with timer("2d.1 Perbandingan pendekatan class imbalance"):
+    with catat_waktu("2d.1 Perbandingan pendekatan class imbalance"):
         hasil_imb = bandingkan_pendekatan_imbalance(folds, seed=SEED)
         for nama, met in hasil_imb.items():
             print(
@@ -693,7 +693,7 @@ def jalankan_pemodelan_klasifikasi(save_json_flag: bool = True) -> dict[str, Any
         "best_configs": best_configs,
     }
     if save_json_flag:
-        save_json(hasil, RESULTS_DIR / "task2_models.json")
+        tulis_json(hasil, RESULTS_DIR / "task2_models.json")
         print("[SAVED] task2_models.json & cache/task2_oof.npz")
     return hasil
 
