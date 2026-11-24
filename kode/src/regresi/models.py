@@ -53,7 +53,7 @@ from src.config import (  # noqa: E402
     siapkan_direktori,
 )
 from src.regresi.features import Task1FeaturePipeline  # noqa: E402
-from src.regresi.preprocess import CATEGORICAL_COLUMNS, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
+from src.regresi.preprocess import CATEGORICAL_COLUMNS, TARGET_COLUMN, perbaiki_satuan_target  # noqa: E402
 from src.regresi.validation import TimeFold, buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
@@ -103,8 +103,8 @@ def siapkan_semua_fold(train: pd.DataFrame) -> list[PreparedFold]:
     for f in folds:
         tr_raw = train.iloc[f.train_idx].reset_index(drop=True)
         va_raw = train.iloc[f.val_idx].reset_index(drop=True)
-        y_tr, _ = fix_target_unit_errors(tr_raw[TARGET_COLUMN])
-        y_va, _ = fix_target_unit_errors(va_raw[TARGET_COLUMN])
+        y_tr, _ = perbaiki_satuan_target(tr_raw[TARGET_COLUMN])
+        y_va, _ = perbaiki_satuan_target(va_raw[TARGET_COLUMN])
         pipe = Task1FeaturePipeline(seed=SEED)
         X_tr = pipe.fit_transform(tr_raw, y_tr)
         X_va = pipe.transform(va_raw)

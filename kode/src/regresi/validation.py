@@ -46,8 +46,8 @@ from src.regresi.preprocess import (  # noqa: E402
     TARGET_COLUMN,
     BeratImputer,
     RouteDistanceImputer,
-    align_categorical_dtypes,
-    fix_target_unit_errors,
+    samakan_tipe_kategori,
+    perbaiki_satuan_target,
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
@@ -146,7 +146,7 @@ def _evaluasi_satu_fold(
     """Latih & evaluasi probe LightGBM Quantile pada satu pasangan train–val anti-leakage.
 
     Seluruh transformasi (``RouteDistanceImputer``, ``BeratImputer``,
-    ``align_categorical_dtypes``, dan koreksi target ``/ 60``) di-``fit`` ketat
+    ``samakan_tipe_kategori``, dan koreksi target ``/ 60``) di-``fit`` ketat
     hanya pada ``tr_df`` di dalam fold ini.
 
     Parameters
@@ -163,8 +163,8 @@ def _evaluasi_satu_fold(
     dict[str, Any]
         Jumlah baris train/val serta metrik Pinball P50, Pinball P90, P90 Coverage, dan MAE.
     """
-    y_tr, _ = fix_target_unit_errors(tr_df[TARGET_COLUMN])
-    y_va, _ = fix_target_unit_errors(va_df[TARGET_COLUMN])
+    y_tr, _ = perbaiki_satuan_target(tr_df[TARGET_COLUMN])
+    y_va, _ = perbaiki_satuan_target(va_df[TARGET_COLUMN])
 
     dist_imp = RouteDistanceImputer().fit(tr_df)
     berat_imp = BeratImputer().fit(tr_df)
@@ -172,7 +172,7 @@ def _evaluasi_satu_fold(
     va_clean = berat_imp.transform(dist_imp.transform(va_df, add_indicator=True), add_indicator=True)
 
     feat_cols = list(CLEAN_FEATURE_COLUMNS) + ["jarak_km_was_corrupt", "berat_kg_missing"]
-    X_tr, [X_va] = align_categorical_dtypes(tr_clean[feat_cols], [va_clean[feat_cols]])
+    X_tr, [X_va] = samakan_tipe_kategori(tr_clean[feat_cols], [va_clean[feat_cols]])
 
     params = {
         "n_estimators": 300,

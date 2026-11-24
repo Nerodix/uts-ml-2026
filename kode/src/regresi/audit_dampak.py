@@ -38,9 +38,9 @@ from src.regresi.preprocess import (
     TARGET_COLUMN,
     BeratImputer,
     RouteDistanceImputer,
-    align_categorical_dtypes,
-    fix_target_unit_errors,
-    identify_corrupt_jarak_mask,
+    samakan_tipe_kategori,
+    perbaiki_satuan_target,
+    tandai_jarak_rusak,
 )
 from src.utils import (
     LEBAR_GAMBAR,
@@ -142,8 +142,8 @@ def siapkan_split_dampak(train: pd.DataFrame) -> SplitDampak:
     va_raw = train.loc[dt >= AUDIT_VAL_CUTOFF].reset_index(drop=True)
 
     y_tr_raw = tr_raw[TARGET_COLUMN].to_numpy(dtype=np.float64)
-    y_tr_clean, _ = fix_target_unit_errors(y_tr_raw)
-    y_va_clean, _ = fix_target_unit_errors(va_raw[TARGET_COLUMN])
+    y_tr_clean, _ = perbaiki_satuan_target(y_tr_raw)
+    y_va_clean, _ = perbaiki_satuan_target(va_raw[TARGET_COLUMN])
 
     dist_imp = RouteDistanceImputer().fit(tr_raw)
     berat_imp = BeratImputer().fit(tr_raw)
@@ -152,7 +152,7 @@ def siapkan_split_dampak(train: pd.DataFrame) -> SplitDampak:
 
     # Latih acuan jujur (tanpa jumlah_scan, target /60, jarak pulih, semua 50 f) sekali saja
     base_cols = list(CATEGORICAL_COLUMNS) + list(NAMED_NUMERIC_COLUMNS) + list(ANONYMOUS_F_COLUMNS)
-    X_tr, [X_va] = align_categorical_dtypes(tr_clean[base_cols], [va_clean[base_cols]])
+    X_tr, [X_va] = samakan_tipe_kategori(tr_clean[base_cols], [va_clean[base_cols]])
     p50_honest, p90_honest = _fit_predict_lgbm_quantile(X_tr, y_tr_clean, X_va)
 
     return SplitDampak(
@@ -195,7 +195,7 @@ def ukur_dampak_leakage_scan(split: SplitDampak, test: pd.DataFrame) -> dict[str
         + list(ANONYMOUS_F_COLUMNS)
         + list(LEAKAGE_COLUMNS)
     )
-    X_tr, [X_va_naive] = align_categorical_dtypes(split.tr_clean[leaky_cols], [split.va_clean[leaky_cols]])
+    X_tr, [X_va_naive] = samakan_tipe_kategori(split.tr_clean[leaky_cols], [split.va_clean[leaky_cols]])
 
     params = _lgbm_params(SEED)
     m50 = lgb.LGBMRegressor(objective="quantile", alpha=0.5, **params).fit(X_tr, split.y_tr_clean)
@@ -240,7 +240,7 @@ def ukur_dampak_satuan_target(split: SplitDampak) -> dict[str, dict[str, float]]
     """
     # 1. LightGBM Quantile pada target mentah vs target bersih
     base_cols = list(CATEGORICAL_COLUMNS) + list(NAMED_NUMERIC_COLUMNS) + list(ANONYMOUS_F_COLUMNS)
-    X_tr, [X_va] = align_categorical_dtypes(split.tr_clean[base_cols], [split.va_clean[base_cols]])
+    X_tr, [X_va] = samakan_tipe_kategori(split.tr_clean[base_cols], [split.va_clean[base_cols]])
     p50_raw, p90_raw = _fit_predict_lgbm_quantile(X_tr, split.y_tr_raw, X_va)
 
     # 2. Ridge Regression (L2) pada target mentah vs target bersih
@@ -296,10 +296,10 @@ def ukur_dampak_pemulihan_jarak(split: SplitDampak) -> dict[str, Any]:
     base_cols = list(CATEGORICAL_COLUMNS) + list(NAMED_NUMERIC_COLUMNS) + list(ANONYMOUS_F_COLUMNS)
     tr_raw_j = split.berat_imputer.transform(split.tr_raw, add_indicator=False)
     va_raw_j = split.berat_imputer.transform(split.va_raw, add_indicator=False)
-    X_tr, [X_va] = align_categorical_dtypes(tr_raw_j[base_cols], [va_raw_j[base_cols]])
+    X_tr, [X_va] = samakan_tipe_kategori(tr_raw_j[base_cols], [va_raw_j[base_cols]])
     p50_raw_j, p90_raw_j = _fit_predict_lgbm_quantile(X_tr, split.y_tr_clean, X_va)
 
-    sent_mask = identify_corrupt_jarak_mask(split.va_raw["jarak_km"])
+    sent_mask = tandai_jarak_rusak(split.va_raw["jarak_km"])
     assert split.honest_metrics is not None
     assert split.honest_pred_p50 is not None
     assert split.honest_pred_p90 is not None
@@ -371,7 +371,7 @@ def ukur_dampak_seleksi_f(split: SplitDampak) -> dict[str, dict[str, float]]:
         Metrik P50, P90, coverage, dan MAE untuk semua 50 fitur ``f`` vs 10 fitur sinyal.
     """
     pruned_cols = list(CATEGORICAL_COLUMNS) + list(NAMED_NUMERIC_COLUMNS) + list(SIGNAL_F_COLUMNS)
-    X_tr, [X_va] = align_categorical_dtypes(split.tr_clean[pruned_cols], [split.va_clean[pruned_cols]])
+    X_tr, [X_va] = samakan_tipe_kategori(split.tr_clean[pruned_cols], [split.va_clean[pruned_cols]])
     p50_pr, p90_pr = _fit_predict_lgbm_quantile(X_tr, split.y_tr_clean, X_va)
 
     assert split.honest_metrics is not None

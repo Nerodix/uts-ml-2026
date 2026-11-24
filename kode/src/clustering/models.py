@@ -95,7 +95,7 @@ def _summarize_partition(
     return out
 
 
-def compare_clustering_methods(
+def bandingkan_metode_clustering(
     X_26d: np.ndarray,
     Z_pca: np.ndarray,
     k: int = SELECTED_K,
@@ -251,7 +251,7 @@ def _compute_gap_statistic(
     return gap_out
 
 
-def scan_k_selection(
+def pindai_pilihan_k(
     Z_pca: np.ndarray,
     k_values: tuple[int, ...] = K_CANDIDATES,
     seed: int = SEED,
@@ -489,8 +489,8 @@ def main() -> int:
         bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
         X_26d, Z_pca = bundle["X_weighted_26d"], bundle["Z_pca"]
 
-        k_res = scan_k_selection(Z_pca, k_values=K_CANDIDATES, seed=SEED)
-        meth_res = compare_clustering_methods(X_26d, Z_pca, k=SELECTED_K, seed=SEED)
+        k_res = pindai_pilihan_k(Z_pca, k_values=K_CANDIDATES, seed=SEED)
+        meth_res = bandingkan_metode_clustering(X_26d, Z_pca, k=SELECTED_K, seed=SEED)
 
         fig_path = FIGURES_DIR / "task3_3cd_methods_and_k.png"
         buat_grafik_metode_dan_k(k_res, meth_res, fig_path)

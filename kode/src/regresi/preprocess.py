@@ -58,7 +58,7 @@ JARAK_SENTINEL_LOW = 0.0
 JARAK_SENTINEL_HIGH = 9999.0
 
 
-def fix_target_unit_errors(
+def perbaiki_satuan_target(
     y: pd.Series | np.ndarray,
     threshold: float = TARGET_UNIT_THRESHOLD_HOURS,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -87,7 +87,7 @@ def fix_target_unit_errors(
     return y_clean, corrupt_mask
 
 
-def identify_corrupt_jarak_mask(jarak: pd.Series | np.ndarray) -> np.ndarray:
+def tandai_jarak_rusak(jarak: pd.Series | np.ndarray) -> np.ndarray:
     """Identifikasi baris dengan nilai sentinel ``jarak_km`` rusak (<= 0 atau >= 9999).
 
     Parameters
@@ -133,7 +133,7 @@ class RouteDistanceImputer:
         RouteDistanceImputer
             Objek imputer yang sudah ter-fit.
         """
-        valid = df.loc[~identify_corrupt_jarak_mask(df["jarak_km"])]
+        valid = df.loc[~tandai_jarak_rusak(df["jarak_km"])]
         self.route_map = (
             valid.groupby(["kota_asal", "kota_tujuan"])["jarak_km"].median().to_dict()
         )
@@ -160,7 +160,7 @@ class RouteDistanceImputer:
             Salinan DataFrame dengan ``jarak_km`` terpulihkan.
         """
         out = df.copy()
-        bad_mask = identify_corrupt_jarak_mask(out["jarak_km"])
+        bad_mask = tandai_jarak_rusak(out["jarak_km"])
         if add_indicator:
             out["jarak_km_was_corrupt"] = bad_mask.astype(np.int8)
 
@@ -246,7 +246,7 @@ class BeratImputer:
         return out
 
 
-def align_categorical_dtypes(
+def samakan_tipe_kategori(
     train_df: pd.DataFrame,
     other_dfs: list[pd.DataFrame],
     cat_cols: tuple[str, ...] = CATEGORICAL_COLUMNS,
