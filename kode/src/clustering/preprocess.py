@@ -1,4 +1,4 @@
-"""Konstanta skema dan pra-deteksi anomali bot/outlier Tugas 3a (Segmentasi Pelanggan)."""
+"""Konstanta skema, deteksi bot pra-skala, dan transformasi kanonik Tugas 3a."""
 
 from __future__ import annotations
 
@@ -8,6 +8,8 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from scipy import stats
+from sklearn.linear_model import Ridge
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
 
@@ -128,6 +130,30 @@ def muat_data_clustering(path: Path = CLUSTERING_PATH) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def logit_halus(values: np.ndarray, eps: float = LOGIT_EPS) -> np.ndarray:
+    """Transformasi logit terklip pada [eps, 1 - eps] untuk variabel proporsi Beta."""
+    clipped = np.clip(np.asarray(values, dtype=np.float64), eps, 1.0 - eps)
+    return np.log(clipped / (1.0 - clipped))
+
+
+def transformasi_clr(shares: np.ndarray, eps: float = CLR_EPS) -> np.ndarray:
+    """Centered Log-Ratio (CLR) untuk data komposisional pada simpleks unit."""
+    arr = np.maximum(np.asarray(shares, dtype=np.float64), 0.0) + eps
+    log_arr = np.log(arr)
+    return log_arr - np.mean(log_arr, axis=1, keepdims=True)
+
+
+def winsorize_kuantil(
+    values: np.ndarray,
+    lo_q: float = WINSOR_LO,
+    hi_q: float = WINSOR_HI,
+) -> tuple[np.ndarray, float, float]:
+    """Klip ekor ekstrem pada rentang kuantil [lo_q, hi_q] dengan mengabaikan NaN."""
+    arr = np.asarray(values, dtype=np.float64)
+    lo = float(np.nanquantile(arr, lo_q))
+    hi = float(np.nanquantile(arr, hi_q))
+    return np.clip(arr, lo, hi), lo, hi
+
 
 def deteksi_anomali_bot_aktivitas(
     df: pd.DataFrame,
@@ -197,5 +223,124 @@ def deteksi_anomali_bot_aktivitas(
         "gaps": gaps,
     }
     return is_bot, summary
+
+
+def praproses_fitur_kanonik(
+    df_normal: pd.DataFrame,
+    ridge_alpha: float = 10.0,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Terapkan transformasi kanonik (log, log1p, logit, CLR, imputasi Ridge) pada pelanggan non-bot.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict[str, Any]]
+        DataFrame fitur tertransformasi (belum distandardisasi, indeks mengikuti ``df_normal``)
+        beserta ringkasan diagnostik transformasi, kemencengan, dan imputasi.
+    """
+    out = pd.DataFrame(index=df_normal.index)
+    skew_before: dict[str, float] = {}
+    skew_after: dict[str, float] = {}
+    winsor_bounds: dict[str, list[float]] = {}
+
+    # 1. Positif menceng kanan -> winsorize [0,1%, 99,9%] lalu log
+    for col in LOG_POSITIVE_COLUMNS:
+        raw = df_normal[col].to_numpy(dtype=np.float64)
+        skew_before[col] = float(stats.skew(raw[~np.isnan(raw)]))
+        clipped, lo, hi = winsorize_kuantil(raw)
+        winsor_bounds[col] = [lo, hi]
+        if col == "rata2_keranjang":
+            # Tunda imputasi hingga fitur prediktor lain tersedia
+            out["log_rata2_keranjang"] = np.where(np.isnan(clipped), np.nan, np.log(clipped))
+        else:
+            transformed = np.log(clipped)
+            out[f"log_{col}"] = transformed
+            skew_after[col] = float(stats.skew(transformed))
+
+    # 2. Cacah (count) -> winsorize ujung atas 99,9% lalu log1p
+    for col in LOG1P_COUNT_COLUMNS:
+        raw = df_normal[col].to_numpy(dtype=np.float64)
+        skew_before[col] = float(stats.skew(raw))
+        hi = float(np.quantile(raw, WINSOR_HI))
+        winsor_bounds[col] = [0.0, hi]
+        transformed = np.log1p(np.clip(raw, 0.0, hi))
+        out[f"log1p_{col}"] = transformed
+        skew_after[col] = float(stats.skew(transformed))
+
+    # 3. Proporsi [0, 1] -> logit halus
+    for col in LOGIT_PROPORTION_COLUMNS:
+        raw = df_normal[col].to_numpy(dtype=np.float64)
+        skew_before[col] = float(stats.skew(raw))
+        transformed = logit_halus(raw)
+        out[f"logit_{col}"] = transformed
+        skew_after[col] = float(stats.skew(transformed))
+
+    # 4. Numerik simetris
+    for col in LINEAR_NUMERIC_COLUMNS:
+        raw = df_normal[col].to_numpy(dtype=np.float64)
+        skew_before[col] = float(stats.skew(raw))
+        out[col] = raw
+        skew_after[col] = float(stats.skew(raw))
+
+    # 5. Kategorikal perangkat -> indikator tunggal is_ios (web == android secara perilaku)
+    out["is_ios"] = (df_normal["perangkat"] == "ios").astype(np.float64)
+
+    # 6. Komposisional waktu belanja (CLR 4 -> ambil 3 dimensi independen: pagi, siang, malam)
+    clr_jam = transformasi_clr(df_normal[list(PORSI_JAM_COLUMNS)].to_numpy(dtype=np.float64))
+    out["clr_jam_pagi"] = clr_jam[:, 0]
+    out["clr_jam_siang"] = clr_jam[:, 1]
+    out["clr_jam_malam"] = clr_jam[:, 3]
+
+    # 7. Komposisional 16 kategori belanja (CLR)
+    clr_kat = transformasi_clr(df_normal[list(PORSI_KATEGORI_COLUMNS)].to_numpy(dtype=np.float64))
+    for i, col in enumerate(PORSI_KATEGORI_COLUMNS):
+        out[f"clr_{col}"] = clr_kat[:, i]
+
+    # 8. Imputasi struktural log(rata2_keranjang) memakai Ridge pada perilaku non-frekuensi
+    pred_cols = [
+        "log_recency_hari",
+        "log1p_item_per_pesanan",
+        "log1p_retur_90h",
+        "log_sesi_per_minggu",
+        "log_lama_member_bulan",
+        "umur",
+        "logit_persen_voucher",
+        "logit_persen_flash_sale",
+        "logit_persen_paylater",
+        "logit_persen_cod",
+        "is_ios",
+        "clr_jam_pagi",
+        "clr_jam_siang",
+        "clr_jam_malam",
+    ] + [f"clr_{c}" for c in PORSI_KATEGORI_COLUMNS]
+
+    obs_mask = out["log_rata2_keranjang"].notna().to_numpy()
+    X_pred = StandardScaler().fit_transform(out[pred_cols].to_numpy(dtype=np.float64))
+    y_obs = out.loc[obs_mask, "log_rata2_keranjang"].to_numpy(dtype=np.float64)
+
+    ridge = Ridge(alpha=ridge_alpha)
+    ridge.fit(X_pred[obs_mask], y_obs)
+    r2_obs = float(ridge.score(X_pred[obs_mask], y_obs))
+    pred_missing = ridge.predict(X_pred[~obs_mask])
+    # Pastikan nilai imputasi tetap berada dalam rentang teramati
+    lo_log, hi_log = float(y_obs.min()), float(y_obs.max())
+    pred_missing = np.clip(pred_missing, lo_log, hi_log)
+
+    krj_imputed = out["log_rata2_keranjang"].to_numpy(dtype=np.float64).copy()
+    krj_imputed[~obs_mask] = pred_missing
+    out["log_rata2_keranjang"] = krj_imputed
+    skew_after["rata2_keranjang"] = float(stats.skew(krj_imputed))
+
+    meta: dict[str, Any] = {
+        "n_rows": int(len(df_normal)),
+        "n_missing_rata2_keranjang": int((~obs_mask).sum()),
+        "pct_missing_rata2_keranjang": float((~obs_mask).mean() * 100.0),
+        "ridge_imputation_r2": r2_obs,
+        "imputed_median_idr": float(np.exp(np.median(pred_missing))),
+        "observed_median_idr": float(np.exp(np.median(y_obs))),
+        "skew_before": skew_before,
+        "skew_after": skew_after,
+        "winsor_bounds": winsor_bounds,
+    }
+    return out, meta
 
 
