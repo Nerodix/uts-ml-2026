@@ -64,7 +64,7 @@ python kode/run_all.py --check-env
 python kode/run_all.py
 ```
 
-Perintah ini menjalankan pipeline tiap tugas dan menghasilkan ketiga berkas prediksi serta seluruh berkas hasil di `kode/results/` dan `kode/figures/`. Tahap yang belum diimplementasikan (`clustering`) dilewati otomatis.
+Perintah ini menjalankan seluruh pipeline Tugas 1 (`regresi`), Tugas 2 (`klasifikasi`), dan Tugas 3 (`clustering`) serta menghasilkan ketiga berkas prediksi (`prediksi_regresi.csv`, `prediksi_klasifikasi.csv`, `cluster.csv`) beserta seluruh berkas hasil di `kode/results/` dan grafik di `kode/figures/`. Untuk menjalankan satu tugas saja, gunakan misalnya `python kode/run_all.py --stages clustering`.
 
 ## Konvensi Grafik
 

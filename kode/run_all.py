@@ -96,9 +96,15 @@ def run_stage(stage: str) -> int:
         _run_python_script("src/klasifikasi/analysis.py")
         return 0
 
-    # Tahap yang belum punya pipeline dilewati (bukan galat) supaya perintah tunggal tetap tuntas.
-    print(f"[LEWATI] Tahap '{stage}' belum diimplementasikan (menyusul lewat PR tugas terkait).")
-    return 0
+    if stage == "clustering":
+        _run_python_script("src/clustering/preprocess.py", ["--save-json"])
+        _run_python_script("src/clustering/features.py", ["--run-ablation", "--save-json"])
+        _run_python_script("src/clustering/models.py", ["--save-json"])
+        _run_python_script("src/clustering/stability.py", ["--save-json"])
+        _run_python_script("src/clustering/analysis.py", ["--save-json"])
+        return 0
+
+    raise ValueError(f"Tahap pipeline tidak dikenal: {stage}")
 
 
 def main() -> int:
