@@ -40,28 +40,28 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.features import Task1FeaturePipeline  # noqa: E402
 from src.regresi.models import (  # noqa: E402
     LogTargetRidgeQuantile,
-    fit_predict_catboost,
-    fit_predict_lgbm,
+    latih_prediksi_catboost,
+    latih_prediksi_lgbm,
 )
 from src.regresi.preprocess import DATE_COLUMN, ID_COLUMN, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
 from src.regresi.validation import buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
-    load_json,
+    baca_json,
     miring,
-    p90_coverage,
-    pinball_loss,
-    save_json,
-    set_global_seed,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 
@@ -85,9 +85,9 @@ def _ringkas_grup(
                 "median_p50": round(float(np.median(q50)), 2),
                 "bias_median": round(float(np.median(q50 - yt)), 2),
                 "mae_p50": round(float(mean_absolute_error(yt, q50)), 2),
-                "pinball_p50": round(pinball_loss(yt, q50, 0.5), 4),
-                "pinball_p90": round(pinball_loss(yt, q90, 0.9), 4),
-                "p90_coverage": round(p90_coverage(yt, q90), 4),
+                "pinball_p50": round(hitung_pinball_loss(yt, q50, 0.5), 4),
+                "pinball_p90": round(hitung_pinball_loss(yt, q90, 0.9), 4),
+                "p90_coverage": round(hitung_cakupan_p90(yt, q90), 4),
             }
         )
     rows.sort(key=lambda r: r["pinball_p50"], reverse=True)
@@ -121,9 +121,9 @@ def analisis_error_per_segmen(train: pd.DataFrame) -> dict[str, Any]:
     breakdown = {
         "overall_fold3_calibrated": {
             "n": int(len(y_f3)),
-            "pinball_p50": round(pinball_loss(y_f3, p50, 0.5), 4),
-            "pinball_p90": round(pinball_loss(y_f3, p90, 0.9), 4),
-            "p90_coverage": round(p90_coverage(y_f3, p90), 4),
+            "pinball_p50": round(hitung_pinball_loss(y_f3, p50, 0.5), 4),
+            "pinball_p90": round(hitung_pinball_loss(y_f3, p90, 0.9), 4),
+            "p90_coverage": round(hitung_cakupan_p90(y_f3, p90), 4),
             "mae_p50": round(float(mean_absolute_error(y_f3, p50)), 4),
         },
         "by_layanan": _ringkas_grup(df_f3, "layanan", y_f3, p50, p90),
@@ -137,8 +137,8 @@ def analisis_error_per_segmen(train: pd.DataFrame) -> dict[str, Any]:
 
 def plot_breakdown_error(breakdown: dict[str, Any]) -> Path:
     """Buat grafik 3-panel pinball loss menurut layanan, pulau tujuan, dan mitra kurir."""
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     # Tata letak "constrained" memberi ruang label per panel (nama pulau lebih panjang daripada kode kurir)
     fig, axes = plt.subplots(1, 3, figsize=(LEBAR_GAMBAR, 2.2), layout="constrained")
@@ -199,7 +199,7 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
     dict[str, Any]
         Daftar 15 fitur paling berpengaruh untuk P50 dan P90 beserta nama grafik.
     """
-    models_meta = load_json(RESULTS_DIR / "task1_models.json")
+    models_meta = baca_json(RESULTS_DIR / "task1_models.json")
     lgb_cfg = models_meta["models"]["lgbm"]["best_config"]
 
     fold3 = buat_fold_waktu(train)[-1]
@@ -211,7 +211,7 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
     X_tr = pipe.fit_transform(tr_raw, y_tr)
     X_va = pipe.transform(va_raw)
 
-    _, _, m50, m90 = fit_predict_lgbm(
+    _, _, m50, m90 = latih_prediksi_lgbm(
         X_tr,
         y_tr,
         X_va,
@@ -234,8 +234,8 @@ def analisis_shap_model(train: pd.DataFrame, sample_size: int = 3_000) -> dict[s
     top15 = list(mean_abs_50.head(15).index)
 
     # Grafik 2-panel: (a) rata-rata |SHAP| 15 fitur terpenting; (b) arah pengaruh 10 fitur numerik pada P50
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.3), gridspec_kw={"width_ratios": [1.0, 1.12]})
 
     y_pos = np.arange(len(top15))
@@ -321,8 +321,8 @@ def latih_final_dan_prediksi_test(
         Ringkasan statistik prediksi test, uji kewajaran ``K13`` & tanggal kembar
         ``9.9``/``10.10``, serta status validator kontrak.
     """
-    models_meta = load_json(RESULTS_DIR / "task1_models.json")
-    cal_meta = load_json(RESULTS_DIR / "task1_calibration.json")
+    models_meta = baca_json(RESULTS_DIR / "task1_models.json")
+    cal_meta = baca_json(RESULTS_DIR / "task1_calibration.json")
 
     ridge_cfg = models_meta["models"]["log_ridge"]["best_config"]
     lgb_cfg = models_meta["models"]["lgbm"]["best_config"]
@@ -341,7 +341,7 @@ def latih_final_dan_prediksi_test(
     p50_r, p90_r = ridge_model.predict(X_te)
 
     # 2. LightGBM Quantile terbaik
-    p50_l, p90_l, _, _ = fit_predict_lgbm(
+    p50_l, p90_l, _, _ = latih_prediksi_lgbm(
         X_tr,
         y_tr_clean,
         X_te,
@@ -352,7 +352,7 @@ def latih_final_dan_prediksi_test(
     )
 
     # 3. CatBoost MultiQuantile terbaik
-    p50_c, p90_c, _ = fit_predict_catboost(
+    p50_c, p90_c, _ = latih_prediksi_catboost(
         X_tr,
         y_tr_clean,
         X_te,
@@ -419,19 +419,19 @@ def latih_final_dan_prediksi_test(
 
 def main() -> None:
     """Jalankan seluruh Tugas 1f: breakdown error, SHAP, dan generasi ``prediksi_regresi.csv``."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
     train = pd.read_csv(REGRESI_TRAIN_PATH)
     test = pd.read_csv(REGRESI_TEST_PATH)
 
-    with timer("Analisis breakdown error (layanan, pulau_tujuan, mitra_kurir)"):
+    with catat_waktu("Analisis breakdown error (layanan, pulau_tujuan, mitra_kurir)"):
         breakdown = analisis_error_per_segmen(train)
 
-    with timer("Analisis SHAP pada LightGBM Quantile P50 & P90"):
+    with catat_waktu("Analisis SHAP pada LightGBM Quantile P50 & P90"):
         shap_info = analisis_shap_model(train)
 
-    with timer("Pelatihan Ensemble final (100% train) & generasi prediksi_regresi.csv"):
+    with catat_waktu("Pelatihan Ensemble final (100% train) & generasi prediksi_regresi.csv"):
         sub_info = latih_final_dan_prediksi_test(train, test)
 
     report = {
@@ -441,7 +441,7 @@ def main() -> None:
         "shap_analysis": shap_info,
         "submission_summary": sub_info,
     }
-    save_json(report, RESULTS_DIR / "task1_analysis.json")
+    tulis_json(report, RESULTS_DIR / "task1_analysis.json")
 
     print("\n================ RINGKASAN TUGAS 1f ================")
     print("Breakdown Error Fold 3 Terkalibrasi (by layanan):")

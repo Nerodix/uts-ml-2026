@@ -204,7 +204,7 @@ def tambah_flag_kualitas_data(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def align_categorical_dtypes(
+def samakan_tipe_kategori(
     train_df: pd.DataFrame,
     other_dfs: Sequence[pd.DataFrame],
     cat_cols: Sequence[str] = CATEGORICAL_COLUMNS,

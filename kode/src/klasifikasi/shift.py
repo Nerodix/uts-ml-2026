@@ -46,7 +46,7 @@ from src.config import (  # noqa: E402
     N_JOBS,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.features import (  # noqa: E402
     SELECTED_TASK2_FEATURES,
@@ -56,7 +56,7 @@ from src.klasifikasi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
     SNAPSHOT_TIMESTAMP,
     TARGET_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     estimasi_kurva_maturitas_label,
     hitung_hari_sebelum_snapshot,
     muat_data_klasifikasi,
@@ -64,15 +64,15 @@ from src.klasifikasi.preprocess import (  # noqa: E402
 from src.klasifikasi.validation import buat_split_shift_agustus  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     label_batang,
-    load_json,
+    baca_json,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 FEATURE_LIST = list(SELECTED_TASK2_FEATURES)
@@ -82,7 +82,7 @@ def _ambil_lgbm_params(seed: int = SEED) -> dict[str, Any]:
     """Muat konfigurasi terbaik LightGBM dari task2_models.json bila tersedia."""
     model_json = RESULTS_DIR / "task2_models.json"
     if model_json.exists():
-        cfg = load_json(model_json).get("best_configs", {}).get("lgbm", {})
+        cfg = baca_json(model_json).get("best_configs", {}).get("lgbm", {})
         if cfg:
             return {**cfg, "n_jobs": N_JOBS, "random_state": seed}
     return {
@@ -183,7 +183,7 @@ def _evaluasi_irisan_shift(
         ym, pm, nm, fm = y[mask], p[mask], nom[mask], flg[mask]
         pr = float(average_precision_score(ym, pm)) if ym.sum() > 0 else 0.0
         roc = float(roc_auc_score(ym, pm)) if ym.sum() > 0 else 0.5
-        cost = float(fraud_total_cost(ym, fm, nm, review_cost=FRAUD_REVIEW_COST_IDR))
+        cost = float(hitung_biaya_total_fraud(ym, fm, nm, review_cost=FRAUD_REVIEW_COST_IDR))
         rec = float(((ym == 1) & (fm == 1)).sum() / max(int(ym.sum()), 1))
         return pr, roc, cost, rec
 
@@ -209,10 +209,10 @@ def _evaluasi_irisan_shift(
 
 def jalankan_eksperimen_shift(save_json_flag: bool = True) -> dict[str, Any]:
     """Jalankan eksperimen adaptasi *pattern shift* pada jendela kronologis Agt 11–21."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Muat data & fitur kausal 2c untuk eksperimen shift 2e"):
+    with catat_waktu("Muat data & fitur kausal 2c untuk eksperimen shift 2e"):
         train_raw, _ = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
         train_feat, _ = bangun_fitur_bebas_label(train_raw, None)
         splits = buat_split_shift_agustus(train_feat)
@@ -225,8 +225,8 @@ def jalankan_eksperimen_shift(save_json_flag: bool = True) -> dict[str, Any]:
     df_jj_ad = train_feat.iloc[np.concatenate([idx_jj, idx_ad])]
     df_va = train_feat.iloc[idx_va]
 
-    tr_jj, [va_for_jj] = align_categorical_dtypes(df_jj, [df_va], cat_cols=CATEGORICAL_COLUMNS)
-    tr_ad, [va_for_ad] = align_categorical_dtypes(df_jj_ad, [df_va], cat_cols=CATEGORICAL_COLUMNS)
+    tr_jj, [va_for_jj] = samakan_tipe_kategori(df_jj, [df_va], cat_cols=CATEGORICAL_COLUMNS)
+    tr_ad, [va_for_ad] = samakan_tipe_kategori(df_jj_ad, [df_va], cat_cols=CATEGORICAL_COLUMNS)
 
     y_va = va_for_ad[TARGET_COLUMN].to_numpy(dtype=np.int8)
     nom_va = va_for_ad["nominal"].to_numpy(dtype=np.float64)
@@ -252,7 +252,7 @@ def jalankan_eksperimen_shift(save_json_flag: bool = True) -> dict[str, Any]:
 
     hasil_strategi: list[dict[str, Any]] = []
     for kode, lbl, tr_x, va_x, sw, w_rec, hl in strategi_list:
-        with timer(f"2e Evaluasi strategi: {kode}"):
+        with catat_waktu(f"2e Evaluasi strategi: {kode}"):
             clf = lgb.LGBMClassifier(**lgb_params)
             clf.fit(tr_x[FEATURE_LIST], tr_x[TARGET_COLUMN].to_numpy(dtype=np.int8), sample_weight=sw)
             prob = clf.predict_proba(va_x[FEATURE_LIST])[:, 1]
@@ -309,7 +309,7 @@ def jalankan_eksperimen_shift(save_json_flag: bool = True) -> dict[str, Any]:
         },
     }
     if save_json_flag:
-        save_json(hasil, RESULTS_DIR / "task2_shift.json")
+        tulis_json(hasil, RESULTS_DIR / "task2_shift.json")
         print("[SAVED] task2_shift.json")
     return hasil
 
@@ -319,7 +319,7 @@ def simpan_plot_adaptasi_shift(
     output_path: Path = FIGURES_DIR / "task2_2e_pattern_shift_adaptation.png",
 ) -> Path:
     """Gambar figur 2 panel dampak adaptasi gelombang QRIS Agustus (PR-AUC & Total Biaya)."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75))
 
     lbls = [r["label_pendek"] for r in strategi]
@@ -368,7 +368,7 @@ def simpan_plot_adaptasi_shift(
     ax1.legend(loc="upper right", fontsize=5.8)
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path

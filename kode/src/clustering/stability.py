@@ -32,18 +32,18 @@ KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
-from src.clustering.features import DEFAULT_N_PCA, build_clustering_features  # noqa: E402
+from src.clustering.features import DEFAULT_N_PCA, bangun_fitur_clustering  # noqa: E402
 from src.clustering.preprocess import muat_data_clustering  # noqa: E402
-from src.config import FIGURES_DIR, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.config import FIGURES_DIR, RESULTS_DIR, SEED, siapkan_direktori  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 K_STABILITY_RANGE: tuple[int, ...] = (4, 5, 6, 7, 8)
@@ -266,7 +266,7 @@ def buat_grafik_stabilitas(
     out_path: Path,
 ) -> None:
     """Buat grafik 2-panel Tugas 3e: stabilitas ARI lintas K dan Jaccard per segmen K=6."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.95), constrained_layout=True)
 
     # Panel A: Stabilitas pairwise ARI (mean ± SD terklip pada [0, 1]) lintas K = 4..8
@@ -386,12 +386,12 @@ def main() -> int:
     parser.add_argument("--save-json", action="store_true", help="Save JSON report to kode/results/.")
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Task 3e: Clustering Stability Evaluation"):
+    with catat_waktu("Task 3e: Clustering Stability Evaluation"):
         df = muat_data_clustering()
-        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+        bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
 
         k_stab = evaluate_stability_across_k(
             bundle["Z_pca"], k_values=K_STABILITY_RANGE, n_runs=N_RUNS_KSCAN, seed=SEED
@@ -407,8 +407,8 @@ def main() -> int:
             "stability_across_k": k_stab,
             "final_model_stability": final_stab,
         }
-        if args.save_json:
-            save_json(report, RESULTS_DIR / "task3_stability.json")
+        if args.tulis_json:
+            tulis_json(report, RESULTS_DIR / "task3_stability.json")
 
         print("=== Stabilitas Subsampling 80% Lintas K (66 pasangan ARI) ===")
         for k in K_STABILITY_RANGE:

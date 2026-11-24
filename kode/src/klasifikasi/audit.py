@@ -41,7 +41,7 @@ from src.config import (  # noqa: E402
     KLASIFIKASI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.audit_dampak import jalankan_semua_dampak  # noqa: E402
 from src.klasifikasi.preprocess import (  # noqa: E402
@@ -62,14 +62,14 @@ from src.klasifikasi.preprocess import (  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     label_bulan,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 PILIHAN_CEK = (
@@ -274,7 +274,7 @@ def cek_label_dan_delay_konfirmasi(
 
 def _plot_label_delay(hasil: dict[str, Any], output_path: Path) -> Path:
     """Gambar figur 2 panel audit *right-censoring* & jeda konfirmasi label."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
 
     # Panel A: Laju fraud bulanan total vs non-QRIS
@@ -328,7 +328,7 @@ def _plot_label_delay(hasil: dict[str, Any], output_path: Path) -> Path:
     label_batang(ax1, b_mat, desimal=0, ukuran=5.8)
 
     fig.tight_layout(w_pad=1.4)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -440,7 +440,7 @@ def cek_leakage_review_manual(
 
 def _plot_leakage_review(hasil: dict[str, Any], output_path: Path) -> Path:
     """Gambar figur 2 panel pembuktian forensik leakage ``flag_review_manual``."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
 
     # Panel A: Laju bulanan flag_review_manual=1 di Latih vs Uji
@@ -490,7 +490,7 @@ def _plot_leakage_review(hasil: dict[str, Any], output_path: Path) -> Path:
     ax1.legend(loc="lower right", fontsize=6.0)
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -705,7 +705,7 @@ def cek_screening_fitur_v(
 
 def _plot_v_screening(df_v: pd.DataFrame, output_path: Path) -> Path:
     """Gambar peta screening 50 fitur anonim ``v01–v50`` (KS drift vs kekuatan sinyal)."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.65), gridspec_kw={"width_ratios": [1.15, 1.0]})
 
     # Panel A: Scatter KS (latih vs uji) vs |AUC - 0,5| (Jan–Jul matang)
@@ -771,7 +771,7 @@ def _plot_v_screening(df_v: pd.DataFrame, output_path: Path) -> Path:
     ax1.legend(loc="lower right", fontsize=6.0)
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -956,7 +956,7 @@ def tetapkan_arketipe_fraud(df: pd.DataFrame) -> pd.Series:
 
 def _plot_pattern_shift(hasil: dict[str, Any], output_path: Path) -> Path:
     """Gambar figur 2 panel pergeseran pola fraud QRIS Agustus & kelanjutannya di uji."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.7))
 
     # Panel A: Laju fraud bulanan per kanal (Jan–Agt)
@@ -1013,7 +1013,7 @@ def _plot_pattern_shift(hasil: dict[str, Any], output_path: Path) -> Path:
     )
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -1037,28 +1037,28 @@ def jalankan_audit_klasifikasi(
     dict[str, Any]
         Kamus hasil audit lengkap Tugas 2a.
     """
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
     dipilih = list(PILIHAN_CEK) if not cek_list else list(cek_list)
 
-    with timer("Muat dataset klasifikasi"):
+    with catat_waktu("Muat dataset klasifikasi"):
         train, test = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
 
     hasil: dict[str, Any] = {}
     if "schema" in dipilih:
-        with timer("2a.1 Skema & duplikat"):
+        with catat_waktu("2a.1 Skema & duplikat"):
             hasil["skema"] = cek_skema_dan_duplikat(train, test)
             print(f"  Train={hasil['skema']['train_shape']}, Test={hasil['skema']['test_shape']}, dup_id={hasil['skema']['dup_id_train']}")
     if "time" in dipilih:
-        with timer("2a.2 Rentang waktu & urutan"):
+        with catat_waktu("2a.2 Rentang waktu & urutan"):
             hasil["waktu"] = cek_rentang_waktu_dan_urutan(train, test)
             print(f"  Train terurut={hasil['waktu']['train_terurut_waktu']}, Test terurut={hasil['waktu']['test_terurut_waktu']}")
     if "id" in dipilih:
-        with timer("2a.3 Keacakan ID"):
+        with catat_waktu("2a.3 Keacakan ID"):
             hasil["id"] = cek_keacakan_id(train)
             print(f"  Spearman(id_transaksi, waktu)={hasil['id']['spearman_id_transaksi_waktu']:.5f}")
     if "delay" in dipilih:
-        with timer("2a.4 Label & kurva delay konfirmasi"):
+        with catat_waktu("2a.4 Label & kurva delay konfirmasi"):
             hasil["label_delay"] = cek_label_dan_delay_konfirmasi(train, simpan_plot=True)
             print(
                 f"  Laju matang Jan–Jul={hasil['label_delay']['laju_fraud_matang_pct']:.3f}%, "
@@ -1066,7 +1066,7 @@ def jalankan_audit_klasifikasi(
                 f"29–31 Agt fraud={hasil['label_delay']['tiga_hari_terakhir_fraud']}/{hasil['label_delay']['tiga_hari_terakhir_n']}"
             )
     if "leakage" in dipilih:
-        with timer("2a.5 Audit forensik leakage flag_review_manual"):
+        with catat_waktu("2a.5 Audit forensik leakage flag_review_manual"):
             hasil["leakage_review"] = cek_leakage_review_manual(train, test, simpan_plot=True)
             print(
                 f"  Review rate train={hasil['leakage_review']['laju_review_train_total_pct']:.2f}% "
@@ -1074,7 +1074,7 @@ def jalankan_audit_klasifikasi(
                 f"test={hasil['leakage_review']['laju_review_test_total_pct']:.2f}%"
             )
     if "quality" in dipilih:
-        with timer("2a.6 Kualitas fitur, missing, anomali, & unseen"):
+        with catat_waktu("2a.6 Kualitas fitur, missing, anomali, & unseen"):
             hasil["kualitas"] = cek_kualitas_fitur_dan_anomali(train, test)
             um = hasil["kualitas"]["umur_merchant_negatif"]
             print(
@@ -1082,7 +1082,7 @@ def jalankan_audit_klasifikasi(
                 f"n_te={um['test_count']}"
             )
     if "v_scan" in dipilih:
-        with timer("2a.7 Screening 50 fitur anonim v01–v50"):
+        with catat_waktu("2a.7 Screening 50 fitur anonim v01–v50"):
             hasil["v_screening"] = cek_screening_fitur_v(train, test, simpan_plot=True)
             v15 = hasil["v_screening"]["v15_detail"]
             print(
@@ -1090,7 +1090,7 @@ def jalankan_audit_klasifikasi(
                 f"v15 drift KS={v15['ks_train_test']:.3f}, AUC={v15['auc_matang']:.3f}"
             )
     if "shift" in dipilih:
-        with timer("2a.8 Pergeseran pola fraud & arketipe modus"):
+        with catat_waktu("2a.8 Pergeseran pola fraud & arketipe modus"):
             hasil["pattern_shift"] = cek_pergeseran_pola_fraud(train, test, simpan_plot=True)
             ps = hasil["pattern_shift"]
             print(
@@ -1098,7 +1098,7 @@ def jalankan_audit_klasifikasi(
                 f"QRIS bulat 100rb di Agt fraud={ps['persen_bulat100k_pada_fraud_qris_agt']:.1f}%, di test={ps['n_qris_bulat100k_test_sep_okt']}"
             )
     if "impact" in dipilih:
-        with timer("2a.9 Eksperimen dampak kuantitatif (4 temuan)"):
+        with catat_waktu("2a.9 Eksperimen dampak kuantitatif (4 temuan)"):
             hasil["dampak"] = jalankan_semua_dampak(train, seed=SEED, simpan_plot=True)
             lk = hasil["dampak"]["leakage_review_manual"]
             print(
@@ -1109,7 +1109,7 @@ def jalankan_audit_klasifikasi(
 
     if simpan_json:
         out_json = RESULTS_DIR / "task2_audit.json"
-        save_json(hasil, out_json)
+        tulis_json(hasil, out_json)
         print(f"[SAVED] {out_json.name}")
     return hasil
 
@@ -1129,7 +1129,7 @@ def main() -> int:
         help="Save audit summary to kode/results/task2_audit.json.",
     )
     args = parser.parse_args()
-    jalankan_audit_klasifikasi(cek_list=args.checks, simpan_json=args.save_json or args.checks is None)
+    jalankan_audit_klasifikasi(cek_list=args.checks, simpan_json=args.tulis_json or args.checks is None)
     return 0
 
 

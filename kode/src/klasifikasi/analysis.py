@@ -40,7 +40,7 @@ from src.config import (  # noqa: E402
     PRED_KLASIFIKASI_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.klasifikasi.audit import tetapkan_arketipe_fraud  # noqa: E402
 from src.klasifikasi.calibration import (  # noqa: E402
@@ -61,7 +61,7 @@ from src.klasifikasi.preprocess import (  # noqa: E402
     CATEGORICAL_COLUMNS,
     ID_COLUMN,
     TARGET_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     muat_data_klasifikasi,
 )
 from src.klasifikasi.shift import buat_bobot_latih_produksi  # noqa: E402
@@ -69,13 +69,13 @@ from src.klasifikasi.validation import buat_split_shift_agustus  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
-    fraud_total_cost,
-    load_json,
-    save_json,
-    set_global_seed,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
+    baca_json,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 FEATURE_LIST = list(SELECTED_TASK2_FEATURES)
@@ -112,7 +112,7 @@ def _ringkas_grup(
         fn = int(((yg == 1) & (fg == 0)).sum())
         missed_loss = float(ng[(yg == 1) & (fg == 0)].sum())
         rev_cost = float(FRAUD_REVIEW_COST_IDR * (fg == 1).sum())
-        tot_cost = fraud_total_cost(yg, fg, ng, review_cost=FRAUD_REVIEW_COST_IDR)
+        tot_cost = hitung_biaya_total_fraud(yg, fg, ng, review_cost=FRAUD_REVIEW_COST_IDR)
         pr_auc = float(average_precision_score(yg, pg)) if (n_fraud > 0 and n_fraud < len(yg)) else None
 
         rows.append(
@@ -142,7 +142,7 @@ def simpan_plot_error_breakdown(
     output_path: Path = FIGURES_DIR / "task2_2g_error_breakdown.png",
 ) -> Path:
     """Gambar figur 2 panel pemecahan error per kanal dan per arketipe pola fraud."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75), gridspec_kw={"width_ratios": [1.0, 1.15]})
 
     # Panel A: Kerugian Lolos vs Biaya Review per Kanal (Fold 3 Jul)
@@ -205,7 +205,7 @@ def simpan_plot_error_breakdown(
         )
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -216,7 +216,7 @@ def simpan_plot_shap_summary(
     output_path: Path = FIGURES_DIR / "task2_2g_shap_summary.png",
 ) -> Path:
     """Gambar peringkat 15 fitur terpenting berdasarkan rerata ``|SHAP|`` di ruang log-odds."""
-    configure_plotting()
+    atur_gaya_grafik()
     top15 = list(reversed(shap_rows[:15]))
     fig, ax = plt.subplots(figsize=(LEBAR_GAMBAR, 3.05))
 
@@ -260,7 +260,7 @@ def simpan_plot_shap_summary(
     )
 
     fig.tight_layout()
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -268,22 +268,22 @@ def simpan_plot_shap_summary(
 
 def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[str, Any]:
     """Jalankan Tugas 2g: error breakdown, SHAP, refit produksi, dan ``prediksi_klasifikasi.csv``."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    models_meta = load_json(RESULTS_DIR / "task2_models.json")
-    shift_meta = load_json(RESULTS_DIR / "task2_shift.json")
-    cal_meta = load_json(RESULTS_DIR / "task2_calibration.json")
+    models_meta = baca_json(RESULTS_DIR / "task2_models.json")
+    shift_meta = baca_json(RESULTS_DIR / "task2_shift.json")
+    cal_meta = baca_json(RESULTS_DIR / "task2_calibration.json")
     f3_cache = np.load(CACHE_DIR / "task2_fold3_calibrated.npz")
     oof_cache = np.load(CACHE_DIR / "task2_oof.npz")
 
-    with timer("Muat data & bangun fitur kausal bebas-label (Train + Test)"):
+    with catat_waktu("Muat data & bangun fitur kausal bebas-label (Train + Test)"):
         train_raw, test_raw = muat_data_klasifikasi(KLASIFIKASI_TRAIN_PATH, KLASIFIKASI_TEST_PATH)
         train_feat, test_feat = bangun_fitur_bebas_label(train_raw, test_raw)
         assert test_feat is not None
 
     # 1) Pemecahan Error Fold 3 (Jul 2025)
-    with timer("2g.1 Pemecahan error per kanal, kategori merchant, & 5 arketipe pola fraud"):
+    with catat_waktu("2g.1 Pemecahan error per kanal, kategori merchant, & 5 arketipe pola fraud"):
         idx_f3 = f3_cache["idx_f3"]
         y_f3 = f3_cache["y_f3"]
         nom_f3 = f3_cache["nom_f3"]
@@ -301,7 +301,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         sp = buat_split_shift_agustus(train_feat)
         tr_s = train_feat.iloc[np.concatenate([sp["jan_jul_idx"], sp["aug_adapt_idx"]])]
         va_s = train_feat.iloc[sp["aug_val_idx"]].copy()
-        tr_sal, [va_sal] = align_categorical_dtypes(tr_s, [va_s], cat_cols=CATEGORICAL_COLUMNS)
+        tr_sal, [va_sal] = samakan_tipe_kategori(tr_s, [va_s], cat_cols=CATEGORICAL_COLUMNS)
         w_rec = float(shift_meta["strategi_terpilih"]["w_recent"])
         hl = shift_meta["strategi_terpilih"]["decay_half_life_days"]
         is_aug_s = (pd.to_datetime(tr_sal["waktu_dt"]) >= pd.Timestamp("2025-08-01")).to_numpy()
@@ -342,7 +342,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
             )
 
     # 2) Pelatihan Final Production Ensemble (Jan–Agt Censoring-Aware + Shift-Adaptive) -> Sep–Okt
-    with timer("2g.2 Refit production ensemble (LGBM + CatBoost + XGBoost) adaptif shift & sensor"):
+    with catat_waktu("2g.2 Refit production ensemble (LGBM + CatBoost + XGBoost) adaptif shift & sensor"):
         keep_mask, w_prod = buat_bobot_latih_produksi(
             train_feat,
             w_recent=w_rec,
@@ -350,7 +350,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         )
         tr_prod = train_feat.loc[keep_mask].copy()
         sw_prod = w_prod[keep_mask]
-        tr_prod_al, [te_prod_al] = align_categorical_dtypes(tr_prod, [test_feat], cat_cols=CATEGORICAL_COLUMNS)
+        tr_prod_al, [te_prod_al] = samakan_tipe_kategori(tr_prod, [test_feat], cat_cols=CATEGORICAL_COLUMNS)
 
         cb_cfg = {**models_meta["best_configs"]["catboost"], "thread_count": N_JOBS, "random_seed": SEED}
         xgb_cfg = {**models_meta["best_configs"]["xgboost"], "n_jobs": N_JOBS, "random_state": SEED}
@@ -378,7 +378,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         tandai_te = aturan_keputusan_bayes(p_te_final, nom_te, review_cost=FRAUD_REVIEW_COST_IDR)
 
     # 3) Interpretasi SHAP pada model produksi LightGBM
-    with timer("2g.3 Hitung SHAP TreeExplainer (sampel 4.000 baris uji + fraud Fold 3)"):
+    with catat_waktu("2g.3 Hitung SHAP TreeExplainer (sampel 4.000 baris uji + fraud Fold 3)"):
         rng = np.random.default_rng(SEED)
         idx_sample = rng.choice(len(te_prod_al), size=min(4_000, len(te_prod_al)), replace=False)
         X_shap = te_prod_al.iloc[idx_sample][FEATURE_LIST]
@@ -397,7 +397,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         print("  Top 5 SHAP:", ", ".join(f"{r['fitur']}={r['mean_abs_shap']:.3f}" for r in shap_rows[:5]))
 
     # 4) Simpan & validasi prediksi_klasifikasi.csv
-    with timer("2g.4 Tulis & validasi prediksi_klasifikasi.csv"):
+    with catat_waktu("2g.4 Tulis & validasi prediksi_klasifikasi.csv"):
         pred_df = pd.DataFrame(
             {
                 ID_COLUMN: test_raw[ID_COLUMN].astype(str),
@@ -463,7 +463,7 @@ def jalankan_analisis_dan_prediksi_final(save_json_flag: bool = True) -> dict[st
         "test_sanity": sanity,
     }
     if save_json_flag:
-        save_json(hasil, RESULTS_DIR / "task2_analysis.json")
+        tulis_json(hasil, RESULTS_DIR / "task2_analysis.json")
         print("[SAVED] task2_analysis.json & prediksi_klasifikasi.csv")
     return hasil
 

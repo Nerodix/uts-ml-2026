@@ -34,7 +34,7 @@ KODE_DIR = Path(__file__).resolve().parents[2]
 if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
-from src.clustering.features import DEFAULT_N_PCA, build_clustering_features  # noqa: E402
+from src.clustering.features import DEFAULT_N_PCA, bangun_fitur_clustering  # noqa: E402
 from src.clustering.preprocess import (  # noqa: E402
     BOT_INTEGRITY_COLUMNS,
     ID_COLUMN,
@@ -42,16 +42,16 @@ from src.clustering.preprocess import (  # noqa: E402
     PORSI_KATEGORI_COLUMNS,
     muat_data_clustering,
 )
-from src.config import FIGURES_DIR, PRED_CLUSTER_PATH, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.config import FIGURES_DIR, PRED_CLUSTER_PATH, RESULTS_DIR, SEED, siapkan_direktori  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 FINAL_K = 6
@@ -327,7 +327,7 @@ def buat_grafik_profil_segmen(
     out_path: Path,
 ) -> None:
     """Buat grafik 2-panel Tugas 3f: heatmap profil z-score segmen dan proyeksi PCA 2D."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(
         1, 2, figsize=(LEBAR_GAMBAR, 3.35), gridspec_kw={"width_ratios": [1.32, 1.0]}, constrained_layout=True
     )
@@ -435,7 +435,7 @@ def buat_grafik_anomali(
     out_path: Path,
 ) -> None:
     """Buat grafik 2-panel Tugas 3g: rasio 4 sumbu bot (-1) dan uji ekor log-likelihood non-bot."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.85), constrained_layout=True)
 
     # Panel A: Rasio log10(median bot / median normal) pada 4 sumbu integritas + konversi
@@ -565,12 +565,12 @@ def main() -> int:
     parser.add_argument("--save-json", action="store_true", help="Save JSON report to kode/results/.")
     args = parser.parse_args()
 
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
-    with timer("Tasks 3f & 3g: Segment Profiles, Anomalies & cluster.csv"):
+    with catat_waktu("Tasks 3f & 3g: Segment Profiles, Anomalies & cluster.csv"):
         df = muat_data_clustering()
-        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+        bundle = bangun_fitur_clustering(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
 
         fit_res = fit_final_gmm_and_order_segments(
             bundle["df_normal"], bundle["X_weighted_26d"], k=FINAL_K, seed=SEED
@@ -607,8 +607,8 @@ def main() -> int:
             "anomalies": anom_res,
             "submission": csv_meta,
         }
-        if args.save_json:
-            save_json(report, RESULTS_DIR / "task3_analysis.json")
+        if args.tulis_json:
+            tulis_json(report, RESULTS_DIR / "task3_analysis.json")
 
         print(
             f"Model final   : GMM Full 26D (K={FINAL_K}, converged={fit_res['converged']}, "

@@ -27,7 +27,7 @@ from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from src.config import FIGURES_DIR, N_JOBS, SEED, ensure_dirs
+from src.config import FIGURES_DIR, N_JOBS, SEED, siapkan_direktori
 from src.regresi.preprocess import (
     ANONYMOUS_F_COLUMNS,
     CATEGORICAL_COLUMNS,
@@ -45,11 +45,11 @@ from src.regresi.preprocess import (
 from src.utils import (
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    p90_coverage,
-    pinball_loss,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
     sumbu_koma,
 )
 
@@ -111,9 +111,9 @@ def _hitung_metrik_kuantil(
 ) -> dict[str, float]:
     """Hitung metrik evaluasi resmi Tugas 1 (Pinball P50, Pinball P90, Coverage, MAE)."""
     return {
-        "pinball_p50": round(pinball_loss(y_true, p50, 0.5), 4),
-        "pinball_p90": round(pinball_loss(y_true, p90, 0.9), 4),
-        "p90_coverage": round(p90_coverage(y_true, p90), 4),
+        "pinball_p50": round(hitung_pinball_loss(y_true, p50, 0.5), 4),
+        "pinball_p90": round(hitung_pinball_loss(y_true, p90, 0.9), 4),
+        "p90_coverage": round(hitung_cakupan_p90(y_true, p90), 4),
         "mae_p50": round(float(mean_absolute_error(y_true, p50)), 4),
     }
 
@@ -266,13 +266,13 @@ def ukur_dampak_satuan_target(split: SplitDampak) -> dict[str, dict[str, float]]
             "rmse": round(float(root_mean_squared_error(split.y_va_clean, pr_raw)), 4),
             "mae": round(float(mean_absolute_error(split.y_va_clean, pr_raw)), 4),
             "mean_bias": round(float(np.mean(pr_raw - split.y_va_clean)), 4),
-            "pinball_p50": round(pinball_loss(split.y_va_clean, pr_raw, 0.5), 4),
+            "pinball_p50": round(hitung_pinball_loss(split.y_va_clean, pr_raw, 0.5), 4),
         },
         "ridge_target_koreksi_60": {
             "rmse": round(float(root_mean_squared_error(split.y_va_clean, pr_clean)), 4),
             "mae": round(float(mean_absolute_error(split.y_va_clean, pr_clean)), 4),
             "mean_bias": round(float(np.mean(pr_clean - split.y_va_clean)), 4),
-            "pinball_p50": round(pinball_loss(split.y_va_clean, pr_clean, 0.5), 4),
+            "pinball_p50": round(hitung_pinball_loss(split.y_va_clean, pr_clean, 0.5), 4),
         },
         "lgbm_target_mentah": _hitung_metrik_kuantil(split.y_va_clean, p50_raw, p90_raw),
         "lgbm_target_koreksi_60": split.honest_metrics,
@@ -394,8 +394,8 @@ def plot_dampak_audit(hasil_dampak: dict[str, Any]) -> Path:
     Path
         Path file PNG yang tersimpan di ``kode/figures/task1_1a6_dampak_audit.png``.
     """
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.6))
     w = 0.36

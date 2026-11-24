@@ -41,7 +41,7 @@ TEST_END_DATE = "2025-10-31"
 FRAUD_REVIEW_COST_IDR = 25_000.0
 
 
-def ensure_dirs() -> None:
+def siapkan_direktori() -> None:
     """Pastikan direktori output (results, figures, cache) tersedia."""
     for d in (RESULTS_DIR, FIGURES_DIR, CACHE_DIR):
         d.mkdir(parents=True, exist_ok=True)

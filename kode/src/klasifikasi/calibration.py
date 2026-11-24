@@ -43,18 +43,18 @@ from src.config import (  # noqa: E402
     FRAUD_REVIEW_COST_IDR,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     miring,
-    save_json,
-    set_global_seed,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 
@@ -198,8 +198,8 @@ def _ringkas_kalibrasi(
 ) -> dict[str, float]:
     p = _clip_prob(prob)
     flg = aturan_keputusan_bayes(p, nom, pengali_ambang=pengali)
-    cost = fraud_total_cost(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
-    cost_none = fraud_total_cost(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost = hitung_biaya_total_fraud(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost_none = hitung_biaya_total_fraud(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
     tp = int(((y == 1) & (flg == 1)).sum())
     return {
         "pr_auc": float(average_precision_score(y, p)),
@@ -223,7 +223,7 @@ def _ringkas_aturan_keputusan(
     flg: np.ndarray,
     nom: np.ndarray,
 ) -> dict[str, float]:
-    cost = fraud_total_cost(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost = hitung_biaya_total_fraud(y, flg, nom, review_cost=FRAUD_REVIEW_COST_IDR)
     missed = float(nom[(y == 1) & (flg == 0)].sum())
     review = float(FRAUD_REVIEW_COST_IDR * (flg == 1).sum())
     tp = int(((y == 1) & (flg == 1)).sum())
@@ -249,7 +249,7 @@ def simpan_plot_kalibrasi_dan_biaya(
     output_path: Path = FIGURES_DIR / "task2_2f_calibration_and_cost.png",
 ) -> Path:
     """Gambar figur 2 panel diagram reliabilitas & perbandingan total biaya keputusan 2f."""
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75))
 
     # Panel A: Reliability Diagram (sebelum vs sesudah kalibrasi pada Fold 3 Jul)
@@ -301,7 +301,7 @@ def simpan_plot_kalibrasi_dan_biaya(
         )
 
     fig.tight_layout(w_pad=1.5)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path
@@ -309,8 +309,8 @@ def simpan_plot_kalibrasi_dan_biaya(
 
 def jalankan_kalibrasi_dan_keputusan(save_json_flag: bool = True) -> dict[str, Any]:
     """Jalankan evaluasi kalibrasi kronologis (Fit F1–F2 -> Eval F3) & aturan biaya 2f."""
-    set_global_seed(SEED)
-    ensure_dirs()
+    atur_seed_global(SEED)
+    siapkan_direktori()
 
     oof_path = CACHE_DIR / "task2_oof.npz"
     if not oof_path.exists():
@@ -318,7 +318,7 @@ def jalankan_kalibrasi_dan_keputusan(save_json_flag: bool = True) -> dict[str, A
             "Cache OOF tidak ditemukan. Jalankan `python kode/src/klasifikasi/models.py` terlebih dahulu."
         )
 
-    with timer("2f.1 Kalibrasi kronologis (Fit Mei–Jun -> Eval Jul)"):
+    with catat_waktu("2f.1 Kalibrasi kronologis (Fit Mei–Jun -> Eval Jul)"):
         oof = np.load(oof_path)
         p_cal_fit = np.concatenate([oof["ensemble_f1"], oof["ensemble_f2"]])
         y_cal_fit = np.concatenate([oof["y_f1"], oof["y_f2"]])
@@ -363,7 +363,7 @@ def jalankan_kalibrasi_dan_keputusan(save_json_flag: bool = True) -> dict[str, A
         p_f3_best = preds_f3[terbaik_nama]
         print(f"  Kalibrator terpilih: {terbaik_nama}")
 
-    with timer("2f.2 Evaluasi aturan keputusan berbasis biaya vs baseline"):
+    with catat_waktu("2f.2 Evaluasi aturan keputusan berbasis biaya vs baseline"):
         # Cari ambang F1 optimal pada Fold 1–2 (bebas mengintip Fold 3)
         best_t_f1, best_f1 = 0.25, -1.0
         for t in np.linspace(0.05, 0.70, 66):
@@ -377,7 +377,7 @@ def jalankan_kalibrasi_dan_keputusan(save_json_flag: bool = True) -> dict[str, A
         best_k, best_k_cost = 1.0, float("inf")
         for k_cand in np.linspace(0.75, 1.25, 21):
             flg_c = aturan_keputusan_bayes(p_f12_cal, nom_cal_fit, pengali_ambang=float(k_cand))
-            c_val = fraud_total_cost(y_cal_fit, flg_c, nom_cal_fit)
+            c_val = hitung_biaya_total_fraud(y_cal_fit, flg_c, nom_cal_fit)
             if c_val < best_k_cost:
                 best_k_cost, best_k = c_val, float(k_cand)
 
@@ -450,7 +450,7 @@ def jalankan_kalibrasi_dan_keputusan(save_json_flag: bool = True) -> dict[str, A
         },
     }
     if save_json_flag:
-        save_json(hasil, RESULTS_DIR / "task2_calibration.json")
+        tulis_json(hasil, RESULTS_DIR / "task2_calibration.json")
         print("[SAVED] task2_calibration.json & cache/task2_fold3_calibrated.npz")
     return hasil
 

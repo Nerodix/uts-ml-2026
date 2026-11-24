@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
-from src.config import FIGURES_DIR, FRAUD_REVIEW_COST_IDR, N_JOBS, SEED, ensure_dirs
+from src.config import FIGURES_DIR, FRAUD_REVIEW_COST_IDR, N_JOBS, SEED, siapkan_direktori
 from src.klasifikasi.preprocess import (
     ANONYMOUS_V_COLUMNS,
     CATEGORICAL_COLUMNS,
@@ -33,14 +33,14 @@ from src.klasifikasi.preprocess import (
     SIGNAL_V_COLUMNS,
     TARGET_COLUMN,
     TIME_COLUMN,
-    align_categorical_dtypes,
+    samakan_tipe_kategori,
     tambah_flag_kualitas_data,
 )
 from src.utils import (
     LEBAR_GAMBAR,
     angka_id,
-    configure_plotting,
-    fraud_total_cost,
+    atur_gaya_grafik,
+    hitung_biaya_total_fraud,
     label_batang,
     miring,
     sumbu_koma,
@@ -95,9 +95,9 @@ def _evaluasi_probabilitas(
 
     # Aturan keputusan Bayes untuk probabilitas: tandai jika p * nominal > 25.000
     flagged = (p * nom > FRAUD_REVIEW_COST_IDR).astype(np.int8)
-    cost = fraud_total_cost(y, flagged, nom, review_cost=FRAUD_REVIEW_COST_IDR)
-    cost_none = fraud_total_cost(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
-    cost_all = fraud_total_cost(y, np.ones_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost = hitung_biaya_total_fraud(y, flagged, nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost_none = hitung_biaya_total_fraud(y, np.zeros_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
+    cost_all = hitung_biaya_total_fraud(y, np.ones_like(y), nom, review_cost=FRAUD_REVIEW_COST_IDR)
     n_flagged = int(flagged.sum())
     n_tp = int(((y == 1) & (flagged == 1)).sum())
     n_pos = int(y.sum())
@@ -127,7 +127,7 @@ def _latih_dan_evaluasi_probe(
 ) -> tuple[lgb.LGBMClassifier, np.ndarray, dict[str, float]]:
     """Latih probe LightGBM pada daftar fitur tertentu dan kembalikan prediksi & metrik."""
     cat_in_fitur = [c for c in CATEGORICAL_COLUMNS if c in fitur]
-    tr_al, [va_al] = align_categorical_dtypes(tr_df, [va_df], cat_cols=cat_in_fitur)
+    tr_al, [va_al] = samakan_tipe_kategori(tr_df, [va_df], cat_cols=cat_in_fitur)
     clf = lgb.LGBMClassifier(**_probe_lgbm_params(seed))
     clf.fit(tr_al[list(fitur)], tr_al[TARGET_COLUMN].to_numpy(dtype=np.int8))
     prob = clf.predict_proba(va_al[list(fitur)])[:, 1]
@@ -208,7 +208,7 @@ def ukur_dampak_leakage_review(
     p_bg_review = float(split.tr_df.loc[split.tr_df[TARGET_COLUMN] == 0, "flag_review_manual"].mean())
     va_sim = split.va_df.copy()
     va_sim["flag_review_manual"] = (rng.random(len(va_sim)) < p_bg_review).astype(np.int8)
-    _, [va_sim_al] = align_categorical_dtypes(split.tr_df, [va_sim], cat_cols=CATEGORICAL_COLUMNS)
+    _, [va_sim_al] = samakan_tipe_kategori(split.tr_df, [va_sim], cat_cols=CATEGORICAL_COLUMNS)
     prob_sim = clf_bocor.predict_proba(va_sim_al[fitur_bocor])[:, 1]
     metrik_bocor_sim = _evaluasi_probabilitas(split.y_va, prob_sim, split.nom_va)
 
@@ -274,7 +274,7 @@ def ukur_dampak_label_delay(
     val_aug_late = df[df["waktu_dt"] >= pd.Timestamp("2025-08-15")].copy()
     val_aug_nonqris_late = val_aug_late[val_aug_late["kanal"] != "qris"].copy()
 
-    tr_al, aligned_vals = align_categorical_dtypes(
+    tr_al, aligned_vals = samakan_tipe_kategori(
         tr_jj,
         [val_jul, val_aug_all, val_aug_late, val_aug_nonqris_late],
         cat_cols=CATEGORICAL_COLUMNS,
@@ -448,7 +448,7 @@ def simpan_plot_dampak_audit(
     Path
         Path berkas gambar yang tersimpan.
     """
-    configure_plotting()
+    atur_gaya_grafik()
     fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 2.75))
 
     # Panel A: Dampak Leakage flag_review_manual (PR-AUC & Biaya dalam juta Rp)
@@ -536,7 +536,7 @@ def simpan_plot_dampak_audit(
     ax1.set_title("(b) Seleksi fitur v & indikator pola nominal QRIS")
 
     fig.tight_layout(w_pad=1.6)
-    ensure_dirs()
+    siapkan_direktori()
     fig.savefig(output_path)
     plt.close(fig)
     return output_path

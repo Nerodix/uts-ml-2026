@@ -50,22 +50,22 @@ from src.config import (  # noqa: E402
     REGRESI_TRAIN_PATH,
     RESULTS_DIR,
     SEED,
-    ensure_dirs,
+    siapkan_direktori,
 )
 from src.regresi.features import Task1FeaturePipeline  # noqa: E402
 from src.regresi.preprocess import CATEGORICAL_COLUMNS, TARGET_COLUMN, fix_target_unit_errors  # noqa: E402
 from src.regresi.validation import TimeFold, buat_fold_waktu  # noqa: E402
 from src.utils import (  # noqa: E402
     LEBAR_GAMBAR,
-    configure_plotting,
+    atur_gaya_grafik,
     label_batang,
     miring,
-    p90_coverage,
-    pinball_loss,
-    save_json,
-    set_global_seed,
+    hitung_cakupan_p90,
+    hitung_pinball_loss,
+    tulis_json,
+    atur_seed_global,
     sumbu_koma,
-    timer,
+    catat_waktu,
 )
 
 LOW_CARD_CATS = ("layanan", "hub_asal", "pulau_tujuan")
@@ -126,9 +126,9 @@ def _eval_fold_preds(y_true: np.ndarray, p50: np.ndarray, p90: np.ndarray) -> di
     """Hitung metrik standar satu fold (Pinball P50, Pinball P90, Coverage, MAE)."""
     p90_safe = np.maximum(p50, p90)
     return {
-        "pinball_p50": round(pinball_loss(y_true, p50, 0.5), 4),
-        "pinball_p90": round(pinball_loss(y_true, p90_safe, 0.9), 4),
-        "p90_coverage": round(p90_coverage(y_true, p90_safe), 4),
+        "pinball_p50": round(hitung_pinball_loss(y_true, p50, 0.5), 4),
+        "pinball_p90": round(hitung_pinball_loss(y_true, p90_safe, 0.9), 4),
+        "p90_coverage": round(hitung_cakupan_p90(y_true, p90_safe), 4),
         "mae_p50": round(float(mean_absolute_error(y_true, p50)), 4),
     }
 
@@ -254,7 +254,7 @@ def _select_model_cols(X: pd.DataFrame, drop_mitra_id: bool) -> list[str]:
     return list(X.columns)
 
 
-def fit_predict_lgbm(
+def latih_prediksi_lgbm(
     X_tr: pd.DataFrame,
     y_tr: np.ndarray,
     X_va: pd.DataFrame,
@@ -295,7 +295,7 @@ def _prep_catboost_df(df: pd.DataFrame, cols: list[str]) -> tuple[pd.DataFrame, 
     return out, cat_cols
 
 
-def fit_predict_catboost(
+def latih_prediksi_catboost(
     X_tr: pd.DataFrame,
     y_tr: np.ndarray,
     X_va: pd.DataFrame,
@@ -327,7 +327,7 @@ def fit_predict_catboost(
     return p50, np.maximum(p50, p90), model
 
 
-def fit_predict_xgboost(
+def latih_prediksi_xgboost(
     X_tr: pd.DataFrame,
     y_tr: np.ndarray,
     X_va: pd.DataFrame,
@@ -370,7 +370,7 @@ def optimasi_bobot_ensemble(
     w0 = np.full(k, 1.0 / k, dtype=np.float64)
 
     def obj(w: np.ndarray) -> float:
-        return pinball_loss(y_true, P @ w, q)
+        return hitung_pinball_loss(y_true, P @ w, q)
 
     res = minimize(
         obj,
@@ -400,8 +400,8 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
         Hasil lengkap tuning tiap model, perbandingan akhir, bobot ensemble,
         serta menyimpan prediksi OOF ke ``kode/cache/task1_oof.npz``.
     """
-    ensure_dirs()
-    with timer("Menyiapkan 3 fold Time CV dengan feature pipeline anti-leakage"):
+    siapkan_direktori()
+    with catat_waktu("Menyiapkan 3 fold Time CV dengan feature pipeline anti-leakage"):
         folds = siapkan_semua_fold(train)
 
     tuning_log: dict[str, list[dict[str, Any]]] = {}
@@ -411,7 +411,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
     # ------------------------------------------------------------------
     # 0. Baseline sederhana
     # ------------------------------------------------------------------
-    with timer("Model 0: Baseline Group Quantile (layanan x pulau_tujuan)"):
+    with catat_waktu("Model 0: Baseline Group Quantile (layanan x pulau_tujuan)"):
         base_folds, base_oof = [], []
         for pf in folds:
             m = BaselineGroupQuantile().fit(pf.tr_raw, pf.y_tr)
@@ -426,7 +426,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
     # ------------------------------------------------------------------
     # 1. Model Linear: Log-Target Ridge (tuning alpha di dalam Time CV)
     # ------------------------------------------------------------------
-    with timer("Model 1: Log-Target Ridge Quantile (tuning alpha)"):
+    with catat_waktu("Model 1: Log-Target Ridge Quantile (tuning alpha)"):
         ridge_grid = [1.0, 10.0, 100.0, 500.0]
         ridge_trials: list[dict[str, Any]] = []
         best_ridge_score = float("inf")
@@ -463,7 +463,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
     # ------------------------------------------------------------------
     # 2. LightGBM Quantile (tuning target transform, drop_mitra_id, & hyperparams)
     # ------------------------------------------------------------------
-    with timer("Model 2: LightGBM Quantile (tuning di dalam 3-fold Time CV)"):
+    with catat_waktu("Model 2: LightGBM Quantile (tuning di dalam 3-fold Time CV)"):
         lgb_configs: list[dict[str, Any]] = [
             {
                 "label": "raw_with_mitra_d63",
@@ -499,7 +499,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
         for cfg in lgb_configs:
             f_res, f_oof = [], []
             for pf in folds:
-                p50, p90, _, _ = fit_predict_lgbm(
+                p50, p90, _, _ = latih_prediksi_lgbm(
                     pf.X_tr,
                     pf.y_tr,
                     pf.X_va,
@@ -532,7 +532,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
     # ------------------------------------------------------------------
     # 3. CatBoost MultiQuantile (tuning depth & regularization)
     # ------------------------------------------------------------------
-    with timer("Model 3: CatBoost MultiQuantile (tuning di dalam 3-fold Time CV)"):
+    with catat_waktu("Model 3: CatBoost MultiQuantile (tuning di dalam 3-fold Time CV)"):
         cb_configs: list[dict[str, Any]] = [
             {
                 "label": "cb_log_d6_l2_5",
@@ -556,7 +556,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
         for cfg in cb_configs:
             f_res, f_oof = [], []
             for pf in folds:
-                p50, p90, _ = fit_predict_catboost(
+                p50, p90, _ = latih_prediksi_catboost(
                     pf.X_tr,
                     pf.y_tr,
                     pf.X_va,
@@ -589,7 +589,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
     # ------------------------------------------------------------------
     # 4. XGBoost MultiQuantile (tuning max_depth & min_child_weight)
     # ------------------------------------------------------------------
-    with timer("Model 4: XGBoost MultiQuantile (tuning di dalam 3-fold Time CV)"):
+    with catat_waktu("Model 4: XGBoost MultiQuantile (tuning di dalam 3-fold Time CV)"):
         xgb_configs: list[dict[str, Any]] = [
             {
                 "label": "xgb_log_d6_mcw50",
@@ -613,7 +613,7 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
         for cfg in xgb_configs:
             f_res, f_oof = [], []
             for pf in folds:
-                p50, p90, _ = fit_predict_xgboost(
+                p50, p90, _ = latih_prediksi_xgboost(
                     pf.X_tr,
                     pf.y_tr,
                     pf.X_va,
@@ -704,14 +704,14 @@ def jalankan_perbandingan_dan_tuning(train: pd.DataFrame) -> dict[str, Any]:
         "tuning_log": tuning_log,
         "figure": fig_path.name,
     }
-    save_json(result, RESULTS_DIR / "task1_models.json")
+    tulis_json(result, RESULTS_DIR / "task1_models.json")
     return result
 
 
 def plot_perbandingan_model(summary_table: dict[str, Any]) -> Path:
     """Buat grafik 2-panel perbandingan pinball loss P50 dan P90 semua model pada validasi berbasis waktu."""
-    ensure_dirs()
-    configure_plotting()
+    siapkan_direktori()
+    atur_gaya_grafik()
 
     order = [
         ("baseline", "Model\ndasar"),
@@ -757,7 +757,7 @@ def plot_perbandingan_model(summary_table: dict[str, Any]) -> Path:
 
 def main() -> None:
     """Jalankan benchmark & tuning Tugas 1c dari CLI."""
-    set_global_seed(SEED)
+    atur_seed_global(SEED)
     train = pd.read_csv(REGRESI_TRAIN_PATH)
     res = jalankan_perbandingan_dan_tuning(train)
 
