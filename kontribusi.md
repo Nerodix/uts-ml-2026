@@ -28,9 +28,14 @@ Setiap butir dikerjakan di *fork* masing-masing anggota dan digabungkan ke `main
   - [#12](https://github.com/Nerodix/uts-ml-2026/pull/12): laporan Tugas 3a–3b
 
 ### Rainaldi Pakpahan (`@rainaldipakpahan`)
-- **Peran:** *(akan dilengkapi sesuai PR)*.
+- **Peran:** Tugas 1a–1b (audit data, prapemrosesan tanpa kebocoran data, dan desain validasi); laporan Tugas 1 dan perapian grafik; Tugas 2c–2g (fitur perilaku, ketidakseimbangan kelas dan model, adaptasi pergeseran pola, kalibrasi dan aturan keputusan, analisis galat, dan `prediksi_klasifikasi.csv`); Tugas 3c–3g (perbandingan metode, pemilihan K, stabilitas, profil segmen, deteksi anomali, `cluster.csv`, dan integrasi `run_all.py`); bagian laporan untuk butir 2c–2g dan 3c–3g.
 - **Pull Requests:**
-  - *(akan diisi)*
+  - [#2](https://github.com/Nerodix/uts-ml-2026/pull/2): Tugas 1a–1b (audit data, prapemrosesan, dan validasi berbasis waktu)
+  - [#4](https://github.com/Nerodix/uts-ml-2026/pull/4): laporan Tugas 1 dan perapian grafik
+  - [#6](https://github.com/Nerodix/uts-ml-2026/pull/6): Tugas 2c–2g (fitur perilaku, ketidakseimbangan kelas, adaptasi pergeseran pola, kalibrasi, SHAP, dan `prediksi_klasifikasi.csv`)
+  - [#9](https://github.com/Nerodix/uts-ml-2026/pull/9): Tugas 3c–3g (metode, pemilihan K, stabilitas, profil segmen, anomali, `cluster.csv`, dan `run_all.py`)
+  - [#11](https://github.com/Nerodix/uts-ml-2026/pull/11): laporan Tugas 2c–2g
+  - [#13](https://github.com/Nerodix/uts-ml-2026/pull/13): laporan Tugas 3c–3g
 
 ## Penggunaan Alat AI
 
@@ -56,4 +61,4 @@ Kedua anggota bertanggung jawab atas seluruh isi kode dan laporan.
 
 Seluruh anggota telah meninjau, memahami, dan menyetujui pembagian kontribusi di atas:
 - [x] Firdaus Arif Ramadhani (`101032300131`)
-- [ ] Rainaldi Pakpahan (`101032300084`)
+- [x] Rainaldi Pakpahan (`101032300084`)
