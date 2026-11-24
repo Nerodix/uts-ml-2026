@@ -1,17 +1,49 @@
-"""Seleksi fitur kuantitatif 59 kandidat & pembobotan blok Tugas 3b."""
+"""Seleksi fitur berbasis bukti kuantitatif & pembobotan blok Tugas 3b (Segmentasi Pelanggan).
+
+Modul ini:
+1. Menyaring seluruh 59 fitur kandidat pada pelanggan non-bot (118.200 baris) memakai
+   tiga bukti independen: koherensi multivariat Spearman ``sum_r2``, prediktabilitas
+   silang *out-of-fold* Ridge ``R^2``, dan koefisien bimodalitas Sarle (``BC``).
+2. Mengungkap 21 fitur *noise* murni:
+   - 15 kolom anonim ``n01–n15`` (pola 7 keluarga distribusi sintetis berulang, termasuk
+     jebakan bimodal berbentuk-U ``n06`` & ``n13`` dengan ``BC ≈ 0,666`` namun ``R^2 ≈ 0``).
+   - 6 kolom bernama tanpa sinyal segmen pada pelanggan normal: ``kota_tier``,
+     ``jumlah_alamat``, ``rating_beri_rata2``, serta 3 pendeteksi khusus bot
+     (``durasi_sesi_menit``, ``klik_iklan_30h``, ``wishlist``).
+3. Memangkas 4 fitur redundan/deterministik (``belanja_90h``, ``belanja_30h``,
+   ``frekuensi_30h``, ``rasio_konversi``), 7 kategori berprofil datar, serta indikator
+   ``is_web`` yang identik secara perilaku dengan ``android``.
+4. Menerapkan pembobotan blok seimbang pada 26 fitur terpilih (13 perilaku inti w=1,0;
+   3 CLR waktu belanja w=1,0; ``is_ios`` w=0,50; 9 CLR kategori informatif w=0,45)
+   serta proyeksi PCA-12 untuk pemodelan kovarians penuh yang stabil.
+5. Membuktikan dampak seleksi & pembobotan fitur lewat ablasi 5 konfigurasi pada K=6.
+
+Jalankan langsung:
+    python kode/src/clustering/features.py --run-ablation --save-json
+"""
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
+from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.linear_model import Ridge
-from sklearn.metrics import r2_score
+from sklearn.metrics import (
+    adjusted_rand_score,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+    r2_score,
+    silhouette_score,
+)
+from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 
@@ -21,6 +53,7 @@ if str(KODE_DIR) not in sys.path:
 
 from src.clustering.preprocess import (  # noqa: E402
     ANONYMOUS_N_COLUMNS,
+    BOT_INTEGRITY_COLUMNS,
     ID_COLUMN,
     INFORMATIVE_KATEGORI_COLUMNS,
     LOW_SIGNAL_KATEGORI_COLUMNS,
@@ -29,9 +62,20 @@ from src.clustering.preprocess import (  # noqa: E402
     PORSI_KATEGORI_COLUMNS,
     REDUNDANT_COLUMNS,
     deteksi_anomali_bot_aktivitas,
+    muat_data_clustering,
     praproses_fitur_kanonik,
 )
-from src.config import SEED  # noqa: E402
+from src.config import FIGURES_DIR, RESULTS_DIR, SEED, ensure_dirs  # noqa: E402
+from src.utils import (  # noqa: E402
+    LEBAR_GAMBAR,
+    configure_plotting,
+    label_batang,
+    miring,
+    save_json,
+    set_global_seed,
+    sumbu_koma,
+    timer,
+)
 
 # 13 fitur perilaku inti tertransformasi (bobot blok = 1,0)
 SELECTED_CORE_BEHAVIOR_COLS: tuple[str, ...] = (
@@ -275,3 +319,264 @@ def screen_all_features(df_normal: pd.DataFrame, seed: int = SEED) -> list[dict[
     return rows
 
 
+def _eval_clustering_config(
+    X: np.ndarray,
+    k: int = 6,
+    gmm_reg: float = 1e-2,
+    seed: int = SEED,
+) -> dict[str, Any]:
+    """Evaluasi satu konfigurasi matriks fitur pada K=6 dengan K-Means dan GMM."""
+    km1 = KMeans(n_clusters=k, n_init=10, random_state=seed).fit(X)
+    km2 = KMeans(n_clusters=k, n_init=10, random_state=seed + 57).fit(X)
+    g1 = GaussianMixture(
+        n_components=k,
+        covariance_type="full",
+        reg_covar=gmm_reg,
+        n_init=2,
+        max_iter=200,
+        random_state=seed,
+    ).fit(X)
+    g2 = GaussianMixture(
+        n_components=k,
+        covariance_type="full",
+        reg_covar=gmm_reg,
+        n_init=2,
+        max_iter=200,
+        random_state=seed + 57,
+    ).fit(X)
+    l_g1 = g1.predict(X)
+    l_g2 = g2.predict(X)
+    sizes_pct = sorted(
+        (pd.Series(l_g1).value_counts(normalize=True) * 100.0).round(1).tolist(),
+        reverse=True,
+    )
+    return {
+        "n_dims": int(X.shape[1]),
+        "km_silhouette": float(silhouette_score(X, km1.labels_, sample_size=10_000, random_state=seed)),
+        "gmm_silhouette": float(silhouette_score(X, l_g1, sample_size=10_000, random_state=seed)),
+        "km_calinski_harabasz": float(calinski_harabasz_score(X, km1.labels_)),
+        "km_davies_bouldin": float(davies_bouldin_score(X, km1.labels_)),
+        "km_gmm_agreement_ari": float(adjusted_rand_score(km1.labels_, l_g1)),
+        "km_seed_stability_ari": float(adjusted_rand_score(km1.labels_, km2.labels_)),
+        "gmm_seed_stability_ari": float(adjusted_rand_score(l_g1, l_g2)),
+        "gmm_mean_max_posterior": float(g1.predict_proba(X).max(axis=1).mean()),
+        "gmm_sizes_pct": sizes_pct,
+    }
+
+
+def run_feature_ablation(
+    df_normal: pd.DataFrame,
+    feat_bundle: dict[str, Any],
+    seed: int = SEED,
+) -> dict[str, dict[str, Any]]:
+    """Bandingkan 5 konfigurasi seleksi & pembobotan fitur pada subsampel 30.000 pelanggan non-bot."""
+    rng = np.random.default_rng(seed)
+    idx_sub = rng.choice(len(df_normal), size=30_000, replace=False)
+    sub_raw = df_normal.iloc[idx_sub]
+    df_canon_sub = feat_bundle["df_canon"].iloc[idx_sub]
+
+    # 1. All 59 raw (naif: termasuk n01-n15, 6 named noise, 4 redundant, fillna(0), OHE perangkat)
+    raw_df = sub_raw.drop(columns=[ID_COLUMN]).copy()
+    raw_df["rata2_keranjang"] = raw_df["rata2_keranjang"].fillna(0.0)
+    raw_df = pd.get_dummies(raw_df, columns=["perangkat"], drop_first=False, dtype=np.float64)
+    X_all_59 = StandardScaler().fit_transform(raw_df.to_numpy(dtype=np.float64))
+
+    # 2. Drop n01-n15 saja (masih simpan 6 named noise, 4 redundant, OHE perangkat, 16 raw kat)
+    no_n_df = raw_df.drop(columns=list(ANONYMOUS_N_COLUMNS))
+    X_drop_n = StandardScaler().fit_transform(no_n_df.to_numpy(dtype=np.float64))
+
+    # 3. 26D terpilih tanpa pembobotan blok (seluruh 26 fitur bobot 1,0)
+    X_26_unw = StandardScaler().fit_transform(
+        df_canon_sub[list(SELECTED_26_COLS)].to_numpy(dtype=np.float64)
+    )
+
+    # 4. 26D terpilih + pembobotan blok seimbang
+    X_26_w = feat_bundle["X_weighted_26d"][idx_sub]
+
+    # 5. Proyeksi PCA-12 dari 26D terbobot
+    Z_pca12 = feat_bundle["Z_pca"][idx_sub]
+
+    configs = [
+        ("all_59_raw", X_all_59, 1e-2),
+        ("drop_n15_only", X_drop_n, 1e-2),
+        ("selected_26d_unweighted", X_26_unw, 1e-2),
+        ("selected_26d_weighted", X_26_w, 1e-2),
+        ("selected_pca12", Z_pca12, 1e-3),
+    ]
+    results: dict[str, dict[str, Any]] = {}
+    for name, mat, reg in configs:
+        results[name] = _eval_clustering_config(mat, k=6, gmm_reg=reg, seed=seed)
+    return results
+
+
+def buat_grafik_seleksi_fitur(
+    screening: list[dict[str, Any]],
+    ablation: dict[str, dict[str, Any]],
+    out_path: Path,
+) -> None:
+    """Buat grafik 2-panel Tugas 3b: penyaringan fitur (termasuk jebakan n06/n13) & ablasi."""
+    configure_plotting()
+    fig, axes = plt.subplots(1, 2, figsize=(LEBAR_GAMBAR, 3.05), constrained_layout=True)
+
+    # Panel A: OOF Ridge R^2 vs Sarle Bimodality Coefficient (mengungkap jebakan n06 & n13!)
+    ax = axes[0]
+    group_styles = {
+        "selected_core_behavior": ("#2B6CB0", "o", "Inti & waktu terpilih"),
+        "selected_time_clr": ("#2B6CB0", "o", None),
+        "selected_device_ios": ("#2B6CB0", "o", None),
+        "selected_category_clr": ("#2F855A", "s", "Kategori informatif (9)"),
+        "dropped_low_signal_category": ("#68D391", "^", "Kategori datar (7)"),
+        "dropped_redundant": ("#D69E2E", "D", "Redundan/deterministik (4)"),
+        "dropped_bot_only_detector": ("#DD6B20", "P", "Khusus bot / noise bernama (6)"),
+        "dropped_named_noise": ("#DD6B20", "P", None),
+        "dropped_anonymous_noise": ("#C53030", "X", "Noise anonim n01–n15 (15)"),
+    }
+    seen_labels: set[str] = set()
+    for row in screening:
+        color, marker, lbl = group_styles[row["status"]]
+        show_lbl = lbl if (lbl is not None and lbl not in seen_labels) else None
+        if show_lbl is not None:
+            seen_labels.add(show_lbl)
+        ax.scatter(
+            row["sarle_bimodality"],
+            row["oof_ridge_r2"],
+            color=color,
+            marker=marker,
+            s=28,
+            alpha=0.88,
+            edgecolors="white",
+            linewidths=0.35,
+            label=show_lbl,
+            zorder=3,
+        )
+
+    # Anotasi jebakan bimodal n06 & n13 serta batas bimodalitas Sarle
+    ax.axvline(0.555, color="#718096", linestyle="--", linewidth=0.8)
+    ax.annotate(
+        "Jebakan bimodal\nn06 & n13\n(BC=0,67; R²≈0)",
+        xy=(0.666, 0.005),
+        xytext=(0.645, 0.28),
+        fontsize=5.8,
+        color="#9B2C2C",
+        arrowprops={"arrowstyle": "->", "color": "#9B2C2C", "lw": 0.7},
+        bbox={"boxstyle": "round,pad=0.2", "facecolor": "#FFF5F5", "edgecolor": "#FEB2B2", "lw": 0.5},
+    )
+    ax.text(0.545, 0.99, "Batas bimodal\nSarle (0,555)", fontsize=5.6, color="#4A5568", va="top", ha="right")
+
+    ax.set_xlabel("Koefisien bimodalitas Sarle (univariat)")
+    ax.set_ylabel(f"Prediktabilitas silang OOF {miring('Ridge')} $R^2$")
+    ax.set_title("(a) Penyaringan 59 Fitur: Sinyal vs Jebakan Noise")
+    ax.set_xlim(0.28, 0.88)
+    ax.set_ylim(-0.04, 1.05)
+    sumbu_koma(ax, "xy")
+    ax.legend(loc="upper right", fontsize=5.5, handletextpad=0.3, borderpad=0.25)
+
+    # Panel B: Ablasi 5 konfigurasi fitur pada K=6 (Silhouette KM & Kesepakatan KM-GMM ARI)
+    ax = axes[1]
+    order = [
+        ("all_59_raw", "Semua 59\nmentah"),
+        ("drop_n15_only", "Buang\nn01–n15"),
+        ("selected_26d_unweighted", "26D bersih\ntanpa bobot"),
+        ("selected_26d_weighted", "26D bersih\nterbobot"),
+        ("selected_pca12", "PCA-12\n(terpilih)"),
+    ]
+    x_pos = np.arange(len(order))
+    sil_vals = [ablation[k]["km_silhouette"] for k, _ in order]
+    ari_vals = [ablation[k]["km_gmm_agreement_ari"] for k, _ in order]
+    w = 0.37
+
+    b1 = ax.bar(x_pos - w / 2, sil_vals, width=w, color="#2B6CB0", label=f"{miring('Silhouette')} K-Means")
+    b2 = ax.bar(x_pos + w / 2, ari_vals, width=w, color="#2F855A", label="Kesepakatan KM–GMM (ARI)")
+    label_batang(ax, b1, desimal=3, ukuran=5.6)
+    label_batang(ax, b2, desimal=2, ukuran=5.6)
+
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([lbl for _, lbl in order], fontsize=6.2)
+    ax.set_ylim(0, 1.04)
+    ax.set_ylabel("Skor evaluasi (K = 6)")
+    ax.set_title("(b) Dampak Seleksi & Pembobotan Fitur pada K = 6")
+    sumbu_koma(ax, "y")
+    ax.legend(loc="upper left", fontsize=6.0)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=300)
+    plt.close(fig)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Task 3b: Feature screening, weighting & ablation.")
+    parser.add_argument("--run-ablation", action="store_true", help="Run 5-config feature ablation at K=6.")
+    parser.add_argument("--save-json", action="store_true", help="Save compact JSON report to kode/results/.")
+    args = parser.parse_args()
+
+    set_global_seed(SEED)
+    ensure_dirs()
+
+    with timer("Task 3b: Feature Selection & Block Weighting"):
+        df = muat_data_clustering()
+        bundle = build_clustering_features(df, n_pca_components=DEFAULT_N_PCA, seed=SEED)
+        screening = screen_all_features(bundle["df_normal"], seed=SEED)
+
+        ablation: dict[str, dict[str, Any]] = {}
+        if args.run_ablation:
+            ablation = run_feature_ablation(bundle["df_normal"], bundle, seed=SEED)
+
+        # Ringkas statistik penyaringan per kategori status
+        by_status: dict[str, list[dict[str, Any]]] = {}
+        for row in screening:
+            by_status.setdefault(row["status"], []).append(row)
+
+        status_summary: dict[str, dict[str, Any]] = {}
+        for st, items in sorted(by_status.items()):
+            status_summary[st] = {
+                "count": len(items),
+                "max_oof_r2": max(r["oof_ridge_r2"] for r in items),
+                "max_spearman_sum_r2": max(r["spearman_sum_r2"] for r in items),
+                "max_sarle_bimodality": max(r["sarle_bimodality"] for r in items),
+                "features": [r["feature"] for r in items],
+            }
+
+        # Soroti jebakan bimodal n06 & n13 secara eksplisit
+        bimodal_trap = [r for r in screening if r["feature"] in ("n06", "n13")]
+
+        report: dict[str, Any] = {
+            "n_total_raw_features": len(screening),
+            "n_selected_transformed_dims": len(SELECTED_26_COLS),
+            "n_pca_dims": DEFAULT_N_PCA,
+            "pca_cumulative_variance_ratio": bundle["pca_cumulative_variance_ratio"],
+            "pca_explained_variance_ratio": bundle["pca_explained_variance_ratio"],
+            "block_weights": bundle["block_weights"],
+            "block_variance_share_pct": bundle["block_variance_share_pct"],
+            "bot_only_detectors_kept_for_3g": list(BOT_INTEGRITY_COLUMNS[1:]),
+            "status_summary": status_summary,
+            "bimodal_noise_trap": bimodal_trap,
+            "screening_table": screening,
+            "ablation_k6": ablation,
+        }
+
+        if ablation:
+            fig_path = FIGURES_DIR / "task3_3b_feature_selection.png"
+            buat_grafik_seleksi_fitur(screening, ablation, fig_path)
+            print(f"Figur         : {fig_path.name}")
+
+        if args.save_json:
+            save_json(report, RESULTS_DIR / "task3_features.json")
+
+        print(
+            f"Seleksi fitur : 59 kandidat -> 26D terbobot -> PCA-{DEFAULT_N_PCA} "
+            f"(varians kumulatif {bundle['pca_cumulative_variance_ratio']*100:.1f}%)"
+        )
+        print("Pangsa varians blok 26D:", {k: round(v, 1) for k, v in bundle["block_variance_share_pct"].items()})
+        if ablation:
+            print("Ablasi K=6:")
+            for cfg, m in ablation.items():
+                print(
+                    f"  {cfg:<24s} ({m['n_dims']:2d}D): KM_sil={m['km_silhouette']:.4f}, "
+                    f"GMM_sil={m['gmm_silhouette']:.4f}, KM-GMM_ARI={m['km_gmm_agreement_ari']:.4f}, "
+                    f"GMM_stab={m['gmm_seed_stability_ari']:.4f}"
+                )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
