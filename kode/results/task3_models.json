@@ -1,0 +1,394 @@
+{
+  "k_selection": {
+    "gap_n_refs": 8,
+    "k_scan": [
+      {
+        "gap": 1.5368886325526514,
+        "gap_gain": 0.0,
+        "gap_sk": 0.0019107932929760961,
+        "gmm_aic": 1180404.7300391966,
+        "gmm_bic": 1181936.551743822,
+        "gmm_dbic": 0.0,
+        "gmm_mean_max_posterior": 0.9776431335600263,
+        "gmm_seed_stability_ari": 0.9987423452378286,
+        "gmm_silhouette": 0.1457479743802943,
+        "gmm_sizes_pct": [
+          58.13,
+          41.87
+        ],
+        "k": 2,
+        "km_calinski_harabasz": 6477.662934537996,
+        "km_davies_bouldin": 2.203836804285006,
+        "km_gmm_agreement_ari": 0.356937071440291,
+        "km_seed_stability_ari": 0.999198712765619,
+        "km_silhouette": 0.15216335284573387
+      },
+      {
+        "gap": 1.6109721099903531,
+        "gap_gain": 0.07408347743770172,
+        "gap_sk": 0.0020975852835703997,
+        "gmm_aic": 1167951.3541818487,
+        "gmm_bic": 1170253.318290457,
+        "gmm_dbic": -11683.233453365043,
+        "gmm_mean_max_posterior": 0.97086171445108,
+        "gmm_seed_stability_ari": 1.0,
+        "gmm_silhouette": 0.17110273078567567,
+        "gmm_sizes_pct": [
+          42.36,
+          37.53,
+          20.11
+        ],
+        "k": 3,
+        "km_calinski_harabasz": 6498.464105309849,
+        "km_davies_bouldin": 1.8397873539685035,
+        "km_gmm_agreement_ari": 0.9061800772635269,
+        "km_seed_stability_ari": 1.0,
+        "km_silhouette": 0.17268211944783535
+      },
+      {
+        "gap": 1.6244273582147493,
+        "gap_gain": 0.013455248224396144,
+        "gap_sk": 0.002870889196734012,
+        "gmm_aic": 1161741.5183785018,
+        "gmm_bic": 1164813.624891093,
+        "gmm_dbic": -5439.693399363896,
+        "gmm_mean_max_posterior": 0.9498124509482505,
+        "gmm_seed_stability_ari": 0.8280843434914149,
+        "gmm_silhouette": 0.15115720020642026,
+        "gmm_sizes_pct": [
+          37.66,
+          25.11,
+          20.13,
+          17.11
+        ],
+        "k": 4,
+        "km_calinski_harabasz": 5366.048436514306,
+        "km_davies_bouldin": 1.9836190277286478,
+        "km_gmm_agreement_ari": 0.5707208708690734,
+        "km_seed_stability_ari": 0.9992377836211699,
+        "km_silhouette": 0.15459552550710323
+      },
+      {
+        "gap": 1.6433173761323498,
+        "gap_gain": 0.018890017917600588,
+        "gap_sk": 0.0023392934158625958,
+        "gmm_aic": 1157677.226906197,
+        "gmm_bic": 1161519.475822771,
+        "gmm_dbic": -3294.1490683220327,
+        "gmm_mean_max_posterior": 0.9327259877417547,
+        "gmm_seed_stability_ari": 0.9950269632562343,
+        "gmm_silhouette": 0.1407923787958163,
+        "gmm_sizes_pct": [
+          24.92,
+          24.57,
+          20.22,
+          17.09,
+          13.2
+        ],
+        "k": 5,
+        "km_calinski_harabasz": 4793.344654543392,
+        "km_davies_bouldin": 2.2227867036691227,
+        "km_gmm_agreement_ari": 0.852313632508246,
+        "km_seed_stability_ari": 0.9973746505938966,
+        "km_silhouette": 0.14205664532904066
+      },
+      {
+        "gap": 1.6666056876727726,
+        "gap_gain": 0.023288311540422768,
+        "gap_sk": 0.003908147738422856,
+        "gmm_aic": 1155257.5673202865,
+        "gmm_bic": 1159869.9586408436,
+        "gmm_dbic": -1649.5171819273382,
+        "gmm_mean_max_posterior": 0.9329793759767537,
+        "gmm_seed_stability_ari": 0.9994163692649597,
+        "gmm_silhouette": 0.14709010830151106,
+        "gmm_sizes_pct": [
+          25.02,
+          24.97,
+          20.16,
+          12.96,
+          9.13,
+          7.76
+        ],
+        "k": 6,
+        "km_calinski_harabasz": 4421.199071647636,
+        "km_davies_bouldin": 1.987693280462718,
+        "km_gmm_agreement_ari": 0.8474643392986838,
+        "km_seed_stability_ari": 0.9975583757616446,
+        "km_silhouette": 0.14836157358636445
+      },
+      {
+        "gap": 1.6713619096449346,
+        "gap_gain": 0.004756221972161967,
+        "gap_sk": 0.0028462577173194972,
+        "gmm_aic": 1154441.488979069,
+        "gmm_bic": 1159824.022703609,
+        "gmm_dbic": -45.9359372346662,
+        "gmm_mean_max_posterior": 0.9016470348297955,
+        "gmm_seed_stability_ari": 0.9927795454037193,
+        "gmm_silhouette": 0.1404015047144353,
+        "gmm_sizes_pct": [
+          24.96,
+          20.28,
+          17.83,
+          12.62,
+          9.14,
+          7.61,
+          7.57
+        ],
+        "k": 7,
+        "km_calinski_harabasz": 4005.5169523504783,
+        "km_davies_bouldin": 2.0923826893165467,
+        "km_gmm_agreement_ari": 0.8543046994695461,
+        "km_seed_stability_ari": 0.9954437445456538,
+        "km_silhouette": 0.1403210264936938
+      },
+      {
+        "gap": 1.6692015041553372,
+        "gap_gain": -0.0021604054895973945,
+        "gap_sk": 0.0033534343829104436,
+        "gmm_aic": 1153669.3802985458,
+        "gmm_bic": 1159822.0564270685,
+        "gmm_dbic": -1.9662765404209495,
+        "gmm_mean_max_posterior": 0.8432897313134053,
+        "gmm_seed_stability_ari": 0.11049899245897403,
+        "gmm_silhouette": 0.12056731622354373,
+        "gmm_sizes_pct": [
+          20.32,
+          18.5,
+          17.35,
+          12.52,
+          9.02,
+          7.69,
+          7.55,
+          7.04
+        ],
+        "k": 8,
+        "km_calinski_harabasz": 3651.316242339826,
+        "km_davies_bouldin": 2.2307549255911874,
+        "km_gmm_agreement_ari": 0.7824251156359187,
+        "km_seed_stability_ari": 0.9904740671908695,
+        "km_silhouette": 0.1256439811020634
+      }
+    ],
+    "n_subsample_gap": 10000,
+    "n_subsample_kscan": 35000,
+    "selected_k": 6
+  },
+  "method_comparison_k6": {
+    "hdbscan_diagnostics": {
+      "pca5_mcs100_ms5": {
+        "core_only_silhouette": 0.31337449202231843,
+        "min_cluster_size": 100,
+        "min_samples": 5,
+        "n_clusters_found": 2,
+        "n_dims": 5,
+        "noise_pct": 79.73
+      },
+      "pca5_mcs150_ms10": {
+        "core_only_silhouette": 0.5084269773265239,
+        "min_cluster_size": 150,
+        "min_samples": 10,
+        "n_clusters_found": 3,
+        "n_dims": 5,
+        "noise_pct": 86.62
+      },
+      "pca8_mcs250_ms25": {
+        "core_only_silhouette": null,
+        "min_cluster_size": 250,
+        "min_samples": 25,
+        "n_clusters_found": 0,
+        "n_dims": 8,
+        "noise_pct": 100.0
+      }
+    },
+    "k": 6,
+    "n_subsample": 30000,
+    "n_ward_hdbscan_subsample": 12000,
+    "pairwise_ari_matrix": {
+      "BIRCH_PCA12": {
+        "BIRCH_PCA12": 1.0,
+        "GMM_diag_PCA12": 0.7554,
+        "GMM_full_26D": 0.7489,
+        "GMM_full_PCA12": 0.7731,
+        "KMeans_26D": 0.7384,
+        "KMeans_PCA12": 0.735,
+        "Ward_PCA12": 0.7577
+      },
+      "GMM_diag_PCA12": {
+        "BIRCH_PCA12": 0.7554,
+        "GMM_diag_PCA12": 1.0,
+        "GMM_full_26D": 0.8327,
+        "GMM_full_PCA12": 0.8669,
+        "KMeans_26D": 0.8331,
+        "KMeans_PCA12": 0.8284,
+        "Ward_PCA12": 0.882
+      },
+      "GMM_full_26D": {
+        "BIRCH_PCA12": 0.7489,
+        "GMM_diag_PCA12": 0.8327,
+        "GMM_full_26D": 1.0,
+        "GMM_full_PCA12": 0.8935,
+        "KMeans_26D": 0.8344,
+        "KMeans_PCA12": 0.821,
+        "Ward_PCA12": 0.8473
+      },
+      "GMM_full_PCA12": {
+        "BIRCH_PCA12": 0.7731,
+        "GMM_diag_PCA12": 0.8669,
+        "GMM_full_26D": 0.8935,
+        "GMM_full_PCA12": 1.0,
+        "KMeans_26D": 0.855,
+        "KMeans_PCA12": 0.8482,
+        "Ward_PCA12": 0.8759
+      },
+      "KMeans_26D": {
+        "BIRCH_PCA12": 0.7384,
+        "GMM_diag_PCA12": 0.8331,
+        "GMM_full_26D": 0.8344,
+        "GMM_full_PCA12": 0.855,
+        "KMeans_26D": 1.0,
+        "KMeans_PCA12": 0.977,
+        "Ward_PCA12": 0.9229
+      },
+      "KMeans_PCA12": {
+        "BIRCH_PCA12": 0.735,
+        "GMM_diag_PCA12": 0.8284,
+        "GMM_full_26D": 0.821,
+        "GMM_full_PCA12": 0.8482,
+        "KMeans_26D": 0.977,
+        "KMeans_PCA12": 1.0,
+        "Ward_PCA12": 0.9177
+      },
+      "Ward_PCA12": {
+        "BIRCH_PCA12": 0.7577,
+        "GMM_diag_PCA12": 0.882,
+        "GMM_full_26D": 0.8473,
+        "GMM_full_PCA12": 0.8759,
+        "KMeans_26D": 0.9229,
+        "KMeans_PCA12": 0.9177,
+        "Ward_PCA12": 1.0
+      }
+    },
+    "partition_methods": {
+      "BIRCH_PCA12": {
+        "calinski_harabasz_pca12": 3407.5371499260978,
+        "davies_bouldin_pca12": 2.098096953617658,
+        "mean_consensus_ari": 0.7514,
+        "n_clusters": 6,
+        "silhouette_26d": 0.09534413112895093,
+        "silhouette_pca12": 0.12455470116289294,
+        "sizes_pct": [
+          26.1,
+          24.76,
+          20.37,
+          12.09,
+          8.66,
+          8.02
+        ]
+      },
+      "GMM_diag_PCA12": {
+        "calinski_harabasz_pca12": 3712.502318553397,
+        "davies_bouldin_pca12": 1.914797181483461,
+        "mean_consensus_ari": 0.8331,
+        "mean_max_posterior": 0.9099688501716148,
+        "n_clusters": 6,
+        "silhouette_26d": 0.11118998043285391,
+        "silhouette_pca12": 0.14508117374863866,
+        "sizes_pct": [
+          26.84,
+          26.47,
+          19.93,
+          12.02,
+          7.5,
+          7.24
+        ]
+      },
+      "GMM_full_26D": {
+        "calinski_harabasz_pca12": 3663.7365126094824,
+        "davies_bouldin_pca12": 2.012410184831598,
+        "mean_consensus_ari": 0.8296,
+        "mean_max_posterior": 0.9505473152736988,
+        "n_clusters": 6,
+        "silhouette_26d": 0.10948665664540098,
+        "silhouette_pca12": 0.1411165336473287,
+        "sizes_pct": [
+          24.74,
+          24.74,
+          20.31,
+          12.97,
+          9.35,
+          7.89
+        ]
+      },
+      "GMM_full_PCA12": {
+        "calinski_harabasz_pca12": 3713.1915394991247,
+        "davies_bouldin_pca12": 1.9807788248839169,
+        "mean_consensus_ari": 0.8521,
+        "mean_max_posterior": 0.9353783038956046,
+        "n_clusters": 6,
+        "silhouette_26d": 0.11093086401539343,
+        "silhouette_pca12": 0.14481005232004862,
+        "sizes_pct": [
+          25.03,
+          24.91,
+          20.1,
+          12.94,
+          9.24,
+          7.79
+        ]
+      },
+      "KMeans_26D": {
+        "calinski_harabasz_pca12": 3801.7401280669683,
+        "davies_bouldin_pca12": 1.984042233258539,
+        "mean_consensus_ari": 0.8601,
+        "n_clusters": 6,
+        "silhouette_26d": 0.11241820591419956,
+        "silhouette_pca12": 0.1469929747595089,
+        "sizes_pct": [
+          23.97,
+          22.61,
+          20.32,
+          13.92,
+          9.88,
+          9.3
+        ]
+      },
+      "KMeans_PCA12": {
+        "calinski_harabasz_pca12": 3803.8437042553433,
+        "davies_bouldin_pca12": 1.9855621455512154,
+        "mean_consensus_ari": 0.8546,
+        "n_clusters": 6,
+        "silhouette_26d": 0.11220804837433755,
+        "silhouette_pca12": 0.14699946484380658,
+        "sizes_pct": [
+          24.0,
+          22.36,
+          20.3,
+          14.15,
+          9.88,
+          9.32
+        ]
+      },
+      "Ward_PCA12": {
+        "calinski_harabasz_pca12": 3786.7319272596364,
+        "davies_bouldin_pca12": 1.949896874440978,
+        "mean_consensus_ari": 0.8672,
+        "n_clusters": 6,
+        "silhouette_26d": 0.11348630250445697,
+        "silhouette_pca12": 0.14816913860750677,
+        "sizes_pct": [
+          25.24,
+          23.92,
+          20.36,
+          13.18,
+          8.69,
+          8.61
+        ]
+      }
+    }
+  },
+  "selected_k": 6,
+  "selected_method": "GMM_full_26D",
+  "selection_rationale": "K=6 dipilih karena pertemuan empat kriteria independen: siku penurunan BIC (anjlok >35x dari K=6 ke K=7 lalu mendatar), puncak lokal Silhouette K-Means & GMM, lonjakan marginal tertinggi Gap Statistic, stabilitas seed GMM >0,999, dan kesepakatan antar-metode tinggi (ARI 0,83–0,89). GMM Full Covariance pada 26D terpilih dibanding K-Means/Ward karena memodelkan kovarians elips dan bobot proporsi tak-sama tiap segmen (mean max posterior ~0,95)."
+}
