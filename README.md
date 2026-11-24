@@ -28,3 +28,7 @@ Repositori kelompok untuk Ujian Tengah Semester (UTS) mata kuliah Machine Learni
 ## Reproduksi
 
 Lihat panduan lengkap, versi pustaka, *seed*, dan perintah tunggal reproduksi di [`kode/README.md`](kode/README.md).
+
+## Diagram Alur
+
+Diagram alur *pipeline* (satu alur umum, ringkasan tiap tugas, dan rincian tiap butir soal) tersedia di papan FigJam [Alur Umum Pipeline UTS ML](https://www.figma.com/board/cJ9pRoFQd8qn5P4u622eAd/Alur-Umum-Pipeline-UTS-ML). Diagram ini hanya pendamping; angka dan penjelasan lengkap tetap mengacu pada [`laporan.pdf`](laporan.pdf).
