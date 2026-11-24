@@ -1,0 +1,178 @@
+{
+  "kalibrator_terpilih": "beta_calibration",
+  "parameter_final_3fold": {
+    "a_log_p": 1.1971112930068089,
+    "b_neg_log_1mp": 0.516893793606082,
+    "intercept": 1.0750427185366258
+  },
+  "pengali_bayes_empiris_f12": 1.1,
+  "perbandingan_aturan_keputusan": {
+    "ambang_tetap_05": {
+      "f1": 0.8012718600953895,
+      "flag_rate_pct": 0.5503114610004969,
+      "missed_fraud_loss_idr": 36297200.0,
+      "n_flagged": 288,
+      "precision": 0.875,
+      "recall": 0.7390029325513197,
+      "review_cost_idr": 7200000.0,
+      "total_cost_idr": 43497200.0
+    },
+    "ambang_tetap_f1": {
+      "f1": 0.7938931297709924,
+      "flag_rate_pct": 0.5999923567852639,
+      "missed_fraud_loss_idr": 33387200.0,
+      "n_flagged": 314,
+      "precision": 0.8280254777070064,
+      "recall": 0.7624633431085044,
+      "review_cost_idr": 7850000.0,
+      "total_cost_idr": 41237200.0
+    },
+    "aturan_bayes_terkalibrasi": {
+      "f1": 0.5103305785123967,
+      "flag_rate_pct": 1.1980739098864983,
+      "missed_fraud_loss_idr": 17505600.0,
+      "n_flagged": 627,
+      "precision": 0.3939393939393939,
+      "recall": 0.7243401759530792,
+      "review_cost_idr": 15675000.0,
+      "total_cost_idr": 33180600.0
+    },
+    "aturan_bayes_tuned_k": {
+      "f1": 0.5176470588235295,
+      "flag_rate_pct": 1.1350173883135246,
+      "missed_fraud_loss_idr": 18271500.0,
+      "n_flagged": 594,
+      "precision": 0.4074074074074074,
+      "recall": 0.7096774193548387,
+      "review_cost_idr": 14850000.0,
+      "total_cost_idr": 33121500.0
+    },
+    "aturan_bayes_uncal": {
+      "f1": 0.5531428571428572,
+      "flag_rate_pct": 1.0203691672717545,
+      "missed_fraud_loss_idr": 18723000.0,
+      "n_flagged": 534,
+      "precision": 0.45318352059925093,
+      "recall": 0.7096774193548387,
+      "review_cost_idr": 13350000.0,
+      "total_cost_idr": 32073000.0
+    },
+    "oracle_teoritis": {
+      "f1": 0.934375,
+      "flag_rate_pct": 0.5713303015248213,
+      "missed_fraud_loss_idr": 547000.0,
+      "n_flagged": 299,
+      "precision": 1.0,
+      "recall": 0.8768328445747801,
+      "review_cost_idr": 7475000.0,
+      "total_cost_idr": 8022000.0
+    },
+    "tandai_nol": {
+      "f1": 0.0,
+      "flag_rate_pct": 0.0,
+      "missed_fraud_loss_idr": 347603000.0,
+      "n_flagged": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "review_cost_idr": 0.0,
+      "total_cost_idr": 347603000.0
+    },
+    "tandai_semua": {
+      "f1": 0.012947318462268629,
+      "flag_rate_pct": 100.0,
+      "missed_fraud_loss_idr": 0.0,
+      "n_flagged": 52334,
+      "precision": 0.0065158405625406045,
+      "recall": 1.0,
+      "review_cost_idr": 1308350000.0,
+      "total_cost_idr": 1308350000.0
+    }
+  },
+  "perbandingan_kalibrasi": {
+    "beta_calibration": {
+      "brier": 0.002064856226313998,
+      "cost_reduction_vs_none_pct": 90.45445522622072,
+      "ece_15bin": 0.00035694298393655486,
+      "flag_rate_pct": 1.1980739098864983,
+      "log_loss": 0.00922741080764055,
+      "mean_prob_pct": 0.683099575958398,
+      "n_flagged": 627,
+      "obs_rate_pct": 0.6515840562540605,
+      "params_f12": {
+        "a_log_p": 1.18011321808534,
+        "b_neg_log_1mp": 0.7695590520927837,
+        "intercept": 0.9956642193995676
+      },
+      "pr_auc": 0.8152087902683725,
+      "ratio_pred_to_obs": 1.0483675427626629,
+      "recall": 0.7243401759530792,
+      "roc_auc": 0.994047021782145,
+      "total_cost_idr": 33180600.0
+    },
+    "isotonic": {
+      "brier": 0.002075320582870279,
+      "cost_reduction_vs_none_pct": 90.34861609364707,
+      "ece_15bin": 0.00037434957114741024,
+      "flag_rate_pct": 1.1407497993656133,
+      "log_loss": 0.009276869485626558,
+      "mean_prob_pct": 0.6846140742546943,
+      "n_flagged": 597,
+      "obs_rate_pct": 0.6515840562540605,
+      "params_f12": {
+        "n_thresholds": 70
+      },
+      "pr_auc": 0.7986438397219521,
+      "ratio_pred_to_obs": 1.0506918757197998,
+      "recall": 0.7126099706744868,
+      "roc_auc": 0.9937863279926076,
+      "total_cost_idr": 33548500.0
+    },
+    "platt_scaling": {
+      "brier": 0.002063753377008855,
+      "cost_reduction_vs_none_pct": 90.30129199115082,
+      "ece_15bin": 0.000307252912539492,
+      "flag_rate_pct": 1.1732334619941147,
+      "log_loss": 0.009462906228342248,
+      "mean_prob_pct": 0.6798911725928121,
+      "n_flagged": 614,
+      "obs_rate_pct": 0.6515840562540605,
+      "params_f12": {
+        "intercept": 0.5754968293213768,
+        "slope": 1.0833869351250696
+      },
+      "pr_auc": 0.8152087902683725,
+      "ratio_pred_to_obs": 1.0434435374332032,
+      "recall": 0.7155425219941349,
+      "roc_auc": 0.994047021782145,
+      "total_cost_idr": 33713000.0
+    },
+    "uncalibrated": {
+      "brier": 0.0020963024149052737,
+      "cost_reduction_vs_none_pct": 90.77309459354494,
+      "ece_15bin": 0.000520293159696445,
+      "flag_rate_pct": 1.0203691672717545,
+      "log_loss": 0.009379062389939848,
+      "mean_prob_pct": 0.6221445222898718,
+      "n_flagged": 534,
+      "obs_rate_pct": 0.6515840562540605,
+      "pr_auc": 0.8152087902683725,
+      "ratio_pred_to_obs": 0.9548185169946672,
+      "recall": 0.7096774193548387,
+      "roc_auc": 0.994047021782145,
+      "total_cost_idr": 32073000.0
+    }
+  },
+  "ringkasan_penghematan_f3": {
+    "hemat_vs_tandai_nol_idr": 314422400.0,
+    "hemat_vs_tandai_nol_pct": 90.45445522622072,
+    "hemat_vs_tandai_semua_idr": 1275169400.0,
+    "hemat_vs_tandai_semua_pct": 97.46393549126763
+  },
+  "split_kalibrasi": {
+    "eval_period": "Fold 3 (Jul 2025)",
+    "fit_period": "Fold 1–2 (Mei–Jun 2025)",
+    "n_eval": 52334,
+    "n_fit": 102706
+  },
+  "threshold_f1_dari_f12": 0.32999999999999996
+}

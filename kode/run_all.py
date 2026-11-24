@@ -31,13 +31,8 @@ from src.config import (  # noqa: E402
     ensure_dirs,
 )
 from src.utils import collect_environment_info, save_json, set_global_seed, timer  # noqa: E402
-from src.validate_outputs import validate_all  # noqa: E402
 
-AVAILABLE_STAGES = ["audit", "regresi", "klasifikasi", "clustering", "validate"]
-
-# Tugas yang pipeline-nya sudah terintegrasi. Tambahkan "klasifikasi" / "clustering" di sini
-# (dan cabangnya di run_stage) saat PR tugas tersebut masuk, agar ikut divalidasi.
-TUGAS_SIAP = ["regresi"]
+AVAILABLE_STAGES = ["regresi", "klasifikasi", "clustering"]
 
 
 def check_environment(save_report: bool = True) -> int:
@@ -91,8 +86,15 @@ def run_stage(stage: str) -> int:
         _run_python_script("src/regresi/analysis.py")
         return 0
 
-    if stage == "validate":
-        return validate_all(TUGAS_SIAP)
+    if stage == "klasifikasi":
+        _run_python_script("src/klasifikasi/audit.py", ["--save-json"])
+        _run_python_script("src/klasifikasi/validation.py")
+        _run_python_script("src/klasifikasi/features.py", ["--run-ablation"])
+        _run_python_script("src/klasifikasi/models.py")
+        _run_python_script("src/klasifikasi/shift.py")
+        _run_python_script("src/klasifikasi/calibration.py")
+        _run_python_script("src/klasifikasi/analysis.py")
+        return 0
 
     # Tahap yang belum punya pipeline dilewati (bukan galat) supaya perintah tunggal tetap tuntas.
     print(f"[LEWATI] Tahap '{stage}' belum diimplementasikan (menyusul lewat PR tugas terkait).")
