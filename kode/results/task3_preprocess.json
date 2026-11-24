@@ -1,0 +1,237 @@
+{
+  "bot_prescreening": {
+    "bot_min_posterior": 0.9999999999810356,
+    "four_indicator_vote_counts": {
+      "0": 118161,
+      "1": 39,
+      "4": 1800
+    },
+    "gaps": {
+      "durasi_sesi_menit": {
+        "bot_max": 1.0,
+        "bot_median": 0.6,
+        "bot_min": 0.2,
+        "normal_max": 67.28,
+        "normal_median": 8.01,
+        "normal_min": 0.94,
+        "normal_q001": 1.7,
+        "normal_q999": 37.2740300000002
+      },
+      "klik_iklan_30h": {
+        "bot_max": 244.0,
+        "bot_median": 200.0,
+        "bot_min": 149.0,
+        "normal_max": 54.0,
+        "normal_median": 5.0,
+        "normal_min": 0.0,
+        "normal_q001": 0.0,
+        "normal_q999": 36.0
+      },
+      "sesi_per_minggu": {
+        "bot_max": 399.9,
+        "bot_median": 241.11,
+        "bot_min": 80.25,
+        "normal_max": 70.14,
+        "normal_median": 5.44,
+        "normal_min": 0.19,
+        "normal_q001": 0.43,
+        "normal_q999": 39.32408000000054
+      },
+      "wishlist": {
+        "bot_max": 185.0,
+        "bot_median": 150.0,
+        "bot_min": 114.0,
+        "normal_max": 89.0,
+        "normal_median": 9.0,
+        "normal_min": 0.0,
+        "normal_q001": 0.0,
+        "normal_q999": 56.0
+      }
+    },
+    "n_bot": 1800,
+    "n_normal": 118200,
+    "n_total": 120000,
+    "normal_max_posterior": 6.007865393240832e-191,
+    "pct_bot": 1.5
+  },
+  "canonical_transform": {
+    "imputed_median_idr": 187221.25726075043,
+    "n_missing_rata2_keranjang": 6647,
+    "n_rows": 118200,
+    "observed_median_idr": 183899.99999999985,
+    "pct_missing_rata2_keranjang": 5.623519458544839,
+    "ridge_imputation_r2": 0.326626030591017,
+    "skew_after": {
+      "frekuensi_90h": -0.18924941342540397,
+      "item_per_pesanan": 0.7578913864991583,
+      "lama_member_bulan": -0.5220353641421874,
+      "persen_cod": 0.07342630780768511,
+      "persen_flash_sale": 0.08324794477275874,
+      "persen_paylater": 0.6344467337200687,
+      "persen_voucher": 0.03503551643983408,
+      "rata2_keranjang": 0.292376983742325,
+      "recency_hari": 0.5846027921653068,
+      "retur_90h": 0.8123662715026535,
+      "sesi_per_minggu": -0.401346317670036,
+      "ulasan_90h": 0.5950944735261158,
+      "umur": 0.10098840574309816
+    },
+    "skew_before": {
+      "frekuensi_90h": 3.5352300038042017,
+      "item_per_pesanan": 3.4839617439992465,
+      "lama_member_bulan": 3.271727865382299,
+      "persen_cod": 0.7846938976075314,
+      "persen_flash_sale": 0.357060619641858,
+      "persen_paylater": 1.3199837814903148,
+      "persen_voucher": -0.00881002818112127,
+      "rata2_keranjang": 3.56827246899689,
+      "recency_hari": 7.955390638131612,
+      "retur_90h": 2.8214169031785308,
+      "sesi_per_minggu": 2.287171245770272,
+      "ulasan_90h": 2.9492931267499083,
+      "umur": 0.10098840574309816
+    },
+    "winsor_bounds": {
+      "frekuensi_90h": [
+        0.0,
+        99.0
+      ],
+      "item_per_pesanan": [
+        0.0,
+        24.0
+      ],
+      "lama_member_bulan": [
+        0.7,
+        165.80050000000338
+      ],
+      "rata2_keranjang": [
+        20600.0,
+        2619656.0000000377
+      ],
+      "recency_hari": [
+        0.7,
+        543.840300000002
+      ],
+      "retur_90h": [
+        0.0,
+        10.0
+      ],
+      "sesi_per_minggu": [
+        0.43,
+        39.32408000000054
+      ],
+      "ulasan_90h": [
+        0.0,
+        16.0
+      ]
+    }
+  },
+  "categorical_audit": {
+    "android_vs_web_mannwhitney_p": 0.26900378746197484,
+    "kota_tier": {
+      "1": {
+        "median_belanja_idr": 1126900.0,
+        "median_keranjang_idr": 182300.0,
+        "median_umur": 33.0,
+        "median_voucher": 0.51,
+        "n": 47263,
+        "pct": 39.98561759729272
+      },
+      "2": {
+        "median_belanja_idr": 1140200.0,
+        "median_keranjang_idr": 184500.0,
+        "median_umur": 33.0,
+        "median_voucher": 0.505,
+        "n": 41081,
+        "pct": 34.75549915397631
+      },
+      "3": {
+        "median_belanja_idr": 1144300.0,
+        "median_keranjang_idr": 185500.0,
+        "median_umur": 33.0,
+        "median_voucher": 0.507,
+        "n": 29856,
+        "pct": 25.258883248730964
+      }
+    },
+    "kota_tier_kruskal_H": 2.790216384897018,
+    "kota_tier_kruskal_p": 0.24780622415466838,
+    "perangkat": {
+      "android": {
+        "median_belanja_idr": 998700.0,
+        "median_cod": 0.277,
+        "median_keranjang_idr": 167600.0,
+        "median_umur": 32.0,
+        "median_voucher": 0.555,
+        "n": 76569,
+        "pct": 64.77918781725889
+      },
+      "ios": {
+        "median_belanja_idr": 1762050.0,
+        "median_cod": 0.201,
+        "median_keranjang_idr": 265450.0,
+        "median_umur": 36.0,
+        "median_voucher": 0.356,
+        "n": 31252,
+        "pct": 26.43993231810491
+      },
+      "web": {
+        "median_belanja_idr": 982800.0,
+        "median_cod": 0.277,
+        "median_keranjang_idr": 163900.0,
+        "median_umur": 32.0,
+        "median_voucher": 0.568,
+        "n": 10379,
+        "pct": 8.78087986463621
+      }
+    },
+    "perangkat_kruskal_H": 2496.523460974295,
+    "perangkat_kruskal_p": 0.0
+  },
+  "compositional_check": {
+    "porsi_jam_sum_max": 1.0001000000000002,
+    "porsi_jam_sum_min": 0.9998999999999998,
+    "porsi_jam_violations_gt_0p01": 0,
+    "porsi_kategori_sum_max": 1.0005,
+    "porsi_kategori_sum_min": 0.9995999999999997,
+    "porsi_kategori_violations_gt_0p01": 0,
+    "porsi_kategori_zero_rate_max_pct": 32.9492385786802,
+    "porsi_kategori_zero_rate_min_pct": 1.6269035532994924
+  },
+  "f0_continuity": {
+    "f0_ios_pct": 23.469234241010984,
+    "f0_median_recency": 38.5,
+    "f0_median_sesi": 2.51,
+    "f0_median_umur": 34.0,
+    "f1_ios_pct": 25.330673944992654,
+    "f1_median_recency": 30.0,
+    "f1_median_sesi": 2.97,
+    "f1_median_umur": 34.0,
+    "n_f0_non_bot": 6647,
+    "pct_f0_non_bot": 5.623519458544839
+  },
+  "schema": {
+    "belanja_zero_for_all_f0": true,
+    "exact_structural_missing_f0_eq_keranjang_na": true,
+    "missing_counts": {
+      "rata2_keranjang": 6736
+    },
+    "n_anonymous_cols_actual": 15,
+    "n_anonymous_cols_in_kamus": 10,
+    "n_cols": 60,
+    "n_duplicate_ids": 0,
+    "n_rows": 120000
+  },
+  "zero_cliff_experiment": {
+    "ari_naive_vs_canon_k6": 0.652684582785943,
+    "canon_k6_f0_concentration_in_top_cluster": 0.7820359281437126,
+    "canon_k6_max_f0_purity_in_cluster": 0.21544044869679974,
+    "canon_k6_silhouette": 0.12363062028912596,
+    "canon_log_gap_f0_to_f1_median": 0.07208704692167522,
+    "n_subsample": 30000,
+    "naive_k6_f0_concentration_in_top_cluster": 1.0,
+    "naive_k6_max_f0_purity_in_cluster": 1.0,
+    "naive_k6_silhouette": 0.13189995884990335,
+    "naive_log1p_gap_f0_to_f1_median": 12.067965083912192
+  }
+}
