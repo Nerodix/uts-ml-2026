@@ -1,4 +1,4 @@
-"""Pembentukan matriks fitur terpilih terbobot blok (26D) dan proyeksi PCA-12 Tugas 3b."""
+"""Seleksi fitur kuantitatif 59 kandidat & pembobotan blok Tugas 3b."""
 
 from __future__ import annotations
 
@@ -8,7 +8,11 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 from sklearn.decomposition import PCA
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score
+from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 
 KODE_DIR = Path(__file__).resolve().parents[2]
@@ -16,7 +20,14 @@ if str(KODE_DIR) not in sys.path:
     sys.path.insert(0, str(KODE_DIR))
 
 from src.clustering.preprocess import (  # noqa: E402
+    ANONYMOUS_N_COLUMNS,
+    ID_COLUMN,
     INFORMATIVE_KATEGORI_COLUMNS,
+    LOW_SIGNAL_KATEGORI_COLUMNS,
+    NOISE_NAMED_COLUMNS,
+    PORSI_JAM_COLUMNS,
+    PORSI_KATEGORI_COLUMNS,
+    REDUNDANT_COLUMNS,
     deteksi_anomali_bot_aktivitas,
     praproses_fitur_kanonik,
 )
@@ -69,6 +80,21 @@ BLOCK_WEIGHTS: dict[str, float] = {
 }
 
 DEFAULT_N_PCA = 12
+
+
+def _sarle_bimodality_coeff(x: np.ndarray) -> float:
+    """Hitung koefisien bimodalitas Sarle; nilai > 0,555 mengindikasikan bimodalitas univariat."""
+    arr = np.asarray(x, dtype=np.float64)
+    arr = arr[np.isfinite(arr)]
+    n = len(arr)
+    if n < 4:
+        return 0.0
+    skew = float(stats.skew(arr))
+    kurt = float(stats.kurtosis(arr, fisher=True))  # excess kurtosis
+    denom = kurt + 3.0 * ((n - 1) ** 2) / ((n - 2) * (n - 3))
+    if denom <= 0.0:
+        return 0.0
+    return float((skew * skew + 1.0) / denom)
 
 
 def build_clustering_features(
@@ -127,5 +153,125 @@ def build_clustering_features(
         "block_weights": dict(BLOCK_WEIGHTS),
         "block_variance_share_pct": block_var_shares,
     }
+
+
+def _classify_raw_feature(col: str) -> str:
+    """Kelompokkan status seleksi tiap kolom mentah untuk pelaporan transparan."""
+    if col in ANONYMOUS_N_COLUMNS:
+        return "dropped_anonymous_noise"
+    if col in ("durasi_sesi_menit", "klik_iklan_30h", "wishlist"):
+        return "dropped_bot_only_detector"
+    if col in NOISE_NAMED_COLUMNS:
+        return "dropped_named_noise"
+    if col in REDUNDANT_COLUMNS:
+        return "dropped_redundant"
+    if col in LOW_SIGNAL_KATEGORI_COLUMNS:
+        return "dropped_low_signal_category"
+    if col in INFORMATIVE_KATEGORI_COLUMNS:
+        return "selected_category_clr"
+    if col in PORSI_JAM_COLUMNS:
+        return "selected_time_clr"
+    if col == "perangkat":
+        return "selected_device_ios"
+    return "selected_core_behavior"
+
+
+def screen_all_features(df_normal: pd.DataFrame, seed: int = SEED) -> list[dict[str, Any]]:
+    """Saring seluruh 59 fitur kandidat pada pelanggan non-bot dengan 3 metrik kuantitatif."""
+    cand_cols = [c for c in df_normal.columns if c != ID_COLUMN]
+
+    # Bangun tabel numerik peringkat untuk evaluasi koherensi & OOF Ridge R^2 pada subsampel 25k
+    rng = np.random.default_rng(seed)
+    idx_sub = rng.choice(len(df_normal), size=25_000, replace=False)
+    sub = df_normal.iloc[idx_sub].copy()
+
+    num_mat = pd.DataFrame(index=sub.index)
+    for col in cand_cols:
+        if col == "perangkat":
+            num_mat[col] = (sub[col] == "ios").astype(np.float64)
+        else:
+            vals = sub[col].to_numpy(dtype=np.float64)
+            if np.isnan(vals).any():
+                vals = np.where(np.isnan(vals), float(np.nanmedian(vals)), vals)
+            num_mat[col] = vals
+
+    # 1. Matriks korelasi Spearman (pakai salinan writable untuk Pandas 3.x CoW)
+    corr_df = num_mat.corr(method="spearman")
+    corr_arr = corr_df.to_numpy(dtype=np.float64).copy()
+    np.fill_diagonal(corr_arr, 0.0)
+
+    # Basis pembanding koherensi: seluruh fitur non-anonim dan non-redundan
+    ref_cols = [
+        c
+        for c in cand_cols
+        if c not in ANONYMOUS_N_COLUMNS
+        and c not in REDUNDANT_COLUMNS
+        and c not in PORSI_KATEGORI_COLUMNS
+        and c not in PORSI_JAM_COLUMNS
+    ]
+    ref_idx = [cand_cols.index(c) for c in ref_cols]
+
+    # 2. Out-of-fold Ridge R^2 pada ruang rank-normalisasi (tahan skala & outlier Cauchy/Pareto!)
+    rank_mat = np.column_stack(
+        [stats.rankdata(num_mat[c].to_numpy(dtype=np.float64)) / (len(sub) + 1.0) for c in cand_cols]
+    )
+    rank_std = StandardScaler().fit_transform(rank_mat)
+
+    # Gunakan fitur bernama bersih (non-anonim, non-redundan, bukan kolom target sendiri)
+    clean_pred_base = [
+        c
+        for c in cand_cols
+        if c not in ANONYMOUS_N_COLUMNS and c not in REDUNDANT_COLUMNS
+    ]
+    kf = KFold(n_splits=3, shuffle=True, random_state=seed)
+
+    rows: list[dict[str, Any]] = []
+    for i, col in enumerate(cand_cols):
+        # Spearman sum_r2 terhadap kolom perilaku acuan (kecuali dirinya sendiri)
+        r_ref = np.array([corr_arr[i, j] for j in ref_idx if j != i], dtype=np.float64)
+        sum_r2 = float(np.sum(r_ref * r_ref))
+        # Korelasi terkuat terhadap semua kolom lain (termasuk redundansi)
+        abs_all = np.abs(corr_arr[i])
+        top_j = int(np.argmax(abs_all))
+        max_abs_r = float(abs_all[top_j])
+        top_partner = cand_cols[top_j]
+
+        # OOF Ridge R^2 (kecualikan blok komposisional identik agar sum=1 tidak memicu R^2=1 trivial)
+        exclude_set = {col}
+        if col in PORSI_KATEGORI_COLUMNS:
+            exclude_set.update(PORSI_KATEGORI_COLUMNS)
+        elif col in PORSI_JAM_COLUMNS:
+            exclude_set.update(PORSI_JAM_COLUMNS)
+        pred_idx = [cand_cols.index(c) for c in clean_pred_base if c not in exclude_set]
+
+        y = rank_std[:, i]
+        Xp = rank_std[:, pred_idx]
+        oof_pred = np.empty_like(y)
+        for tr, va in kf.split(Xp):
+            model = Ridge(alpha=50.0)
+            model.fit(Xp[tr], y[tr])
+            oof_pred[va] = model.predict(Xp[va])
+        oof_r2 = float(max(0.0, r2_score(y, oof_pred)))
+
+        # Sarle bimodality coefficient pada nilai mentah
+        raw_vals = df_normal[col].to_numpy(dtype=np.float64) if col != "perangkat" else (
+            df_normal[col] == "ios"
+        ).to_numpy(dtype=np.float64)
+        bc = _sarle_bimodality_coeff(raw_vals)
+
+        rows.append(
+            {
+                "feature": col,
+                "status": _classify_raw_feature(col),
+                "spearman_sum_r2": round(sum_r2, 5),
+                "max_abs_spearman": round(max_abs_r, 4),
+                "top_partner": top_partner,
+                "oof_ridge_r2": round(oof_r2, 5),
+                "sarle_bimodality": round(bc, 4),
+            }
+        )
+
+    rows.sort(key=lambda r: r["oof_ridge_r2"], reverse=True)
+    return rows
 
 
