@@ -1,0 +1,820 @@
+{
+  "ablation_k6": {
+    "all_59_raw": {
+      "gmm_mean_max_posterior": 0.9518858359410283,
+      "gmm_seed_stability_ari": 0.27918970306591034,
+      "gmm_silhouette": 0.0036120245766831835,
+      "gmm_sizes_pct": [
+        32.4,
+        24.1,
+        17.2,
+        12.0,
+        7.8,
+        6.5
+      ],
+      "km_calinski_harabasz": 945.9868632795007,
+      "km_davies_bouldin": 3.6267429629068157,
+      "km_gmm_agreement_ari": 0.32909596070715524,
+      "km_seed_stability_ari": 0.9983468582670886,
+      "km_silhouette": 0.04839280742211815,
+      "n_dims": 61
+    },
+    "drop_n15_only": {
+      "gmm_mean_max_posterior": 0.9647259223350209,
+      "gmm_seed_stability_ari": 0.41507068966795957,
+      "gmm_silhouette": 0.04141640048476383,
+      "gmm_sizes_pct": [
+        42.1,
+        16.4,
+        14.0,
+        11.3,
+        10.9,
+        5.4
+      ],
+      "km_calinski_harabasz": 1294.620300300712,
+      "km_davies_bouldin": 3.304286309435554,
+      "km_gmm_agreement_ari": 0.24664226199829795,
+      "km_seed_stability_ari": 0.7179921384368292,
+      "km_silhouette": 0.05275960039601607,
+      "n_dims": 46
+    },
+    "selected_26d_unweighted": {
+      "gmm_mean_max_posterior": 0.9217786300684842,
+      "gmm_seed_stability_ari": 0.8162249633534607,
+      "gmm_silhouette": 0.07608051365028318,
+      "gmm_sizes_pct": [
+        24.6,
+        20.4,
+        17.1,
+        16.9,
+        12.6,
+        8.3
+      ],
+      "km_calinski_harabasz": 1940.9486881536939,
+      "km_davies_bouldin": 2.726880753591331,
+      "km_gmm_agreement_ari": 0.7657617081981701,
+      "km_seed_stability_ari": 0.9994344176101535,
+      "km_silhouette": 0.08956201011767521,
+      "n_dims": 26
+    },
+    "selected_26d_weighted": {
+      "gmm_mean_max_posterior": 0.9505473152736988,
+      "gmm_seed_stability_ari": 0.9995144200449494,
+      "gmm_silhouette": 0.10948665664540098,
+      "gmm_sizes_pct": [
+        24.7,
+        24.7,
+        20.3,
+        13.0,
+        9.3,
+        7.9
+      ],
+      "km_calinski_harabasz": 2742.113871111217,
+      "km_davies_bouldin": 2.3560854178425283,
+      "km_gmm_agreement_ari": 0.8338880692283467,
+      "km_seed_stability_ari": 0.9986657126571723,
+      "km_silhouette": 0.11245216161044407,
+      "n_dims": 26
+    },
+    "selected_pca12": {
+      "gmm_mean_max_posterior": 0.9353783038956046,
+      "gmm_seed_stability_ari": 0.9995512128485224,
+      "gmm_silhouette": 0.14481005232004862,
+      "gmm_sizes_pct": [
+        25.0,
+        24.9,
+        20.1,
+        12.9,
+        9.2,
+        7.8
+      ],
+      "km_calinski_harabasz": 3803.8437042553433,
+      "km_davies_bouldin": 1.9855621455512154,
+      "km_gmm_agreement_ari": 0.8482392706260562,
+      "km_seed_stability_ari": 0.9984433194775548,
+      "km_silhouette": 0.14699946484380658,
+      "n_dims": 12
+    }
+  },
+  "bimodal_noise_trap": [
+    {
+      "feature": "n06",
+      "max_abs_spearman": 0.0173,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6666,
+      "spearman_sum_r2": 0.0007,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "n13",
+      "max_abs_spearman": 0.0192,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6655,
+      "spearman_sum_r2": 0.00096,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "klik_iklan_30h"
+    }
+  ],
+  "block_variance_share_pct": {
+    "category_clr_9": 10.084382348872598,
+    "core_behavior_13": 71.93249412090191,
+    "device_ios_1": 1.383317194632729,
+    "time_clr_3": 16.599806335592753
+  },
+  "block_weights": {
+    "category_clr_top9": 0.45,
+    "core_behavior": 1.0,
+    "device_ios": 0.5,
+    "time_clr": 1.0
+  },
+  "bot_only_detectors_kept_for_3g": [
+    "durasi_sesi_menit",
+    "klik_iklan_30h",
+    "wishlist"
+  ],
+  "n_pca_dims": 12,
+  "n_selected_transformed_dims": 26,
+  "n_total_raw_features": 59,
+  "pca_cumulative_variance_ratio": 0.8051795982143484,
+  "pca_explained_variance_ratio": [
+    0.16897295782327187,
+    0.13593648791532703,
+    0.07624060213847404,
+    0.06581179288810347,
+    0.06487402602172987,
+    0.06001445627344628,
+    0.04909440716538601,
+    0.04481079786684936,
+    0.038861585797905586,
+    0.035023641162377564,
+    0.033926492454541574,
+    0.031612350706935646
+  ],
+  "screening_table": [
+    {
+      "feature": "belanja_90h",
+      "max_abs_spearman": 0.9716,
+      "oof_ridge_r2": 0.9563,
+      "sarle_bimodality": 0.4392,
+      "spearman_sum_r2": 1.96007,
+      "status": "dropped_redundant",
+      "top_partner": "belanja_30h"
+    },
+    {
+      "feature": "rasio_konversi",
+      "max_abs_spearman": 0.7909,
+      "oof_ridge_r2": 0.90382,
+      "sarle_bimodality": 0.4892,
+      "spearman_sum_r2": 1.19107,
+      "status": "dropped_redundant",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "belanja_30h",
+      "max_abs_spearman": 0.9716,
+      "oof_ridge_r2": 0.90257,
+      "sarle_bimodality": 0.4534,
+      "spearman_sum_r2": 1.84661,
+      "status": "dropped_redundant",
+      "top_partner": "belanja_90h"
+    },
+    {
+      "feature": "frekuensi_30h",
+      "max_abs_spearman": 0.8659,
+      "oof_ridge_r2": 0.7499,
+      "sarle_bimodality": 0.4804,
+      "spearman_sum_r2": 1.43756,
+      "status": "dropped_redundant",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "frekuensi_90h",
+      "max_abs_spearman": 0.8659,
+      "oof_ridge_r2": 0.58014,
+      "sarle_bimodality": 0.5033,
+      "spearman_sum_r2": 0.89457,
+      "status": "selected_core_behavior",
+      "top_partner": "frekuensi_30h"
+    },
+    {
+      "feature": "ulasan_90h",
+      "max_abs_spearman": 0.7095,
+      "oof_ridge_r2": 0.50354,
+      "sarle_bimodality": 0.5039,
+      "spearman_sum_r2": 0.70495,
+      "status": "selected_core_behavior",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "persen_voucher",
+      "max_abs_spearman": 0.4696,
+      "oof_ridge_r2": 0.38391,
+      "sarle_bimodality": 0.5768,
+      "spearman_sum_r2": 0.76264,
+      "status": "selected_core_behavior",
+      "top_partner": "persen_flash_sale"
+    },
+    {
+      "feature": "persen_flash_sale",
+      "max_abs_spearman": 0.4696,
+      "oof_ridge_r2": 0.33434,
+      "sarle_bimodality": 0.5864,
+      "spearman_sum_r2": 0.68902,
+      "status": "selected_core_behavior",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "umur",
+      "max_abs_spearman": 0.429,
+      "oof_ridge_r2": 0.31841,
+      "sarle_bimodality": 0.4169,
+      "spearman_sum_r2": 0.66096,
+      "status": "selected_core_behavior",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "rata2_keranjang",
+      "max_abs_spearman": 0.6221,
+      "oof_ridge_r2": 0.29919,
+      "sarle_bimodality": 0.5547,
+      "spearman_sum_r2": 0.6312,
+      "status": "selected_core_behavior",
+      "top_partner": "belanja_90h"
+    },
+    {
+      "feature": "recency_hari",
+      "max_abs_spearman": 0.4248,
+      "oof_ridge_r2": 0.26788,
+      "sarle_bimodality": 0.4895,
+      "spearman_sum_r2": 0.49977,
+      "status": "selected_core_behavior",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "sesi_per_minggu",
+      "max_abs_spearman": 0.3497,
+      "oof_ridge_r2": 0.22764,
+      "sarle_bimodality": 0.4775,
+      "spearman_sum_r2": 0.39735,
+      "status": "selected_core_behavior",
+      "top_partner": "recency_hari"
+    },
+    {
+      "feature": "porsi_jam_malam",
+      "max_abs_spearman": 0.4088,
+      "oof_ridge_r2": 0.1785,
+      "sarle_bimodality": 0.5337,
+      "spearman_sum_r2": 0.43045,
+      "status": "selected_time_clr",
+      "top_partner": "porsi_jam_pagi"
+    },
+    {
+      "feature": "persen_cod",
+      "max_abs_spearman": 0.3386,
+      "oof_ridge_r2": 0.15046,
+      "sarle_bimodality": 0.5776,
+      "spearman_sum_r2": 0.31926,
+      "status": "selected_core_behavior",
+      "top_partner": "belanja_90h"
+    },
+    {
+      "feature": "lama_member_bulan",
+      "max_abs_spearman": 0.2776,
+      "oof_ridge_r2": 0.13623,
+      "sarle_bimodality": 0.4566,
+      "spearman_sum_r2": 0.25602,
+      "status": "selected_core_behavior",
+      "top_partner": "sesi_per_minggu"
+    },
+    {
+      "feature": "porsi_fashion",
+      "max_abs_spearman": 0.25,
+      "oof_ridge_r2": 0.10332,
+      "sarle_bimodality": 0.6005,
+      "spearman_sum_r2": 0.25029,
+      "status": "selected_category_clr",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "persen_paylater",
+      "max_abs_spearman": 0.199,
+      "oof_ridge_r2": 0.09899,
+      "sarle_bimodality": 0.7187,
+      "spearman_sum_r2": 0.19348,
+      "status": "selected_core_behavior",
+      "top_partner": "umur"
+    },
+    {
+      "feature": "perangkat",
+      "max_abs_spearman": 0.215,
+      "oof_ridge_r2": 0.09649,
+      "sarle_bimodality": 1.0,
+      "spearman_sum_r2": 0.19077,
+      "status": "selected_device_ios",
+      "top_partner": "rata2_keranjang"
+    },
+    {
+      "feature": "item_per_pesanan",
+      "max_abs_spearman": 0.2108,
+      "oof_ridge_r2": 0.0904,
+      "sarle_bimodality": 0.5043,
+      "spearman_sum_r2": 0.14323,
+      "status": "selected_core_behavior",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "porsi_jam_pagi",
+      "max_abs_spearman": 0.4088,
+      "oof_ridge_r2": 0.08699,
+      "sarle_bimodality": 0.5374,
+      "spearman_sum_r2": 0.1219,
+      "status": "selected_time_clr",
+      "top_partner": "porsi_jam_malam"
+    },
+    {
+      "feature": "porsi_makanan_minuman",
+      "max_abs_spearman": 0.25,
+      "oof_ridge_r2": 0.06085,
+      "sarle_bimodality": 0.597,
+      "spearman_sum_r2": 0.10623,
+      "status": "selected_category_clr",
+      "top_partner": "porsi_fashion"
+    },
+    {
+      "feature": "porsi_kecantikan",
+      "max_abs_spearman": 0.1872,
+      "oof_ridge_r2": 0.05762,
+      "sarle_bimodality": 0.602,
+      "spearman_sum_r2": 0.14331,
+      "status": "selected_category_clr",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "porsi_elektronik",
+      "max_abs_spearman": 0.1614,
+      "oof_ridge_r2": 0.05578,
+      "sarle_bimodality": 0.6039,
+      "spearman_sum_r2": 0.11983,
+      "status": "selected_category_clr",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "porsi_voucher_digital",
+      "max_abs_spearman": 0.1781,
+      "oof_ridge_r2": 0.05155,
+      "sarle_bimodality": 0.6058,
+      "spearman_sum_r2": 0.11303,
+      "status": "selected_category_clr",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "retur_90h",
+      "max_abs_spearman": 0.1791,
+      "oof_ridge_r2": 0.05143,
+      "sarle_bimodality": 0.5147,
+      "spearman_sum_r2": 0.08285,
+      "status": "selected_core_behavior",
+      "top_partner": "persen_paylater"
+    },
+    {
+      "feature": "porsi_jam_siang",
+      "max_abs_spearman": 0.3393,
+      "oof_ridge_r2": 0.04139,
+      "sarle_bimodality": 0.5225,
+      "spearman_sum_r2": 0.10446,
+      "status": "selected_time_clr",
+      "top_partner": "porsi_jam_malam"
+    },
+    {
+      "feature": "porsi_gadget_aksesoris",
+      "max_abs_spearman": 0.1261,
+      "oof_ridge_r2": 0.03403,
+      "sarle_bimodality": 0.6017,
+      "spearman_sum_r2": 0.05271,
+      "status": "selected_category_clr",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "porsi_ibu_bayi",
+      "max_abs_spearman": 0.1397,
+      "oof_ridge_r2": 0.03389,
+      "sarle_bimodality": 0.6125,
+      "spearman_sum_r2": 0.04605,
+      "status": "selected_category_clr",
+      "top_partner": "porsi_fashion"
+    },
+    {
+      "feature": "porsi_rumah_tangga",
+      "max_abs_spearman": 0.1655,
+      "oof_ridge_r2": 0.02828,
+      "sarle_bimodality": 0.593,
+      "spearman_sum_r2": 0.04772,
+      "status": "selected_category_clr",
+      "top_partner": "porsi_fashion"
+    },
+    {
+      "feature": "porsi_jam_sore",
+      "max_abs_spearman": 0.2725,
+      "oof_ridge_r2": 0.02458,
+      "sarle_bimodality": 0.5238,
+      "spearman_sum_r2": 0.04578,
+      "status": "selected_time_clr",
+      "top_partner": "porsi_jam_malam"
+    },
+    {
+      "feature": "porsi_perabot",
+      "max_abs_spearman": 0.1118,
+      "oof_ridge_r2": 0.02252,
+      "sarle_bimodality": 0.5935,
+      "spearman_sum_r2": 0.05155,
+      "status": "selected_category_clr",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "porsi_olahraga",
+      "max_abs_spearman": 0.0683,
+      "oof_ridge_r2": 0.00567,
+      "sarle_bimodality": 0.5858,
+      "spearman_sum_r2": 0.013,
+      "status": "dropped_low_signal_category",
+      "top_partner": "recency_hari"
+    },
+    {
+      "feature": "porsi_otomotif",
+      "max_abs_spearman": 0.0614,
+      "oof_ridge_r2": 0.00523,
+      "sarle_bimodality": 0.5907,
+      "spearman_sum_r2": 0.01328,
+      "status": "dropped_low_signal_category",
+      "top_partner": "recency_hari"
+    },
+    {
+      "feature": "porsi_kesehatan",
+      "max_abs_spearman": 0.0648,
+      "oof_ridge_r2": 0.00494,
+      "sarle_bimodality": 0.5954,
+      "spearman_sum_r2": 0.0146,
+      "status": "dropped_low_signal_category",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "porsi_hobi",
+      "max_abs_spearman": 0.0652,
+      "oof_ridge_r2": 0.00461,
+      "sarle_bimodality": 0.5849,
+      "spearman_sum_r2": 0.01061,
+      "status": "dropped_low_signal_category",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "porsi_lainnya",
+      "max_abs_spearman": 0.0847,
+      "oof_ridge_r2": 0.00448,
+      "sarle_bimodality": 0.5851,
+      "spearman_sum_r2": 0.01306,
+      "status": "dropped_low_signal_category",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "porsi_buku_alat_tulis",
+      "max_abs_spearman": 0.0671,
+      "oof_ridge_r2": 0.00408,
+      "sarle_bimodality": 0.5777,
+      "spearman_sum_r2": 0.01289,
+      "status": "dropped_low_signal_category",
+      "top_partner": "frekuensi_90h"
+    },
+    {
+      "feature": "porsi_pertanian",
+      "max_abs_spearman": 0.0579,
+      "oof_ridge_r2": 0.00388,
+      "sarle_bimodality": 0.5939,
+      "spearman_sum_r2": 0.01068,
+      "status": "dropped_low_signal_category",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "rating_beri_rata2",
+      "max_abs_spearman": 0.0182,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.4316,
+      "spearman_sum_r2": 0.00121,
+      "status": "dropped_named_noise",
+      "top_partner": "porsi_rumah_tangga"
+    },
+    {
+      "feature": "durasi_sesi_menit",
+      "max_abs_spearman": 0.0172,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.4699,
+      "spearman_sum_r2": 0.00069,
+      "status": "dropped_bot_only_detector",
+      "top_partner": "n04"
+    },
+    {
+      "feature": "kota_tier",
+      "max_abs_spearman": 0.0214,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6571,
+      "spearman_sum_r2": 0.00044,
+      "status": "dropped_named_noise",
+      "top_partner": "n14"
+    },
+    {
+      "feature": "jumlah_alamat",
+      "max_abs_spearman": 0.0178,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6012,
+      "spearman_sum_r2": 0.00086,
+      "status": "dropped_named_noise",
+      "top_partner": "porsi_jam_pagi"
+    },
+    {
+      "feature": "wishlist",
+      "max_abs_spearman": 0.0157,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.5025,
+      "spearman_sum_r2": 0.00099,
+      "status": "dropped_bot_only_detector",
+      "top_partner": "n02"
+    },
+    {
+      "feature": "klik_iklan_30h",
+      "max_abs_spearman": 0.022,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.5318,
+      "spearman_sum_r2": 0.00047,
+      "status": "dropped_bot_only_detector",
+      "top_partner": "n04"
+    },
+    {
+      "feature": "n01",
+      "max_abs_spearman": 0.014,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.5549,
+      "spearman_sum_r2": 0.00037,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "n04"
+    },
+    {
+      "feature": "n02",
+      "max_abs_spearman": 0.0187,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.4783,
+      "spearman_sum_r2": 0.00165,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "retur_90h"
+    },
+    {
+      "feature": "n03",
+      "max_abs_spearman": 0.0195,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.384,
+      "spearman_sum_r2": 0.00075,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "porsi_kecantikan"
+    },
+    {
+      "feature": "n04",
+      "max_abs_spearman": 0.022,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.0044,
+      "spearman_sum_r2": 0.00141,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "klik_iklan_30h"
+    },
+    {
+      "feature": "n05",
+      "max_abs_spearman": 0.0177,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6834,
+      "spearman_sum_r2": 0.00103,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "porsi_hobi"
+    },
+    {
+      "feature": "n06",
+      "max_abs_spearman": 0.0173,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6666,
+      "spearman_sum_r2": 0.0007,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "porsi_makanan_minuman"
+    },
+    {
+      "feature": "n07",
+      "max_abs_spearman": 0.0155,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.3352,
+      "spearman_sum_r2": 0.00064,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "n15"
+    },
+    {
+      "feature": "n08",
+      "max_abs_spearman": 0.0172,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.5554,
+      "spearman_sum_r2": 0.00074,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "n10"
+    },
+    {
+      "feature": "n09",
+      "max_abs_spearman": 0.0173,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.4183,
+      "spearman_sum_r2": 0.001,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "persen_voucher"
+    },
+    {
+      "feature": "n10",
+      "max_abs_spearman": 0.0172,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.3841,
+      "spearman_sum_r2": 0.00054,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "n08"
+    },
+    {
+      "feature": "n11",
+      "max_abs_spearman": 0.0161,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.0058,
+      "spearman_sum_r2": 0.00063,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "porsi_fashion"
+    },
+    {
+      "feature": "n12",
+      "max_abs_spearman": 0.0117,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6687,
+      "spearman_sum_r2": 0.00034,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "n03"
+    },
+    {
+      "feature": "n13",
+      "max_abs_spearman": 0.0192,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.6655,
+      "spearman_sum_r2": 0.00096,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "klik_iklan_30h"
+    },
+    {
+      "feature": "n14",
+      "max_abs_spearman": 0.0214,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.3348,
+      "spearman_sum_r2": 0.00146,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "kota_tier"
+    },
+    {
+      "feature": "n15",
+      "max_abs_spearman": 0.0213,
+      "oof_ridge_r2": 0.0,
+      "sarle_bimodality": 0.5546,
+      "spearman_sum_r2": 0.00094,
+      "status": "dropped_anonymous_noise",
+      "top_partner": "perangkat"
+    }
+  ],
+  "status_summary": {
+    "dropped_anonymous_noise": {
+      "count": 15,
+      "features": [
+        "n01",
+        "n02",
+        "n03",
+        "n04",
+        "n05",
+        "n06",
+        "n07",
+        "n08",
+        "n09",
+        "n10",
+        "n11",
+        "n12",
+        "n13",
+        "n14",
+        "n15"
+      ],
+      "max_oof_r2": 0.0,
+      "max_sarle_bimodality": 0.6834,
+      "max_spearman_sum_r2": 0.00165
+    },
+    "dropped_bot_only_detector": {
+      "count": 3,
+      "features": [
+        "durasi_sesi_menit",
+        "wishlist",
+        "klik_iklan_30h"
+      ],
+      "max_oof_r2": 0.0,
+      "max_sarle_bimodality": 0.5318,
+      "max_spearman_sum_r2": 0.00099
+    },
+    "dropped_low_signal_category": {
+      "count": 7,
+      "features": [
+        "porsi_olahraga",
+        "porsi_otomotif",
+        "porsi_kesehatan",
+        "porsi_hobi",
+        "porsi_lainnya",
+        "porsi_buku_alat_tulis",
+        "porsi_pertanian"
+      ],
+      "max_oof_r2": 0.00567,
+      "max_sarle_bimodality": 0.5954,
+      "max_spearman_sum_r2": 0.0146
+    },
+    "dropped_named_noise": {
+      "count": 3,
+      "features": [
+        "rating_beri_rata2",
+        "kota_tier",
+        "jumlah_alamat"
+      ],
+      "max_oof_r2": 0.0,
+      "max_sarle_bimodality": 0.6571,
+      "max_spearman_sum_r2": 0.00121
+    },
+    "dropped_redundant": {
+      "count": 4,
+      "features": [
+        "belanja_90h",
+        "rasio_konversi",
+        "belanja_30h",
+        "frekuensi_30h"
+      ],
+      "max_oof_r2": 0.9563,
+      "max_sarle_bimodality": 0.4892,
+      "max_spearman_sum_r2": 1.96007
+    },
+    "selected_category_clr": {
+      "count": 9,
+      "features": [
+        "porsi_fashion",
+        "porsi_makanan_minuman",
+        "porsi_kecantikan",
+        "porsi_elektronik",
+        "porsi_voucher_digital",
+        "porsi_gadget_aksesoris",
+        "porsi_ibu_bayi",
+        "porsi_rumah_tangga",
+        "porsi_perabot"
+      ],
+      "max_oof_r2": 0.10332,
+      "max_sarle_bimodality": 0.6125,
+      "max_spearman_sum_r2": 0.25029
+    },
+    "selected_core_behavior": {
+      "count": 13,
+      "features": [
+        "frekuensi_90h",
+        "ulasan_90h",
+        "persen_voucher",
+        "persen_flash_sale",
+        "umur",
+        "rata2_keranjang",
+        "recency_hari",
+        "sesi_per_minggu",
+        "persen_cod",
+        "lama_member_bulan",
+        "persen_paylater",
+        "item_per_pesanan",
+        "retur_90h"
+      ],
+      "max_oof_r2": 0.58014,
+      "max_sarle_bimodality": 0.7187,
+      "max_spearman_sum_r2": 0.89457
+    },
+    "selected_device_ios": {
+      "count": 1,
+      "features": [
+        "perangkat"
+      ],
+      "max_oof_r2": 0.09649,
+      "max_sarle_bimodality": 1.0,
+      "max_spearman_sum_r2": 0.19077
+    },
+    "selected_time_clr": {
+      "count": 4,
+      "features": [
+        "porsi_jam_malam",
+        "porsi_jam_pagi",
+        "porsi_jam_siang",
+        "porsi_jam_sore"
+      ],
+      "max_oof_r2": 0.1785,
+      "max_sarle_bimodality": 0.5374,
+      "max_spearman_sum_r2": 0.43045
+    }
+  }
+}
