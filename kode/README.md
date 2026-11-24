@@ -11,6 +11,7 @@ kode/
 ├── uv.lock                    # Lockfile dependensi persis
 ├── requirements.txt           # Versi paket terkunci untuk pip
 ├── run_all.py                 # Entrypoint perintah tunggal seluruh pipeline
+├── notebooks/                 # Notebook per tugas: pipeline butir demi butir beserta hasilnya
 └── src/
     ├── config.py              # Path, konstanta domain, dan SEED global (= 42)
     ├── utils.py               # Seeding, metrik UTS (pinball, coverage, cost), tema plot
@@ -65,6 +66,23 @@ python kode/run_all.py
 ```
 
 Perintah ini menjalankan seluruh pipeline Tugas 1 (`regresi`), Tugas 2 (`klasifikasi`), dan Tugas 3 (`clustering`) serta menghasilkan ketiga berkas prediksi (`prediksi_regresi.csv`, `prediksi_klasifikasi.csv`, `cluster.csv`) beserta seluruh berkas hasil di `kode/results/` dan grafik di `kode/figures/`. Untuk menjalankan satu tugas saja, gunakan misalnya `python kode/run_all.py --stages clustering`.
+
+## Notebook per Tugas
+
+Folder `kode/notebooks/` berisi satu notebook untuk setiap tugas. Setiap butir menjalankan modul yang sama dengan `run_all.py`, lalu menampilkan ringkasan angka dari `kode/results/` beserta grafiknya sehingga alur pengerjaan bisa diikuti butir demi butir.
+
+| Notebook | Isi |
+| --- | --- |
+| `tugas1_regresi.ipynb` | Tugas 1a s.d. 1f dan pemeriksaan `prediksi_regresi.csv` |
+| `tugas2_klasifikasi.ipynb` | Tugas 2a s.d. 2g dan pemeriksaan `prediksi_klasifikasi.csv` |
+| `tugas3_clustering.ipynb` | Tugas 3a s.d. 3g dan pemeriksaan `cluster.csv` |
+
+```bash
+cd kode
+uv run --with jupyterlab jupyter lab notebooks/
+```
+
+Jalankan sel secara berurutan dari atas karena butir 1e–1f dan 2f–2g memakai prediksi *out-of-fold* yang ditulis butir 1c dan 2d ke `kode/cache/`. Notebook menulis ulang `kode/results/`, `kode/figures/`, dan ketiga berkas prediksi; hasilnya sama dengan `run_all.py`, kecuali selisih pembulatan *floating point* yang sangat kecil (orde 10⁻⁶ atau lebih kecil) dan tidak mengubah kolom `tandai` maupun label klaster.
 
 ## Konvensi Grafik
 
