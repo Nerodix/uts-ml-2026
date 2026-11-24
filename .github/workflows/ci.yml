@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check Python syntax
+        run: |
+          python - <<'EOF'
+          import pathlib, py_compile
+          files = sorted(pathlib.Path("kode").rglob("*.py"))
+          for f in files:
+              py_compile.compile(str(f), doraise=True)
+          print(f"Syntax OK: {len(files)} Python files")
+          EOF
+
+      - name: Lint with Ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --select E4,E7,E9,F --ignore E402 kode"
+
+      - name: Verify committed prediction CSVs
+        run: |
+          python - <<'EOF'
+          import csv, math, pathlib
+
+          def check_regresi(path: pathlib.Path) -> None:
+              with path.open(newline="", encoding="utf-8") as fh:
+                  r = csv.reader(fh)
+                  header = next(r)
+                  assert header == ["id_paket", "p50", "p90"], f"Header salah: {header}"
+                  ids = set()
+                  n = 0
+                  for row in r:
+                      n += 1
+                      pid, p50, p90 = row[0], float(row[1]), float(row[2])
+                      assert pid and pid not in ids, f"Duplikat/kosong id_paket: {pid}"
+                      ids.add(pid)
+                      assert math.isfinite(p50) and math.isfinite(p90) and p50 > 0 and p90 >= p50
+                  assert n == 60_000, f"Baris regresi {n} != 60000"
+              print(f"OK {path.name}: {n:,} rows")
+
+          def check_klasifikasi(path: pathlib.Path) -> None:
+              with path.open(newline="", encoding="utf-8") as fh:
+                  r = csv.reader(fh)
+                  header = next(r)
+                  assert header == ["id_transaksi", "prob", "tandai"], f"Header salah: {header}"
+                  ids = set()
+                  n = 0
+                  for row in r:
+                      n += 1
+                      tid, prob, flag = row[0], float(row[1]), int(row[2])
+                      assert tid and tid not in ids, f"Duplikat/kosong id_transaksi: {tid}"
+                      ids.add(tid)
+                      assert math.isfinite(prob) and 0.0 <= prob <= 1.0
+                      assert flag in (0, 1)
+                  assert n == 106_674, f"Baris klasifikasi {n} != 106674"
+              print(f"OK {path.name}: {n:,} rows")
+
+          def check_clustering(path: pathlib.Path) -> None:
+              with path.open(newline="", encoding="utf-8") as fh:
+                  r = csv.reader(fh)
+                  header = next(r)
+                  assert header == ["id_pelanggan", "cluster"], f"Header salah: {header}"
+                  ids = set()
+                  clusters = set()
+                  n = 0
+                  for row in r:
+                      n += 1
+                      cid, cl = row[0], int(row[1])
+                      assert cid and cid not in ids, f"Duplikat/kosong id_pelanggan: {cid}"
+                      ids.add(cid)
+                      assert cl >= -1
+                      clusters.add(cl)
+                  assert n == 120_000, f"Baris clustering {n} != 120000"
+                  assert len(clusters - {-1}) >= 2, f"Klaster non-anomali terlalu sedikit: {clusters}"
+              print(f"OK {path.name}: {n:,} rows, clusters={sorted(clusters)}")
+
+          for fname, fn in (
+              ("prediksi_regresi.csv", check_regresi),
+              ("prediksi_klasifikasi.csv", check_klasifikasi),
+              ("cluster.csv", check_clustering),
+          ):
+              p = pathlib.Path(fname)
+              if p.exists():
+                  fn(p)
+              else:
+                  print(f"SKIP {fname} (belum ada di branch ini)")
+          EOF
